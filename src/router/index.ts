@@ -171,6 +171,94 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/Dashboard/Profile/ProfilePage.vue')
       },
       {
+        path: 'setores',
+        name: 'setores',
+        component: () => import('@/pages/Dashboard/Setores/SetoresPage.vue'),
+        children: [
+          {
+            path: '',
+            name: 'setores-table',
+            component: () => import('@/pages/Dashboard/Setores/SetoresTable.vue')
+          },
+          {
+            path: 'novo',
+            name: 'setores-novo',
+            component: () => import('@/pages/Dashboard/Setores/NovoSetor.vue')
+          },
+          {
+            path: 'editar/:id',
+            name: 'setores-editar',
+            component: () => import('@/pages/Dashboard/Setores/EditSetor.vue')
+          }
+        ]
+      },
+      {
+        path: 'funcoes',
+        name: 'funcoes',
+        component: () => import('@/pages/Dashboard/Funcoes/FuncoesPage.vue'),
+        children: [
+          {
+            path: '',
+            name: 'funcoes-table',
+            component: () => import('@/pages/Dashboard/Funcoes/FuncoesTable.vue')
+          },
+          {
+            path: 'novo',
+            name: 'funcoes-novo',
+            component: () => import('@/pages/Dashboard/Funcoes/NovaFuncao.vue')
+          },
+          {
+            path: 'editar/:id',
+            name: 'funcoes-editar',
+            component: () => import('@/pages/Dashboard/Funcoes/EditFuncao.vue')
+          }
+        ]
+      },
+      {
+        path: 'funcionarios',
+        name: 'funcionarios',
+        component: () => import('@/pages/Dashboard/Funcionarios/FuncionariosPage.vue'),
+        children: [
+          {
+            path: '',
+            name: 'funcionarios-table',
+            component: () => import('@/pages/Dashboard/Funcionarios/FuncionariosTable.vue')
+          },
+          {
+            path: 'novo',
+            name: 'funcionarios-novo',
+            component: () => import('@/pages/Dashboard/Funcionarios/NovoFuncionario.vue')
+          },
+          {
+            path: 'editar/:id',
+            name: 'funcionarios-editar',
+            component: () => import('@/pages/Dashboard/Funcionarios/EditFuncionario.vue')
+          }
+        ]
+      },
+      {
+        path: 'agrupamentos',
+        name: 'agrupamentos',
+        component: () => import('@/pages/Dashboard/Agrupamentos/AgrupamentosPage.vue'),
+        children: [
+          {
+            path: '',
+            name: 'agrupamentos-table',
+            component: () => import('@/pages/Dashboard/Agrupamentos/AgrupamentosTable.vue')
+          },
+          {
+            path: 'novo',
+            name: 'agrupamentos-novo',
+            component: () => import('@/pages/Dashboard/Agrupamentos/NovoAgrupamento.vue')
+          },
+          {
+            path: 'editar/:id',
+            name: 'agrupamentos-editar',
+            component: () => import('@/pages/Dashboard/Agrupamentos/EditAgrupamento.vue')
+          }
+        ]
+      },
+      {
         path: 'error',
         name: 'dashboard-error',
         component: () => import('@/pages/Dashboard/DashboardErrorPage.vue')

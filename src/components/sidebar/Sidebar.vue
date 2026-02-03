@@ -62,6 +62,30 @@ const menuItems: IMenuItem[] = [
     roles: ['administrador', 'cliente', 'empresa']
   },
   {
+    title: 'Setores',
+    icon: 'folder',
+    path: '/dashboard/setores',
+    roles: ['administrador', 'empresa']
+  },
+  {
+    title: 'Funções',
+    icon: 'document',
+    path: '/dashboard/funcoes',
+    roles: ['administrador', 'empresa']
+  },
+  {
+    title: 'Funcionários',
+    icon: 'person',
+    path: '/dashboard/funcionarios',
+    roles: ['administrador', 'empresa']
+  },
+  {
+    title: 'Agrupamentos',
+    icon: 'folder',
+    path: '/dashboard/agrupamentos',
+    roles: ['administrador', 'empresa']
+  },
+  {
     title: 'Perfil',
     icon: 'profile',
     path: '/dashboard/perfil',
