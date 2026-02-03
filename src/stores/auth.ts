@@ -109,6 +109,11 @@ export const useAuthStore = defineStore('auth', () => {
       userRole.value = user.type
       setUserData(user)
       
+      Cookies.set('ana_lucia.token', loginData.access_token, { 
+        expires: 1/24, // 1 hora
+        path: '/' 
+      })
+      
       handleFetching(false)
       router.push('/dashboard/home')
     } catch (err) {

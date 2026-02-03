@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import Sidebar from '@/components/sidebar/Sidebar.vue'
@@ -8,15 +8,23 @@ import MobileHeader from '@/components/mobileHeader/MobileHeader.vue'
 const authStore = useAuthStore()
 const router = useRouter()
 
-onMounted(() => {
-  if (authStore.me.id === '') {
+const isReady = ref(false)
+
+onMounted(async () => {
+  // Tenta restaurar a sessão do usuário
+  const isAuthenticated = await authStore.checkAuth()
+  
+  if (!isAuthenticated) {
     router.push('/')
+    return
   }
+  
+  isReady.value = true
 })
 </script>
 
 <template>
-  <main class="main">
+  <main v-if="isReady" class="main">
     <div class="aside_container">
       <Sidebar />
     </div>
@@ -25,9 +33,22 @@ onMounted(() => {
       <RouterView />
     </div>
   </main>
+  <div v-else class="loading">
+    <span>Carregando...</span>
+  </div>
 </template>
 
 <style lang="scss" scoped>
+.loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-blue-700);
+  color: white;
+  font-size: 1.2rem;
+}
+
 .main {
   height: 100%;
   min-height: 100vh;
