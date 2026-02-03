@@ -1,0 +1,245 @@
+*,
+html {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+$color-orange-100: #CFC6BC;
+$color-green-200: #5C7866;
+$color-orange-500: #CE6E40;
+
+:root {
+  --color-white-100: #ffffff;
+  --color-white-300: #F8F8F8;
+
+  --color-black-900: #000000;
+
+  --color-orange-100: #CFC6BC;
+
+  --color-orange-500: #CE6E40;
+  --color-orange-600: #C7633B;
+
+  --color-red-500: #D64646;
+
+  --color-green-200: #A7BFB0;
+  --color-green-400: #5C7866;
+
+  --color-blue-600: #263E48;
+  --color-blue-700: #1E3F49;
+
+  --color-gray-500: #707070;
+}
+
+@mixin background-opacity($color, $opacity: 0.3) {
+  background: $color;
+  background: rgba($color, $opacity);
+}
+
+@media (max-width: 1800px) {
+  html {
+    font-size: 75%;
+  }
+}
+
+@media (max-width: 1300px) {
+  html {
+    font-size: 60%;
+  }
+}
+
+.vue-router-link {
+  list-style: none;
+  text-decoration: none;
+}
+
+body,
+input,
+textarea,
+select,
+button {
+  font: 400 1rem 'Inter', sans-serif;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.mb-30 {
+  margin-bottom: 30px;
+}
+
+.mb-14 {
+  margin-bottom: 14px;
+}
+
+.mb-25 {
+  margin-bottom: 25px;
+}
+
+.last_item {
+  position: absolute;
+  bottom: 100px;
+
+  @media (max-height: 1000px) {
+    position: initial;
+    bottom: 0;
+  }
+}
+
+.dashboard_padding {
+  padding-top: 58px;
+  padding-left: 113px;
+  padding-right: 113px;
+  padding-bottom: 90px;
+  overflow: auto;
+
+  @media (max-width: 1250px) {
+    padding-top: 58px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 90px;
+    overflow: auto;
+  }
+
+  @media (max-width: 420px) {
+    padding-top: 20px;
+    padding-left: 13px;
+    padding-right: 13px;
+    padding-bottom: 90px;
+    overflow: auto;
+  }
+}
+
+.dashboard_title {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  color: var(--color-blue-700);
+}
+
+.table_style {
+  width: 100%;
+  @include background-opacity($color-orange-100, 0.1);
+  border-spacing: 38px 1px;
+  border-collapse: collapse;
+  min-width: 600px;
+
+  thead {
+    border-bottom: 1px solid white;
+
+    tr {
+      text-align: left;
+
+      th {
+        padding-top: 22px;
+        padding-bottom: 17px;
+        font-style: normal;
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--color-blue-700);
+      }
+
+      th:first-of-type {
+        padding-left: 38px;
+      }
+
+      th:last-of-type {
+        padding-right: 38px;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      text-align: left;
+      border-bottom: 1px solid white;
+
+      td {
+        padding-top: 15px;
+        padding-bottom: 15px;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 1rem;
+        color: var(--color-blue-700);
+      }
+
+      td:first-of-type {
+        padding-left: 38px;
+      }
+
+      td:last-of-type {
+        padding-right: 38px;
+      }
+    }
+  }
+}
+
+.custom-select__control {
+  display: none;
+  border: 1px solid var(--color-gray-500) !important;
+  border-radius: 0 !important;
+  height: 3.188rem;
+  width: 100%;
+  box-shadow: none !important;
+  background-color: white;
+}
+
+.custom-select__indicators {
+  border: none !important;
+}
+
+.custom-select__indicator-separator {
+  display: none !important;
+}
+
+.custom-select__input-container {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.custom-select__value-container {
+  padding-left: 15px !important;
+}
+
+.custom-select__placeholder {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 0.875rem;
+  color: var(--color-gray-500);
+}
+
+.custom-select__single-value {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 0.875rem;
+  color: var(--color-blue-700);
+}
+
+.custom-select__menu {
+  border-radius: 0 !important;
+  margin-top: 0 !important;
+}
+
+.custom-select__option {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 0.875rem;
+  color: var(--color-blue-700);
+}
+
+.custom-select__option--is-focused {
+  background-color: var(--color-orange-100) !important;
+}
+
+.custom-select__option--is-selected {
+  background-color: var(--color-orange-500) !important;
+  color: white !important;
+}
