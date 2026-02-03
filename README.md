@@ -16,6 +16,12 @@ Sistema web para gerenciamento de arquivos, contratos e clientes desenvolvido em
 - Empresas (CRUD completo)
 - Clientes (CRUD + visualização detalhada)
 
+### 🏢 Gestão Organizacional
+- **Setores** - Cadastro e gerenciamento de setores por empresa
+- **Funções** - Cadastro e gerenciamento de funções/cargos
+- **Funcionários** - Cadastro com vinculação a setores e funções
+- **Agrupamentos** - Grupos de funcionários (individual ou por setor)
+
 ### 📄 Gestão de Documentos
 - Upload de contratos (PDF)
 - Upload de arquivos diversos
@@ -108,21 +114,29 @@ src/
 ├── pages/            # Páginas da aplicação
 │   ├── Dashboard/
 │   │   ├── Administradores/
+│   │   ├── Agrupamentos/
 │   │   ├── Arquivos/
 │   │   ├── Clientes/
 │   │   ├── Contratos/
 │   │   ├── Empresas/
-│   │   └── Home/
+│   │   ├── Funcionarios/
+│   │   ├── Funcoes/
+│   │   ├── Home/
+│   │   └── Setores/
 │   ├── Login/
 │   └── ForgotPassword/
 ├── router/           # Configuração de rotas
 ├── services/         # Services HTTP (API)
 │   └── http/
 │       ├── administradores/
+│       ├── agrupamentos/
 │       ├── arquivos/
 │       ├── clientes/
 │       ├── contratos/
-│       └── empresas/
+│       ├── empresas/
+│       ├── funcionarios/
+│       ├── funcoes/
+│       └── setores/
 ├── stores/           # Pinia stores
 ├── styles/           # Estilos globais SCSS
 ├── types/            # Tipos TypeScript
@@ -161,6 +175,14 @@ O sistema consome uma API REST Laravel. Endpoints principais:
 | GET | `/arquivo` | Listar arquivos |
 | POST | `/arquivo` | Upload de arquivo |
 | GET | `/cliente` | Listar clientes |
+| GET | `/setor` | Listar setores |
+| POST | `/setor` | Criar setor |
+| GET | `/funcao` | Listar funções |
+| POST | `/funcao` | Criar função |
+| GET | `/funcionario` | Listar funcionários |
+| POST | `/funcionario` | Criar funcionário |
+| GET | `/agrupamento` | Listar agrupamentos |
+| POST | `/agrupamento` | Criar agrupamento |
 
 ---
 
