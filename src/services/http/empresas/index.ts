@@ -82,3 +82,10 @@ export async function deleteEmpresa(id: string): Promise<AxiosResponse<any, Axio
   const res = await api.delete(`/user/${id}`)
   return res
 }
+
+export async function getAllEmpresas(): Promise<AxiosResponse<{ data: { id: string; nome: string }[] }, AxiosError>> {
+  const res = await api.get('/empresas', {
+    params: { limit: 100 }
+  })
+  return res
+}
