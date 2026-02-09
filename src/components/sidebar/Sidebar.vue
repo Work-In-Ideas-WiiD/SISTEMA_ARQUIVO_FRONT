@@ -36,12 +36,12 @@ const menuItems: IMenuItem[] = [
     path: '/dashboard/empresas',
     roles: ['administrador']
   },
-  {
-    title: 'Contratos',
-    icon: 'document',
-    path: '/dashboard/contratos',
-    roles: ['administrador', 'cliente', 'empresa']
-  },
+  // {
+  //   title: 'Contratos',
+  //   icon: 'document',
+  //   path: '/dashboard/contratos',
+  //   roles: ['administrador', 'cliente', 'empresa']
+  // },
   {
     title: 'Arquivos',
     icon: 'files',
@@ -124,7 +124,6 @@ function shouldShowItem(item: IMenuItem): boolean {
 
 <template>
   <aside class="sidebar">
-    <img class="logo" src="@/assets/imgs/logo_ana.png" alt="logo" />
     <nav>
       <template v-for="item in menuItems" :key="item.path">
         <SidebarItem
@@ -149,11 +148,6 @@ function shouldShowItem(item: IMenuItem): boolean {
   position: fixed;
   overflow-y: auto;
   overflow-x: hidden;
-
-  .logo {
-    display: block;
-    margin: 15px auto;
-  }
 
   nav {
     min-height: 500px;

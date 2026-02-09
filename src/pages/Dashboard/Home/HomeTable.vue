@@ -4,34 +4,13 @@ import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import CustomButton from '@/components/CustomButton/CustomButton.vue'
 import TableEmptyMessage from '@/components/TableEmptyMessage/TableEmptyMessage.vue'
-import { getHomeContratos } from '@/services/http/home'
-
-interface IAssinante {
-  tipo: 'empresa' | 'cliente'
-  has_signed: boolean
-  dados: {
-    nome: string
-    email: string
-    documento: string
-    contato: string
-  }
-}
-
-interface IHomeContrato {
-  id: string
-  descricao: string
-  path: string
-  status: string
-  created_at: string
-  updated_at: string
-  url: string
-  assinantes: IAssinante[]
-}
+import { getClientes, type IGetClientesDataRes } from '@/services/http/clientes'
+import { formatCnpjCpf } from '@/utils/formatCpfCnpj'
 
 const router = useRouter()
 const toast = useToast()
 
-const contracts = ref<IHomeContrato[]>([])
+const clients = ref<IGetClientesDataRes[]>([])
 const noContent = ref(false)
 
 onMounted(() => {
@@ -40,74 +19,50 @@ onMounted(() => {
 
 async function getData() {
   try {
-    const { data } = await getHomeContratos()
-    contracts.value = data
-    noContent.value = data.length === 0
+    const { data } = await getClientes(1)
+    clients.value = data.data
+    noContent.value = data.data.length === 0
   } catch (error) {
     console.error(error)
     toast.error('Ocorreu um erro ao obter dados.')
   }
 }
 
-function checkSignature(item: IHomeContrato, param: 'cliente' | 'empresa'): string {
-  if (item.assinantes.length === 0) {
-    return 'Pendente'
-  }
-  const assinante = item.assinantes.find(a => a.tipo === param && a.has_signed)
-  return assinante ? 'Assinado' : 'Pendente'
-}
-
-function checkName(item: IHomeContrato, param: 'cliente' | 'empresa'): string {
-  if (item.assinantes.length === 0) {
-    return 'n/a'
-  }
-  const assinante = item.assinantes.find(a => a.tipo === param)
-  return assinante?.dados.nome || 'n/a'
-}
-
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('pt-BR')
+function getDocumentId(item: IGetClientesDataRes): string {
+  if (item.cnpj) return formatCnpjCpf(item.cnpj)
+  if (item.cpf) return formatCnpjCpf(item.cpf)
+  return 'n/a'
 }
 
 function navigateTo() {
-  router.push('/dashboard/contratos')
+  router.push('/dashboard/clientes')
 }
 </script>
 
 <template>
   <section class="table_section">
     <div class="table_header">
-      <label class="table_title">CONTRATOS</label>
+      <label class="table_title">CLIENTES</label>
       <CustomButton title="VER TUDO" @click="navigateTo" />
     </div>
     <div class="table_wrapper">
       <table class="table_style">
         <thead>
           <tr>
-            <th>Nome do contrato</th>
+            <th>Nome</th>
             <th>Nome da empresa</th>
-            <th>Nome do cliente</th>
-            <th>Status - Empresa</th>
-            <th>Status - Cliente</th>
-            <th>Data do envio</th>
+            <th>CPF/CNPJ</th>
+            <th>E-mail</th>
+            <th>Celular</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in contracts" :key="item.id">
-            <td>{{ item.descricao }}</td>
-            <td>{{ checkName(item, 'empresa') }}</td>
-            <td>{{ checkName(item, 'cliente') }}</td>
-            <td>
-              <span :class="['status_badge', checkSignature(item, 'empresa').toLowerCase()]">
-                {{ checkSignature(item, 'empresa') }}
-              </span>
-            </td>
-            <td>
-              <span :class="['status_badge', checkSignature(item, 'cliente').toLowerCase()]">
-                {{ checkSignature(item, 'cliente') }}
-              </span>
-            </td>
-            <td>{{ formatDate(item.updated_at) }}</td>
+          <tr v-for="item in clients" :key="item.id">
+            <td>{{ item.nome }}</td>
+            <td>{{ item.nome_empresa || 'n/a' }}</td>
+            <td>{{ getDocumentId(item) }}</td>
+            <td>{{ item.email || 'n/a' }}</td>
+            <td>{{ item.contato || 'n/a' }}</td>
           </tr>
         </tbody>
       </table>
@@ -143,24 +98,6 @@ function navigateTo() {
 
   .table_wrapper {
     overflow-x: auto;
-  }
-
-  .status_badge {
-    padding: 5px 15px;
-    border-radius: 3px;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    font-weight: 600;
-
-    &.pendente {
-      background-color: var(--color-orange-500);
-      color: white;
-    }
-
-    &.assinado {
-      background-color: var(--color-green-400);
-      color: white;
-    }
   }
 }
 </style>
