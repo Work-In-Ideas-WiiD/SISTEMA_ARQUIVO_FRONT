@@ -124,6 +124,7 @@ function shouldShowItem(item: IMenuItem): boolean {
 
 <template>
   <aside class="sidebar">
+    <img class="logo" src="@/assets/imgs/logo_sidebar.png" alt="logo" />
     <nav>
       <template v-for="item in menuItems" :key="item.path">
         <SidebarItem
@@ -148,6 +149,12 @@ function shouldShowItem(item: IMenuItem): boolean {
   position: fixed;
   overflow-y: auto;
   overflow-x: hidden;
+
+  .logo {
+    display: block;
+    margin: 20px auto;
+    max-width: 200px;
+  }
 
   nav {
     min-height: 500px;

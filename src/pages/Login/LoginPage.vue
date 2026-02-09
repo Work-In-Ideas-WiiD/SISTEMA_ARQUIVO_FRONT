@@ -18,6 +18,7 @@ async function handleLogin() {
 <template>
   <main class="main">
     <form @submit.prevent="handleLogin">
+      <img class="logo" src="@/assets/imgs/logo_login.png" alt="logo" />
       <div class="inputs_wrapper">
         <IconInput
           v-model="email"
@@ -84,6 +85,12 @@ async function handleLogin() {
       transform: none;
       padding: 2%;
       top: 0;
+    }
+
+    .logo {
+      width: 100%;
+      max-width: 300px;
+      margin-bottom: 30px;
     }
 
     .inputs_wrapper {
