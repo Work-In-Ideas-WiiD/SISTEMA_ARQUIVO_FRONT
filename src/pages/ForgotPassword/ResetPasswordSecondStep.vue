@@ -11,7 +11,8 @@ const toast = useToast()
 const password = ref('')
 const confirmPassword = ref('')
 const loading = ref(false)
-const token = route.params.id as string
+const token = route.query.token as string
+const id = route.params.id as string
 
 async function handleSubmit() {
   if (password.value !== confirmPassword.value) {
@@ -21,7 +22,7 @@ async function handleSubmit() {
 
   try {
     loading.value = true
-    await postResetPassword(token, password.value, confirmPassword.value)
+    await postResetPassword(token, id, password.value, confirmPassword.value)
     toast.success('Senha alterada com sucesso!')
     router.push('/')
   } catch (error) {
