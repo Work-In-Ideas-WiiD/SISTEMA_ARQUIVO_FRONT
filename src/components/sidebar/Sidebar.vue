@@ -36,6 +36,12 @@ const menuItems: IMenuItem[] = [
     path: '/dashboard/empresas',
     roles: ['administrador']
   },
+  {
+    title: 'Planos',
+    icon: 'document',
+    path: '/dashboard/planos',
+    roles: ['administrador']
+  },
   // {
   //   title: 'Contratos',
   //   icon: 'document',

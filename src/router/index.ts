@@ -13,6 +13,16 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/Login/LoginCustomer.vue')
   },
   {
+    path: '/cadastro',
+    name: 'cadastro',
+    component: () => import('@/pages/Cadastro/CadastroPage.vue')
+  },
+  {
+    path: '/contratar',
+    name: 'contratar',
+    component: () => import('@/pages/Contratar/ContratarPage.vue')
+  },
+  {
     path: '/assinar/:id',
     name: 'assinatura',
     component: () => import('@/pages/Assinatura/AssinaturaPage.vue')
@@ -255,6 +265,33 @@ const routes: RouteRecordRaw[] = [
             path: 'editar/:id',
             name: 'agrupamentos-editar',
             component: () => import('@/pages/Dashboard/Agrupamentos/EditAgrupamento.vue')
+          }
+        ]
+      },
+      {
+        path: 'planos',
+        name: 'planos',
+        component: () => import('@/pages/Dashboard/Planos/PlanosPage.vue'),
+        children: [
+          {
+            path: '',
+            name: 'planos-table',
+            component: () => import('@/pages/Dashboard/Planos/PlanosTable.vue')
+          },
+          {
+            path: 'novo',
+            name: 'planos-novo',
+            component: () => import('@/pages/Dashboard/Planos/NovoPlano.vue')
+          },
+          {
+            path: 'editar/:id',
+            name: 'planos-editar',
+            component: () => import('@/pages/Dashboard/Planos/EditPlano.vue')
+          },
+          {
+            path: 'visualizar/:id',
+            name: 'planos-visualizar',
+            component: () => import('@/pages/Dashboard/Planos/VisualizarPlano.vue')
           }
         ]
       },

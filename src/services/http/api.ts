@@ -16,6 +16,15 @@ api.interceptors.response.use(
       Cookies.remove('ana_lucia.token')
     }
 
+    // Assinatura inativa/pendente (gate do backend) -> leva ao modo de pagamento.
+    if (
+      error.response?.status === 402 &&
+      typeof window !== 'undefined' &&
+      !window.location.pathname.startsWith('/contratar')
+    ) {
+      window.location.assign('/contratar')
+    }
+
     return Promise.reject(error)
   }
 )
