@@ -6,6 +6,7 @@ import { useToast } from 'vue-toastification'
 import { api, setAuthToken } from '@/services/http/api'
 import type { IUserProps, TUserTypes } from '@/types/auth'
 import type { IPostContratoRes } from '@/types/contratos'
+import { postRegistro, type IRegistroModel } from '@/services/http/conta'
 
 const defaultUser: IUserProps = {
   id: '',
@@ -87,7 +88,12 @@ export const useAuthStore = defineStore('auth', () => {
       })
       
       handleFetching(false)
-      router.push('/dashboard/home')
+      // Assinatura pendente/vencida -> modo pagamento (não entra no sistema).
+      if (loginData.requires_payment) {
+        router.push('/contratar')
+      } else {
+        router.push('/dashboard/home')
+      }
     } catch (err) {
       console.error(err)
       handleFetching(false)
@@ -115,11 +121,45 @@ export const useAuthStore = defineStore('auth', () => {
       })
       
       handleFetching(false)
-      router.push('/dashboard/home')
+      if (loginData.requires_payment) {
+        router.push('/contratar')
+      } else {
+        router.push('/dashboard/home')
+      }
     } catch (err) {
       console.error(err)
       handleFetching(false)
       toast.error('E-mail ou senha inválidos.')
+    }
+  }
+
+  async function signUp(payload: IRegistroModel) {
+    try {
+      handleFetching(true)
+      const { data } = await postRegistro(payload)
+      setAuthToken(data.access_token)
+      Cookies.set('ana_lucia.token', data.access_token, {
+        expires: 1 / 24,
+        path: '/'
+      })
+
+      try {
+        const { data: user } = await api.post('/auth/me')
+        userRole.value = user.type
+        setUserData(user)
+      } catch (e) {
+        console.error(e)
+      }
+
+      handleFetching(false)
+      // Conta recém-criada não tem assinatura ativa -> vai para a contratação.
+      router.push('/contratar')
+    } catch (err: any) {
+      handleFetching(false)
+      const errors = err?.response?.data?.errors
+      const firstMsg = errors ? (Object.values(errors)[0] as string[])?.[0] : undefined
+      toast.error(firstMsg || 'Erro ao cadastrar. Verifique os dados.')
+      throw err
     }
   }
 
@@ -157,6 +197,7 @@ export const useAuthStore = defineStore('auth', () => {
     handleFetching,
     signIn,
     signInCustomer,
+    signUp,
     signOut,
     refreshUserData,
     checkAuth,

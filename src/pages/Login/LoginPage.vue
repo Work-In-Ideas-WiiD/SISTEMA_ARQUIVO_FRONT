@@ -51,6 +51,10 @@ async function handleLogin() {
       <RouterLink class="vue-router-link first_access" to="/primeiroacesso">
         É seu primeiro acesso? <span>Cadastrar senha.</span>
       </RouterLink>
+
+      <RouterLink class="vue-router-link sign_up" to="/cadastro">
+        Não tem conta? <span>Cadastre-se.</span>
+      </RouterLink>
     </form>
   </main>
 </template>
@@ -114,6 +118,20 @@ async function handleLogin() {
     .first_access {
       font-size: 0.875rem;
       margin-top: 55px;
+      color: var(--color-white-100);
+
+      span {
+        color: var(--color-orange-600);
+      }
+
+      @media (max-width: 480px) {
+        font-size: 1.25rem;
+      }
+    }
+
+    .sign_up {
+      font-size: 0.875rem;
+      margin-top: 15px;
       color: var(--color-white-100);
 
       span {
