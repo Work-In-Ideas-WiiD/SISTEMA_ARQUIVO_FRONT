@@ -4,6 +4,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import CustomButton from '@/components/CustomButton/CustomButton.vue'
 import { getPlano, patchPlano } from '@/services/http/planos'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const router = useRouter()
 const route = useRoute()
@@ -34,7 +35,7 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error(error)
-    toast.error('Erro ao carregar plano')
+    toast.error(getApiErrorMessage(error, 'Erro ao carregar plano'))
     router.push('/dashboard/planos')
   } finally {
     fetching.value = false
@@ -80,7 +81,7 @@ async function handleSubmit() {
     router.push('/dashboard/planos')
   } catch (error) {
     console.error(error)
-    toast.error('Erro ao atualizar plano')
+    toast.error(getApiErrorMessage(error, 'Erro ao atualizar plano'))
   } finally {
     loading.value = false
   }
@@ -95,7 +96,9 @@ function goBack() {
   <section class="form_section">
     <h2 class="title dashboard_title">EDITAR PLANO</h2>
 
-    <form v-if="!fetching" class="form_container" @submit.prevent="handleSubmit">
+    <p v-if="fetching" class="loading_msg">Carregando...</p>
+
+    <form v-else class="form_container" @submit.prevent="handleSubmit">
       <div class="form_group">
         <label for="nome">Nome *</label>
         <input id="nome" v-model="form.nome" type="text" placeholder="Nome do plano" required />
@@ -144,6 +147,10 @@ function goBack() {
 
   .title {
     margin-bottom: 42px;
+  }
+
+  .loading_msg {
+    color: var(--color-gray-500, #707070);
   }
 
   .form_container {

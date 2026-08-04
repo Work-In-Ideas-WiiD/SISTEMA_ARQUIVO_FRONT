@@ -158,7 +158,7 @@ export const useAuthStore = defineStore('auth', () => {
       handleFetching(false)
       const errors = err?.response?.data?.errors
       const firstMsg = errors ? (Object.values(errors)[0] as string[])?.[0] : undefined
-      toast.error(firstMsg || 'Erro ao cadastrar. Verifique os dados.')
+      toast.error(firstMsg || err?.response?.data?.message || 'Erro ao cadastrar. Verifique os dados.')
       throw err
     }
   }

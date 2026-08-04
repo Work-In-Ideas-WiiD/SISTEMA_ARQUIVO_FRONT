@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import CustomButton from '@/components/CustomButton/CustomButton.vue'
 import { postPlano } from '@/services/http/planos'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const router = useRouter()
 const toast = useToast()
@@ -54,7 +55,7 @@ async function handleSubmit() {
     router.push('/dashboard/planos')
   } catch (error) {
     console.error(error)
-    toast.error('Erro ao criar plano')
+    toast.error(getApiErrorMessage(error, 'Erro ao criar plano'))
   } finally {
     loading.value = false
   }

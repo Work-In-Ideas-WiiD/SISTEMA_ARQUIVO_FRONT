@@ -7,6 +7,7 @@ import CustomButton from '@/components/CustomButton/CustomButton.vue'
 import TableEmptyMessage from '@/components/TableEmptyMessage/TableEmptyMessage.vue'
 import TablePaginator from '@/components/TablePaginator/TablePaginator.vue'
 import { getPlanos, deletePlano, patchPlanoStatus, type IPlano } from '@/services/http/planos'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const router = useRouter()
 const toast = useToast()
@@ -29,7 +30,7 @@ async function getData(pageParam: number, likeParam: string = '') {
     noContent.value = data.data.length === 0
   } catch (error) {
     console.error(error)
-    toast.error('Erro ao carregar planos')
+    toast.error(getApiErrorMessage(error, 'Erro ao carregar planos'))
   } finally {
     fetching.value = false
   }
@@ -72,18 +73,20 @@ async function toggleStatus(item: IPlano) {
     getData(page.value, search.value)
   } catch (error) {
     console.error(error)
-    toast.error('Erro ao alterar status do plano')
+    toast.error(getApiErrorMessage(error, 'Erro ao alterar status do plano'))
   }
 }
 
 async function handleDelete(id: string) {
+  if (!confirm('Tem certeza que deseja excluir este plano?')) return
+
   try {
     await deletePlano(id)
     toast.success('Plano excluído com sucesso')
     getData(page.value, search.value)
   } catch (error) {
     console.error(error)
-    toast.error('Erro ao excluir plano')
+    toast.error(getApiErrorMessage(error, 'Erro ao excluir plano'))
   }
 }
 </script>

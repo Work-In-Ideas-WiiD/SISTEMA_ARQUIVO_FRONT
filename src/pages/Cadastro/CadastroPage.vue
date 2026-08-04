@@ -4,6 +4,12 @@ import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
 import CustomButton from '@/components/CustomButton/CustomButton.vue'
+import {
+  maskCpf,
+  maskCnpj,
+  isValidOptionalCpf,
+  isValidOptionalCnpj
+} from '@/utils/formatCpfCnpj'
 
 const router = useRouter()
 const toast = useToast()
@@ -19,9 +25,25 @@ const form = ref({
   password_confirmation: ''
 })
 
+function onCpfInput(event: Event) {
+  form.value.cpf = maskCpf((event.target as HTMLInputElement).value)
+}
+
+function onCnpjInput(event: Event) {
+  form.value.cnpj = maskCnpj((event.target as HTMLInputElement).value)
+}
+
 async function handleSubmit() {
   if (!form.value.nome || !form.value.email || !form.value.nome_empresa) {
     toast.error('Preencha nome, e-mail e nome da empresa.')
+    return
+  }
+  if (!isValidOptionalCpf(form.value.cpf)) {
+    toast.error('CPF inválido. Informe 11 dígitos ou deixe em branco.')
+    return
+  }
+  if (!isValidOptionalCnpj(form.value.cnpj)) {
+    toast.error('CNPJ inválido. Informe 14 dígitos ou deixe em branco.')
     return
   }
   if (form.value.password.length < 8) {
@@ -33,6 +55,9 @@ async function handleSubmit() {
     return
   }
 
+  const cpfDigits = form.value.cpf.replace(/\D/g, '')
+  const cnpjDigits = form.value.cnpj.replace(/\D/g, '')
+
   try {
     await auth.signUp({
       nome: form.value.nome,
@@ -40,8 +65,8 @@ async function handleSubmit() {
       email: form.value.email,
       password: form.value.password,
       password_confirmation: form.value.password_confirmation,
-      cpf: form.value.cpf || undefined,
-      cnpj: form.value.cnpj || undefined
+      cpf: cpfDigits || undefined,
+      cnpj: cnpjDigits || undefined
     })
   } catch (e) {
     // erro já tratado (toast) na store
@@ -70,11 +95,27 @@ async function handleSubmit() {
         </div>
         <div class="form_group">
           <label for="cpf">CPF</label>
-          <input id="cpf" v-model="form.cpf" type="text" placeholder="000.000.000-00" />
+          <input
+            id="cpf"
+            :value="form.cpf"
+            type="text"
+            inputmode="numeric"
+            placeholder="000.000.000-00"
+            maxlength="14"
+            @input="onCpfInput"
+          />
         </div>
         <div class="form_group">
           <label for="cnpj">CNPJ</label>
-          <input id="cnpj" v-model="form.cnpj" type="text" placeholder="00.000.000/0000-00" />
+          <input
+            id="cnpj"
+            :value="form.cnpj"
+            type="text"
+            inputmode="numeric"
+            placeholder="00.000.000/0000-00"
+            maxlength="18"
+            @input="onCnpjInput"
+          />
         </div>
         <div class="form_group">
           <label for="password">Senha *</label>
