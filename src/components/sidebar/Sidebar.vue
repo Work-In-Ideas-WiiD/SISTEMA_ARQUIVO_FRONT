@@ -42,6 +42,12 @@ const menuItems: IMenuItem[] = [
     path: '/dashboard/planos',
     roles: ['administrador']
   },
+  {
+    title: 'Assinaturas SaaS',
+    icon: 'document',
+    path: '/dashboard/assinaturas-saas',
+    roles: ['administrador']
+  },
   // {
   //   title: 'Contratos',
   //   icon: 'document',
@@ -59,7 +65,7 @@ const menuItems: IMenuItem[] = [
     icon: 'pen',
     path: '/dashboard/assinaturas',
     roles: ['administrador', 'cliente', 'empresa'],
-    featureFlag: 'assinaturas' // Controlado por feature flag
+    featureFlag: 'assinaturas' // Clicksign — NÃO misturar com SaaS
   },
   {
     title: 'Clientes',
@@ -107,7 +113,7 @@ const menuItems: IMenuItem[] = [
 ]
 
 function isActive(path: string): boolean {
-  return route.path.includes(path)
+  return route.path === path || route.path.startsWith(path + '/')
 }
 
 function handleClick(item: IMenuItem) {

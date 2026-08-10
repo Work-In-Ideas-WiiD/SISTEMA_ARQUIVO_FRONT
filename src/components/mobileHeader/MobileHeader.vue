@@ -16,6 +16,7 @@ function handleLogout() {
 }
 
 const showAssinaturas = isFeatureEnabled('assinaturas')
+const isAdmin = authStore.userRole === 'administrador'
 </script>
 
 <template>
@@ -30,6 +31,8 @@ const showAssinaturas = isFeatureEnabled('assinaturas')
       <nav>
         <RouterLink to="/dashboard/home" @click="isOpen = false">Home</RouterLink>
         <RouterLink to="/dashboard/empresas" @click="isOpen = false">Empresas</RouterLink>
+        <RouterLink v-if="isAdmin" to="/dashboard/planos" @click="isOpen = false">Planos</RouterLink>
+        <RouterLink v-if="isAdmin" to="/dashboard/assinaturas-saas" @click="isOpen = false">Assinaturas SaaS</RouterLink>
         <RouterLink to="/dashboard/contratos" @click="isOpen = false">Contratos</RouterLink>
         <RouterLink to="/dashboard/arquivos" @click="isOpen = false">Arquivos</RouterLink>
         <RouterLink v-if="showAssinaturas" to="/dashboard/assinaturas" @click="isOpen = false">Assinaturas</RouterLink>
