@@ -20,7 +20,7 @@ export interface IRegistroRes {
 
 // Contratação de um plano (cartão tokenizado). O valor é definido pelo servidor.
 export interface IContratacaoRes {
-  status: 'ativa' | 'negado' | 'erro'
+  status: 'ativa' | 'pendente' | 'negado' | 'erro'
   message: string
   assinatura: {
     id: string

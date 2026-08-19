@@ -296,6 +296,23 @@ const routes: RouteRecordRaw[] = [
         ]
       },
       {
+        path: 'assinaturas-saas',
+        name: 'assinaturas-saas',
+        component: () => import('@/pages/Dashboard/AssinaturasSaas/AssinaturasSaasPage.vue'),
+        children: [
+          {
+            path: '',
+            name: 'assinaturas-saas-table',
+            component: () => import('@/pages/Dashboard/AssinaturasSaas/AssinaturasSaasTable.vue')
+          },
+          {
+            path: ':id',
+            name: 'assinaturas-saas-visualizar',
+            component: () => import('@/pages/Dashboard/AssinaturasSaas/VisualizarAssinaturaSaas.vue')
+          }
+        ]
+      },
+      {
         path: 'error',
         name: 'dashboard-error',
         component: () => import('@/pages/Dashboard/DashboardErrorPage.vue')

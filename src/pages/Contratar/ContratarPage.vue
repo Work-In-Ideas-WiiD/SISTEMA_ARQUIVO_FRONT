@@ -6,6 +6,7 @@ import Cookies from 'js-cookie'
 import CustomButton from '@/components/CustomButton/CustomButton.vue'
 import { getPlanosPublicos, type IPlanoPublico } from '@/services/http/planos'
 import { getChavePublica, postContratacao } from '@/services/http/conta'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const router = useRouter()
 const toast = useToast()
@@ -126,15 +127,16 @@ async function pagar() {
     if (data.status === 'ativa') {
       sucesso.value = true
       toast.success(data.message || 'Pagamento aprovado! Assinatura ativada.')
+    } else if (data.status === 'pendente') {
+      toast.info(data.message || 'Assinatura criada. Aguardando confirmação do pagamento.')
     } else {
       toast.error(data.message || 'Pagamento não autorizado. Tente outro cartão.')
     }
   } catch (error: any) {
     console.error(error)
-    const msg =
-      error?.response?.data?.message ||
-      'Não foi possível processar o pagamento. Tente novamente.'
-    toast.error(msg)
+    toast.error(
+      getApiErrorMessage(error, 'Não foi possível processar o pagamento. Tente novamente.')
+    )
   } finally {
     processando.value = false
   }
