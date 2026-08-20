@@ -44,7 +44,7 @@ const menuItems: IMenuItem[] = [
   },
   {
     title: 'Assinaturas SaaS',
-    icon: 'document',
+    icon: 'subscription',
     path: '/dashboard/assinaturas-saas',
     roles: ['administrador']
   },
