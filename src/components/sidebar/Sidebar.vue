@@ -38,7 +38,7 @@ const menuItems: IMenuItem[] = [
   },
   {
     title: 'Planos',
-    icon: 'document',
+    icon: 'plans',
     path: '/dashboard/planos',
     roles: ['administrador']
   },
