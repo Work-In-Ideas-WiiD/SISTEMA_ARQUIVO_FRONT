@@ -19,11 +19,42 @@ const toast = useToast()
 const loading = ref(true)
 const acting = ref(false)
 const item = ref<IAssinaturaSaas | null>(null)
+const confirmOpen = ref(false)
+const confirmTipo = ref<'cancelar' | 'suspender' | 'reativar' | null>(null)
 
 const id = route.params.id as string
 
 const historico = computed(() => item.value?.historico_status || [])
 const pagamentos = computed(() => item.value?.pagamentos || [])
+
+const confirmCopy = computed(() => {
+  const tipo = confirmTipo.value
+  if (tipo === 'suspender') {
+    return {
+      title: 'Suspender assinatura',
+      body: 'A cobrança fica pausada no PagBank e o cliente perde o acesso ao sistema até reativar.',
+      confirmLabel: 'SUSPENDER',
+      danger: false
+    }
+  }
+  if (tipo === 'cancelar') {
+    return {
+      title: 'Cancelar assinatura',
+      body: 'A assinatura será cancelada no PagBank. O cliente perde o acesso. Esta ação não pode ser desfeita no gateway.',
+      confirmLabel: 'CANCELAR ASSINATURA',
+      danger: true
+    }
+  }
+  if (tipo === 'reativar') {
+    return {
+      title: 'Reativar assinatura',
+      body: 'A assinatura volta a ficar ativa no PagBank e o acesso do cliente é liberado novamente.',
+      confirmLabel: 'REATIVAR',
+      danger: false
+    }
+  }
+  return { title: '', body: '', confirmLabel: 'CONFIRMAR', danger: false }
+})
 
 onMounted(() => load())
 
@@ -62,14 +93,20 @@ function formatGB(bytes?: number | null) {
   return `${(bytes / 1024 ** 3).toLocaleString('pt-BR', { maximumFractionDigits: 2 })} GB`
 }
 
-async function runAction(tipo: 'cancelar' | 'suspender' | 'reativar') {
-  const labels = {
-    cancelar: 'cancelar esta assinatura? Esta ação não pode ser desfeita no gateway.',
-    suspender: 'suspender esta assinatura?',
-    reativar: 'reativar esta assinatura?'
-  }
+function openConfirm(tipo: 'cancelar' | 'suspender' | 'reativar') {
+  confirmTipo.value = tipo
+  confirmOpen.value = true
+}
 
-  if (!confirm(`Tem certeza que deseja ${labels[tipo]}`)) return
+function closeConfirm() {
+  if (acting.value) return
+  confirmOpen.value = false
+  confirmTipo.value = null
+}
+
+async function confirmAction() {
+  const tipo = confirmTipo.value
+  if (!tipo) return
 
   try {
     acting.value = true
@@ -82,6 +119,8 @@ async function runAction(tipo: 'cancelar' | 'suspender' | 'reativar') {
     const { data } = await fn(id)
     item.value = data
     toast.success('Assinatura atualizada com sucesso')
+    confirmOpen.value = false
+    confirmTipo.value = null
   } catch (error) {
     console.error(error)
     toast.error(getApiErrorMessage(error, 'Erro ao atualizar assinatura'))
@@ -243,7 +282,7 @@ async function runAction(tipo: 'cancelar' | 'suspender' | 'reativar') {
             type="button"
             class="action_btn"
             :disabled="acting || item.status === 'suspensa'"
-            @click="runAction('suspender')"
+            @click="openConfirm('suspender')"
           >
             SUSPENDER
           </button>
@@ -251,7 +290,7 @@ async function runAction(tipo: 'cancelar' | 'suspender' | 'reativar') {
             type="button"
             class="action_btn"
             :disabled="acting || item.status === 'ativa'"
-            @click="runAction('reativar')"
+            @click="openConfirm('reativar')"
           >
             REATIVAR
           </button>
@@ -259,12 +298,33 @@ async function runAction(tipo: 'cancelar' | 'suspender' | 'reativar') {
             type="button"
             class="action_btn danger"
             :disabled="acting || item.status === 'cancelada'"
-            @click="runAction('cancelar')"
+            @click="openConfirm('cancelar')"
           >
             CANCELAR
           </button>
         </div>
       </form>
+    </div>
+
+    <div v-if="confirmOpen" class="confirm_overlay" @click.self="closeConfirm">
+      <div class="confirm_modal" role="dialog" aria-modal="true">
+        <h3>{{ confirmCopy.title }}</h3>
+        <p>{{ confirmCopy.body }}</p>
+        <div class="confirm_actions">
+          <button type="button" class="btn_ghost" :disabled="acting" @click="closeConfirm">
+            Voltar
+          </button>
+          <button
+            type="button"
+            class="action_btn"
+            :class="{ danger: confirmCopy.danger }"
+            :disabled="acting"
+            @click="confirmAction"
+          >
+            {{ acting ? 'Aguarde...' : confirmCopy.confirmLabel }}
+          </button>
+        </div>
+      </div>
     </div>
   </section>
 </template>
@@ -418,6 +478,81 @@ async function runAction(tipo: 'cancelar' | 'suspender' | 'reativar') {
         &.danger {
           background-color: #dc3545;
         }
+      }
+    }
+  }
+
+  .confirm_overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(30, 63, 73, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+  }
+
+  .confirm_modal {
+    width: 100%;
+    max-width: 440px;
+    background: #fff;
+    padding: 28px 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+
+    h3 {
+      margin: 0 0 10px;
+      color: var(--color-blue-700, #1e3f49);
+      font-size: 1.15rem;
+    }
+
+    p {
+      margin: 0 0 24px;
+      color: #555;
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .confirm_actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn_ghost {
+      background: transparent;
+      border: 1px solid var(--color-gray-500, #999);
+      color: var(--color-blue-700, #1e3f49);
+      height: 44px;
+      padding: 0 18px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 600;
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    .action_btn {
+      background-color: var(--color-orange-600, #c7633b);
+      color: #fff;
+      border: none;
+      padding: 0 20px;
+      height: 44px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 600;
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &.danger {
+        background-color: #dc3545;
       }
     }
   }
