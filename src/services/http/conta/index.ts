@@ -53,10 +53,16 @@ export async function getChavePublica(): Promise<AxiosResponse<IChavePublicaRes,
 }
 
 // Envia apenas o cartão já CRIPTOGRAFADO (encrypted) + o plano. O PAN nunca trafega em texto puro.
+// telefone: DDD + número (PagBank exige phones na subscription; opcional se o user já tem contato).
 export async function postContratacao(
   plano_id: string,
-  encrypted: string
+  encrypted: string,
+  telefone?: string
 ): Promise<AxiosResponse<IContratacaoRes, AxiosError>> {
-  const res = await api.post('/contratacao', { plano_id, encrypted })
+  const res = await api.post('/contratacao', {
+    plano_id,
+    encrypted,
+    ...(telefone ? { telefone } : {})
+  })
   return res
 }

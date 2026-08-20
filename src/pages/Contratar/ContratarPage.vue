@@ -26,6 +26,8 @@ const card = ref({
   cvv: ''
 })
 
+const telefone = ref('')
+
 const SDK_URL = 'https://assets.pagseguro.com.br/checkout-sdk-js/rc/dist/browser/pagseguro.min.js'
 
 function carregarSdk(): Promise<void> {
@@ -85,6 +87,14 @@ function voltarParaPlanos() {
   limparCartao()
 }
 
+function telefoneValido(raw: string): boolean {
+  let digits = raw.replace(/\D/g, '')
+  if (digits.startsWith('55') && digits.length > 11) {
+    digits = digits.slice(2)
+  }
+  return digits.length === 10 || digits.length === 11
+}
+
 async function pagar() {
   if (!planoSelecionado.value) return
 
@@ -94,6 +104,9 @@ async function pagar() {
   if (!/^\d{2}$/.test(card.value.expMonth)) return toast.error('Mês de validade inválido (MM).')
   if (!/^\d{4}$/.test(card.value.expYear)) return toast.error('Ano de validade inválido (AAAA).')
   if (card.value.cvv.length < 3) return toast.error('CVV inválido.')
+  if (!telefoneValido(telefone.value)) {
+    return toast.error('Informe um telefone válido com DDD (ex.: 11999998888).')
+  }
 
   try {
     processando.value = true
@@ -119,7 +132,11 @@ async function pagar() {
       return
     }
 
-    const { data } = await postContratacao(planoSelecionado.value.id, encryptResult.encryptedCard)
+    const { data } = await postContratacao(
+      planoSelecionado.value.id,
+      encryptResult.encryptedCard,
+      telefone.value.replace(/\D/g, '')
+    )
 
     // Limpa os dados do cartão do estado assim que possível.
     limparCartao()
@@ -170,6 +187,18 @@ async function pagar() {
       </p>
 
       <form @submit.prevent="pagar">
+        <div class="form_group">
+          <label for="telefone">Telefone (DDD + número) *</label>
+          <input
+            id="telefone"
+            v-model="telefone"
+            type="tel"
+            inputmode="numeric"
+            maxlength="15"
+            placeholder="11999998888"
+            autocomplete="tel"
+          />
+        </div>
         <div class="form_group">
           <label for="holder">Nome impresso no cartão</label>
           <input id="holder" v-model="card.holder" type="text" placeholder="Como está no cartão" autocomplete="cc-name" />
