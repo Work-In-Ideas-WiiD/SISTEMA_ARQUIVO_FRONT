@@ -135,6 +135,7 @@ async function pagar() {
     const { data } = await postContratacao(
       planoSelecionado.value.id,
       encryptResult.encryptedCard,
+      card.value.cvv,
       telefone.value.replace(/\D/g, '')
     )
 
