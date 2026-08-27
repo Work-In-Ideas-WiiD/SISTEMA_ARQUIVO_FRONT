@@ -55,10 +55,17 @@ export async function getContratos(
   return res
 }
 
-export async function postContrato(formData: FormData): Promise<AxiosResponse<any, AxiosError>> {
+export async function postContrato(
+  formData: FormData,
+  onUploadProgress?: (percent: number) => void
+): Promise<AxiosResponse<any, AxiosError>> {
   const res = await api.post('/contrato', formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
+    },
+    onUploadProgress: (event) => {
+      if (!onUploadProgress || !event.total) return
+      onUploadProgress(Math.round((event.loaded * 100) / event.total))
     }
   })
   return res

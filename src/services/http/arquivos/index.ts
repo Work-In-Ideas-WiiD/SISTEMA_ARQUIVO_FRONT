@@ -53,10 +53,17 @@ export async function getArquivos(
   return res
 }
 
-export async function postArquivo(formData: FormData): Promise<AxiosResponse<IGetArquivosDataRes, AxiosError>> {
+export async function postArquivo(
+  formData: FormData,
+  onUploadProgress?: (percent: number) => void
+): Promise<AxiosResponse<IGetArquivosDataRes, AxiosError>> {
   const res = await api.post('/arquivo', formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
+    },
+    onUploadProgress: (event) => {
+      if (!onUploadProgress || !event.total) return
+      onUploadProgress(Math.round((event.loaded * 100) / event.total))
     }
   })
   return res

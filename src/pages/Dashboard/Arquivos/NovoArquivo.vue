@@ -3,17 +3,22 @@ import { ref, onMounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
+import { useUploadProgressStore } from '@/stores/uploadProgress'
+import { usePageFileDrop } from '@/composables/usePageFileDrop'
 import CustomButton from '@/components/CustomButton/CustomButton.vue'
+import UploadDropOverlay from '@/components/UploadDropOverlay/UploadDropOverlay.vue'
 import { postArquivo } from '@/services/http/arquivos'
 import { getAllEmpresas } from '@/services/http/empresas'
 import { postAddEmpresaToArquivo } from '@/services/http/administradores'
 import { getAllSetores, type ISetor } from '@/services/http/setores'
 import { getAllFuncoes, type IFuncao } from '@/services/http/funcoes'
 import { getApiErrorMessage } from '@/utils/apiError'
+import { validateUploadFile } from '@/utils/fileUploadValidation'
 
 const router = useRouter()
 const toast = useToast()
 const authStore = useAuthStore()
+const uploadStore = useUploadProgressStore()
 
 const isAdmin = computed(() => authStore.userRole === 'administrador')
 
@@ -22,11 +27,16 @@ const empresaId = ref('')
 const empresas = ref<{ id: string; nome: string }[]>([])
 const arquivo = ref<File | null>(null)
 const fetching = ref(false)
+const fileInputRef = ref<HTMLInputElement | null>(null)
 
 const setoresDisponiveis = ref<ISetor[]>([])
 const funcoesDisponiveis = ref<IFuncao[]>([])
 const setoresSelecionados = ref<string[]>([])
 const funcoesSelecionadas = ref<string[]>([])
+
+const { isDragging } = usePageFileDrop((file) => {
+  applySelectedFile(file, true)
+})
 
 onMounted(async () => {
   try {
@@ -65,10 +75,24 @@ async function loadSetoresFuncoes(empresa: string) {
   }
 }
 
+function applySelectedFile(file: File, autoUpload: boolean) {
+  const validation = validateUploadFile(file, 'arquivo')
+  if (!validation.ok) {
+    toast.error(validation.message)
+    return
+  }
+
+  arquivo.value = file
+
+  if (autoUpload) {
+    void handleSubmit()
+  }
+}
+
 function onFileChange(event: Event) {
   const target = event.target as HTMLInputElement
   if (target.files && target.files.length > 0) {
-    arquivo.value = target.files[0]
+    applySelectedFile(target.files[0], false)
   }
 }
 
@@ -103,6 +127,14 @@ async function handleSubmit() {
     return
   }
 
+  const validation = validateUploadFile(arquivo.value, 'arquivo')
+  if (!validation.ok) {
+    toast.error(validation.message)
+    return
+  }
+
+  const uploadId = uploadStore.startUpload(arquivo.value.name)
+
   try {
     fetching.value = true
     const formData = new FormData()
@@ -117,19 +149,26 @@ async function handleSubmit() {
       formData.append('funcoes[]', id)
     })
 
-    const { data: arquivoRes } = await postArquivo(formData)
+    const { data: arquivoRes } = await postArquivo(formData, (percent) => {
+      uploadStore.setProgress(uploadId, percent)
+    })
 
     await postAddEmpresaToArquivo([empresaId.value], arquivoRes.id)
 
+    uploadStore.setSuccess(uploadId)
     toast.success('Arquivo cadastrado')
     setTimeout(() => {
       router.push('/dashboard/arquivos')
     }, 1500)
   } catch (error) {
+    uploadStore.setError(uploadId, getApiErrorMessage(error, 'Erro ao cadastrar arquivo'))
     toast.error(getApiErrorMessage(error, 'Erro ao cadastrar arquivo'))
     console.error(error)
   } finally {
     fetching.value = false
+    if (fileInputRef.value) {
+      fileInputRef.value.value = ''
+    }
   }
 }
 
@@ -140,6 +179,8 @@ function goBack() {
 
 <template>
   <section class="new_form">
+    <UploadDropOverlay :visible="isDragging" />
+
     <div class="page_title">
       <button class="back_btn" type="button" @click="goBack">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -219,8 +260,20 @@ function goBack() {
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
               <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" />
             </svg>
-            <span>{{ arquivo ? arquivo.name : 'Upload do arquivo' }}</span>
-            <input type="file" hidden @change="onFileChange" />
+            <span>
+              {{
+                arquivo
+                  ? arquivo.name
+                  : 'Upload do arquivo (ou arraste e solte)'
+              }}
+            </span>
+            <input
+              ref="fileInputRef"
+              type="file"
+              hidden
+              accept=".jpeg,.jpg,.png,.mp4,.mov,.wmv,.mkv,.webm"
+              @change="onFileChange"
+            />
           </label>
         </div>
 

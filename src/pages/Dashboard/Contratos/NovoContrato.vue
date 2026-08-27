@@ -3,18 +3,29 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import CustomButton from '@/components/CustomButton/CustomButton.vue'
+import UploadDropOverlay from '@/components/UploadDropOverlay/UploadDropOverlay.vue'
 import { postContrato } from '@/services/http/contratos'
 import { getEmpresas, type IGetEmpresasDataRes } from '@/services/http/empresas'
 import { postAddEmpresaToContrato } from '@/services/http/administradores'
+import { useUploadProgressStore } from '@/stores/uploadProgress'
+import { usePageFileDrop } from '@/composables/usePageFileDrop'
+import { validateUploadFile } from '@/utils/fileUploadValidation'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const router = useRouter()
 const toast = useToast()
+const uploadStore = useUploadProgressStore()
 
 const nome = ref('')
 const empresaId = ref('')
 const empresas = ref<IGetEmpresasDataRes[]>([])
 const arquivo = ref<File | null>(null)
 const fetching = ref(false)
+const fileInputRef = ref<HTMLInputElement | null>(null)
+
+const { isDragging } = usePageFileDrop((file) => {
+  applySelectedFile(file, true)
+})
 
 onMounted(async () => {
   try {
@@ -25,44 +36,71 @@ onMounted(async () => {
   }
 })
 
+function applySelectedFile(file: File, autoUpload: boolean) {
+  const validation = validateUploadFile(file, 'contrato')
+  if (!validation.ok) {
+    toast.error(validation.message)
+    return
+  }
+
+  arquivo.value = file
+
+  if (autoUpload) {
+    void handleSubmit()
+  }
+}
+
 function onFileChange(event: Event) {
   const target = event.target as HTMLInputElement
   if (target.files && target.files.length > 0) {
-    arquivo.value = target.files[0]
+    applySelectedFile(target.files[0], false)
   }
 }
 
 async function handleSubmit() {
   if (fetching.value) return
-  
+
   if (!nome.value || !arquivo.value) {
     toast.error('Preencha todos os campos e selecione um arquivo')
     return
   }
-  
+
+  const validation = validateUploadFile(arquivo.value, 'contrato')
+  if (!validation.ok) {
+    toast.error(validation.message)
+    return
+  }
+
+  const uploadId = uploadStore.startUpload(arquivo.value.name)
+
   try {
     fetching.value = true
     const formData = new FormData()
     formData.append('descricao', nome.value)
     formData.append('file', arquivo.value)
-    
-    // Primeiro cria o contrato
-    const { data: contratoRes } = await postContrato(formData)
-    
-    // Depois associa a empresa se selecionada
+
+    const { data: contratoRes } = await postContrato(formData, (percent) => {
+      uploadStore.setProgress(uploadId, percent)
+    })
+
     if (empresaId.value) {
       await postAddEmpresaToContrato(empresaId.value, contratoRes.id)
     }
-    
+
+    uploadStore.setSuccess(uploadId)
     toast.success('Contrato cadastrado')
     setTimeout(() => {
       router.push('/dashboard/contratos')
     }, 2000)
   } catch (error) {
-    toast.error('Erro ao cadastrar contrato')
+    uploadStore.setError(uploadId, getApiErrorMessage(error, 'Erro ao cadastrar contrato'))
+    toast.error(getApiErrorMessage(error, 'Erro ao cadastrar contrato'))
     console.error(error)
   } finally {
     fetching.value = false
+    if (fileInputRef.value) {
+      fileInputRef.value.value = ''
+    }
   }
 }
 
@@ -73,15 +111,17 @@ function goBack() {
 
 <template>
   <section class="new_form">
+    <UploadDropOverlay :visible="isDragging" />
+
     <div class="page_title">
-      <button class="back_btn" @click="goBack">
+      <button class="back_btn" type="button" @click="goBack">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
         </svg>
       </button>
       <h2 class="dashboard_title">NOVO CADASTRO</h2>
     </div>
-    
+
     <div class="form_wrapper">
       <form @submit.prevent="handleSubmit">
         <div class="form_group">
@@ -102,13 +142,25 @@ function goBack() {
         <div class="upload_area">
           <label class="upload_label">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
+              <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" />
             </svg>
-            <span>{{ arquivo ? arquivo.name : 'Upload do arquivo' }}</span>
-            <input type="file" @change="onFileChange" accept=".pdf,.doc,.docx" hidden />
+            <span>
+              {{
+                arquivo
+                  ? arquivo.name
+                  : 'Upload do arquivo (ou arraste e solte)'
+              }}
+            </span>
+            <input
+              ref="fileInputRef"
+              type="file"
+              accept=".pdf,.doc,.docx"
+              hidden
+              @change="onFileChange"
+            />
           </label>
         </div>
-        
+
         <div class="btn_container">
           <CustomButton
             title="Adicionar contrato"
@@ -164,7 +216,8 @@ function goBack() {
         color: var(--color-blue-700);
       }
 
-      input, select {
+      input,
+      select {
         height: 51px;
         border: 1px solid var(--color-gray-500);
         padding: 0 15px;
