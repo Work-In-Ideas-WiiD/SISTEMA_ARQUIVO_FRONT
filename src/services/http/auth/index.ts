@@ -21,24 +21,23 @@ export function postLogout() {
   return api.post('/auth/logout')
 }
 
-export function postFirstAccess(email: string, token: string, password: string, passwordConfirmation: string) {
-  return api.post('/auth/first/access', {
-    email,
-    token,
-    password,
-    password_confirmation: passwordConfirmation
-  })
+export function postFirstAccess(email: string) {
+  return api.post('/auth/first-access', { email })
 }
 
 export function postResetPassword(token: string, id: string, password: string, passwordConfirmation: string) {
-  return api.post('/auth/reset/password', {
+  return api.post('/auth/reset/password', { 
     token,
     id,
-    password,
-    password_confirmation: passwordConfirmation
+    password, 
+    password_confirmation: passwordConfirmation 
   })
 }
 
 export function postForgotPassword(email: string, target: string) {
-  return api.post('/auth/reset-password', { email, target })
+  return api.post('/auth/forgot-password', { email, target })
+}
+
+export function postVerifyToken(token: string) {
+  return api.post('/auth/verify-token', { token })
 }
