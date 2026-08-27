@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
+import { useAuthStore } from '@/stores/auth'
 import CustomButton from '@/components/CustomButton/CustomButton.vue'
 import { postArquivo } from '@/services/http/arquivos'
-import { getEmpresas, type IGetEmpresasDataRes } from '@/services/http/empresas'
+import { getAllEmpresas } from '@/services/http/empresas'
 import { postAddEmpresaToArquivo } from '@/services/http/administradores'
 import { getAllSetores, type ISetor } from '@/services/http/setores'
 import { getAllFuncoes, type IFuncao } from '@/services/http/funcoes'
@@ -12,10 +13,13 @@ import { getApiErrorMessage } from '@/utils/apiError'
 
 const router = useRouter()
 const toast = useToast()
+const authStore = useAuthStore()
+
+const isAdmin = computed(() => authStore.userRole === 'administrador')
 
 const nome = ref('')
 const empresaId = ref('')
-const empresas = ref<IGetEmpresasDataRes[]>([])
+const empresas = ref<{ id: string; nome: string }[]>([])
 const arquivo = ref<File | null>(null)
 const fetching = ref(false)
 
@@ -26,21 +30,28 @@ const funcoesSelecionadas = ref<string[]>([])
 
 onMounted(async () => {
   try {
-    const { data } = await getEmpresas(1, '')
-    empresas.value = data.data
-    await loadSetoresFuncoes()
+    if (isAdmin.value) {
+      const { data } = await getAllEmpresas()
+      empresas.value = data.data
+    }
   } catch (error) {
     console.error(error)
+    toast.error('Erro ao carregar empresas')
   }
 })
 
 watch(empresaId, async (id) => {
   setoresSelecionados.value = []
   funcoesSelecionadas.value = []
-  await loadSetoresFuncoes(id || undefined)
+  setoresDisponiveis.value = []
+  funcoesDisponiveis.value = []
+
+  if (id) {
+    await loadSetoresFuncoes(id)
+  }
 })
 
-async function loadSetoresFuncoes(empresa?: string) {
+async function loadSetoresFuncoes(empresa: string) {
   try {
     const [setoresRes, funcoesRes] = await Promise.all([
       getAllSetores(empresa),
@@ -83,7 +94,12 @@ async function handleSubmit() {
   if (fetching.value) return
 
   if (!nome.value || !arquivo.value) {
-    toast.error('Preencha todos os campos e selecione um arquivo')
+    toast.error('Preencha o nome e selecione um arquivo')
+    return
+  }
+
+  if (isAdmin.value && !empresaId.value) {
+    toast.error('Selecione uma empresa')
     return
   }
 
@@ -92,6 +108,7 @@ async function handleSubmit() {
     const formData = new FormData()
     formData.append('descricao', nome.value)
     formData.append('file', arquivo.value)
+    formData.append('empresa_id', empresaId.value)
 
     setoresSelecionados.value.forEach((id) => {
       formData.append('setores[]', id)
@@ -99,15 +116,10 @@ async function handleSubmit() {
     funcoesSelecionadas.value.forEach((id) => {
       formData.append('funcoes[]', id)
     })
-    if (empresaId.value) {
-      formData.append('empresa_id', empresaId.value)
-    }
 
     const { data: arquivoRes } = await postArquivo(formData)
 
-    if (empresaId.value) {
-      await postAddEmpresaToArquivo([empresaId.value], arquivoRes.id)
-    }
+    await postAddEmpresaToArquivo([empresaId.value], arquivoRes.id)
 
     toast.success('Arquivo cadastrado')
     setTimeout(() => {
@@ -145,11 +157,11 @@ function goBack() {
         </div>
 
         <div class="form_group">
-          <label>Empresa</label>
-          <select v-model="empresaId">
-            <option value="">Empresa (opcional)</option>
+          <label for="empresa">Empresa *</label>
+          <select id="empresa" v-model="empresaId" required>
+            <option value="">Selecione uma empresa</option>
             <option v-for="emp in empresas" :key="emp.id" :value="emp.id">
-              {{ emp.nome_empresa || emp.nome }}
+              {{ emp.nome }}
             </option>
           </select>
         </div>
@@ -157,7 +169,10 @@ function goBack() {
         <div class="form_group">
           <label>Setor <span class="optional">(opcional)</span></label>
           <div class="checkbox_list">
-            <div v-if="setoresDisponiveis.length === 0" class="empty_message">
+            <div v-if="!empresaId" class="empty_message">
+              Selecione uma empresa primeiro
+            </div>
+            <div v-else-if="setoresDisponiveis.length === 0" class="empty_message">
               Nenhum setor cadastrado
             </div>
             <label
@@ -178,7 +193,10 @@ function goBack() {
         <div class="form_group">
           <label>Função <span class="optional">(opcional)</span></label>
           <div class="checkbox_list">
-            <div v-if="funcoesDisponiveis.length === 0" class="empty_message">
+            <div v-if="!empresaId" class="empty_message">
+              Selecione uma empresa primeiro
+            </div>
+            <div v-else-if="funcoesDisponiveis.length === 0" class="empty_message">
               Nenhuma função cadastrada
             </div>
             <label
