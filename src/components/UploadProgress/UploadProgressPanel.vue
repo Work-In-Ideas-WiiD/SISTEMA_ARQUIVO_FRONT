@@ -1,14 +1,23 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useUploadProgressStore, type UploadItem } from '@/stores/uploadProgress'
 
 const uploadStore = useUploadProgressStore()
 const { items, hasItems } = storeToRefs(uploadStore)
 
+const gridClass = computed(() => {
+  const count = items.value.length
+  if (count <= 1) return 'upload_progress_panel__scroll--one'
+  if (count === 2) return 'upload_progress_panel__scroll--two'
+  return 'upload_progress_panel__scroll--many'
+})
+
 function statusLabel(item: UploadItem): string {
-  if (item.status === 'uploading') return 'Enviando…'
   if (item.status === 'success') return 'Concluído'
-  return item.errorMessage || 'Erro no envio'
+  if (item.status === 'error') return item.errorMessage || 'Erro no envio'
+  if (item.progress >= 100) return 'Processando…'
+  return 'Enviando…'
 }
 
 function dismiss(id: string) {
@@ -21,9 +30,10 @@ function dismiss(id: string) {
     <aside
       v-if="hasItems"
       class="upload_progress_panel"
+      :class="{ 'upload_progress_panel--compact': items.length === 1 }"
       aria-label="Progresso de uploads"
     >
-      <div class="upload_progress_panel__scroll">
+      <div class="upload_progress_panel__scroll" :class="gridClass">
         <article
           v-for="item in items"
           :key="item.id"
@@ -45,7 +55,13 @@ function dismiss(id: string) {
             </button>
           </div>
 
-          <div class="upload_item__bar" role="progressbar" :aria-valuenow="item.progress" aria-valuemin="0" aria-valuemax="100">
+          <div
+            class="upload_item__bar"
+            role="progressbar"
+            :aria-valuenow="item.progress"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          >
             <div
               class="upload_item__bar_fill"
               :style="{ width: `${item.progress}%` }"
@@ -55,7 +71,7 @@ function dismiss(id: string) {
           <div class="upload_item__footer">
             <span class="upload_item__status">{{ statusLabel(item) }}</span>
             <span v-if="item.status === 'uploading'" class="upload_item__percent">
-              {{ item.progress }}%
+              {{ Math.min(item.progress, 99) }}%
             </span>
           </div>
         </article>
@@ -78,19 +94,34 @@ function dismiss(id: string) {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   overflow: hidden;
 
+  &--compact {
+    width: min(280px, 30vw);
+  }
+
   &__scroll {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
     max-height: 20vh;
     overflow-y: auto;
     padding: 10px;
+
+    &--one {
+      grid-template-columns: 1fr;
+    }
+
+    &--two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    &--many {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 }
 
 .upload_item {
   min-width: 0;
-  padding: 8px;
+  padding: 10px;
   border-radius: 6px;
   background: var(--color-white-300, #f8f8f8);
   border: 1px solid rgba(207, 198, 188, 0.45);
@@ -182,8 +213,12 @@ function dismiss(id: string) {
     width: auto;
     max-width: none;
 
+    &--compact {
+      width: auto;
+    }
+
     &__scroll {
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr !important;
     }
   }
 }

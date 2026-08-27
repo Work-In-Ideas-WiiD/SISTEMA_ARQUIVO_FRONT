@@ -84,9 +84,20 @@ function applySelectedFile(file: File, autoUpload: boolean) {
 
   arquivo.value = file
 
-  if (autoUpload) {
-    void handleSubmit()
+  if (!autoUpload) return
+
+  // Drag-and-drop: anexa o arquivo e só inicia o envio se o formulário estiver completo
+  if (!nome.value.trim()) {
+    toast.error('Arquivo anexado. Preencha o nome para enviar.')
+    return
   }
+
+  if (isAdmin.value && !empresaId.value) {
+    toast.error('Arquivo anexado. Selecione uma empresa para enviar.')
+    return
+  }
+
+  void handleSubmit()
 }
 
 function onFileChange(event: Event) {
@@ -117,8 +128,13 @@ function toggleFuncao(id: string) {
 async function handleSubmit() {
   if (fetching.value) return
 
-  if (!nome.value || !arquivo.value) {
-    toast.error('Preencha o nome e selecione um arquivo')
+  if (!nome.value.trim()) {
+    toast.error('Preencha o nome do arquivo')
+    return
+  }
+
+  if (!arquivo.value) {
+    toast.error('Selecione um arquivo')
     return
   }
 

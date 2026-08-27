@@ -45,9 +45,14 @@ function applySelectedFile(file: File, autoUpload: boolean) {
 
   arquivo.value = file
 
-  if (autoUpload) {
-    void handleSubmit()
+  if (!autoUpload) return
+
+  if (!nome.value.trim()) {
+    toast.error('Arquivo anexado. Preencha o nome para enviar.')
+    return
   }
+
+  void handleSubmit()
 }
 
 function onFileChange(event: Event) {
@@ -60,8 +65,13 @@ function onFileChange(event: Event) {
 async function handleSubmit() {
   if (fetching.value) return
 
-  if (!nome.value || !arquivo.value) {
-    toast.error('Preencha todos os campos e selecione um arquivo')
+  if (!nome.value.trim()) {
+    toast.error('Preencha o nome do contrato')
+    return
+  }
+
+  if (!arquivo.value) {
+    toast.error('Selecione um arquivo')
     return
   }
 

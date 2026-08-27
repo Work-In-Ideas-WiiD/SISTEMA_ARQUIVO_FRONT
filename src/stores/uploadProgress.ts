@@ -40,7 +40,8 @@ export const useUploadProgressStore = defineStore('uploadProgress', () => {
   function setProgress(id: string, progress: number) {
     const item = items.value.find((entry) => entry.id === id)
     if (!item || item.status !== 'uploading') return
-    item.progress = Math.min(100, Math.max(0, Math.round(progress)))
+    // Mantém em no máximo 99% até a API confirmar (evita "100% + Enviando")
+    item.progress = Math.min(99, Math.max(0, Math.round(progress)))
   }
 
   function setSuccess(id: string) {
