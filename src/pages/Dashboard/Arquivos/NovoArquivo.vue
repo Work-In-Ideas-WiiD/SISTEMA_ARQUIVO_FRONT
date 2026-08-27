@@ -99,6 +99,9 @@ async function handleSubmit() {
     funcoesSelecionadas.value.forEach((id) => {
       formData.append('funcoes[]', id)
     })
+    if (empresaId.value) {
+      formData.append('empresa_id', empresaId.value)
+    }
 
     const { data: arquivoRes } = await postArquivo(formData)
 
