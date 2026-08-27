@@ -75,6 +75,16 @@ function getEmpresaCnpj(item: IGetArquivosDataRes): string {
   }
   return 'n/a'
 }
+
+function getSetores(item: IGetArquivosDataRes): string {
+  if (!item.setores || item.setores.length === 0) return '—'
+  return item.setores.map((s) => s.nome).join(', ')
+}
+
+function getFuncoes(item: IGetArquivosDataRes): string {
+  if (!item.funcoes || item.funcoes.length === 0) return '—'
+  return item.funcoes.map((f) => f.nome).join(', ')
+}
 </script>
 
 <template>
@@ -100,6 +110,8 @@ function getEmpresaCnpj(item: IGetArquivosDataRes): string {
             <th>Arquivo</th>
             <th>Empresa</th>
             <th>CNPJ</th>
+            <th>Setor</th>
+            <th>Função</th>
             <th>Ações</th>
           </tr>
         </thead>
@@ -108,6 +120,8 @@ function getEmpresaCnpj(item: IGetArquivosDataRes): string {
             <td>{{ item.descricao }}</td>
             <td>{{ getEmpresaName(item) }}</td>
             <td>{{ getEmpresaCnpj(item) }}</td>
+            <td>{{ getSetores(item) }}</td>
+            <td>{{ getFuncoes(item) }}</td>
             <td>
               <div class="action_btn_container">
                 <button

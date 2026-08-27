@@ -1,6 +1,11 @@
 import type { AxiosResponse, AxiosError } from 'axios'
 import { api } from '../api'
 
+export interface IArquivoVinculo {
+  id: string
+  nome: string
+}
+
 export interface IGetArquivosRes {
   current_page: number
   data: IGetArquivosDataRes[]
@@ -26,6 +31,8 @@ export interface IGetArquivosDataRes {
       updated_at: string
     }
   }[]
+  setores?: IArquivoVinculo[]
+  funcoes?: IArquivoVinculo[]
   path: string
   status: 'pendente' | 'assinado'
   created_at: string
@@ -46,7 +53,7 @@ export async function getArquivos(
   return res
 }
 
-export async function postArquivo(formData: FormData): Promise<AxiosResponse<any, AxiosError>> {
+export async function postArquivo(formData: FormData): Promise<AxiosResponse<IGetArquivosDataRes, AxiosError>> {
   const res = await api.post('/arquivo', formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
