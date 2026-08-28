@@ -1,8 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { postForgotPassword } from '@/services/http/auth'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import iconPerson from '@/assets/imgs/login/icon-person.svg'
+import iconBackCircle from '@/assets/imgs/login/icon-back-circle.svg'
+import iconChevronLeft from '@/assets/imgs/login/icon-chevron-left.svg'
 
 const route = useRoute()
 const toast = useToast()
@@ -10,6 +14,8 @@ const toast = useToast()
 const email = ref('')
 const loading = ref(false)
 const target = route.params.target as string
+
+const loginPath = computed(() => (target === 'cliente' ? '/cliente' : '/'))
 
 async function handleSubmit() {
   try {
@@ -26,59 +32,220 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <form @submit.prevent="handleSubmit">
-    <h2>Recuperar Senha</h2>
-    <p>Informe seu e-mail para recuperar sua senha.</p>
-    <input
-      v-model="email"
-      type="email"
-      placeholder="E-mail"
-      required
-    />
-    <button type="submit" :disabled="loading">
-      {{ loading ? 'Enviando...' : 'Enviar' }}
+  <RouterLink class="back_btn" :to="loginPath" aria-label="Voltar">
+    <img class="back_btn__circle" :src="iconBackCircle" alt="" width="66" height="66" />
+    <img class="back_btn__icon" :src="iconChevronLeft" alt="" width="40" height="40" />
+  </RouterLink>
+
+  <form class="recover_form" @submit.prevent="handleSubmit">
+    <h1 class="recover_form__title">Recuperar a senha</h1>
+    <p class="recover_form__subtitle">Informe seu e-mail para recuperar a senha.</p>
+
+    <label class="recover_field">
+      <span class="recover_field__icon" aria-hidden="true">
+        <img :src="iconPerson" alt="" width="14" height="14" />
+      </span>
+      <input
+        v-model="email"
+        type="email"
+        placeholder="Email"
+        autocomplete="email"
+        required
+      />
+    </label>
+
+    <button type="submit" class="recover_btn" :disabled="loading">
+      <LoadingSpinner v-if="loading" />
+      <span v-else>ENVIAR</span>
     </button>
-    <RouterLink to="/">Voltar para login</RouterLink>
+
+    <RouterLink class="recover_form__back_link" :to="loginPath">
+      Voltar para login.
+    </RouterLink>
   </form>
 </template>
 
 <style lang="scss" scoped>
-form {
-  max-width: 400px;
-  width: 100%;
-  padding: 40px;
+.back_btn {
+  position: absolute;
+  z-index: 3;
+  top: clamp(24px, 17.2vh, 186px);
+  left: clamp(16px, 24vw, 461px);
+  width: 66px;
+  height: 66px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.85;
+  }
+
+  &__circle {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  &__icon {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    transform: rotate(90deg);
+    object-fit: contain;
+    display: block;
+  }
+}
+
+.recover_form {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 358px);
+  max-height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  align-items: center;
+  padding: clamp(12px, 2.2vh, 24px) 16px clamp(16px, 4.4vh, 48px);
 
-  h2, p {
-    color: white;
+  &__title {
+    margin: 0;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: normal;
+    color: #f7f7f7;
     text-align: center;
   }
 
-  input {
-    height: 51px;
-    padding: 0 20px;
-    border: 1px solid var(--color-gray-500);
-    font-size: 1rem;
+  &__subtitle {
+    margin: clamp(12px, 1.6vh, 17px) 0 0;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: normal;
+    color: #f7f7f7;
+    text-align: center;
   }
 
-  button {
-    height: 52px;
-    background-color: white;
-    border: none;
-    color: var(--color-blue-700);
-    font-size: 1rem;
-    cursor: pointer;
+  &__back_link {
+    margin-top: clamp(20px, 3vh, 32px);
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: normal;
+    color: #f7f7f7;
+    text-align: center;
+    text-decoration: none;
 
-    &:disabled {
-      opacity: 0.7;
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+}
+
+.recover_field {
+  width: 100%;
+  margin-top: clamp(20px, 2.8vh, 29px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 49px;
+  padding: 0 22px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.2);
+  cursor: text;
+
+  &__icon {
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
     }
   }
 
-  a {
-    color: var(--color-orange-500);
-    text-align: center;
+  input {
+    flex: 1;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #fff;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 400;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.85);
+    }
+  }
+}
+
+.recover_btn {
+  width: 168px;
+  height: 49px;
+  margin-top: clamp(32px, 5.1vh, 55px);
+  border: none;
+  border-radius: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f7f7f7;
+  color: #212121;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: wait;
+  }
+}
+
+@media (max-height: 820px) {
+  .back_btn {
+    top: clamp(16px, 2.5vh, 48px);
+    left: clamp(16px, 4vw, 48px);
+    width: 56px;
+    height: 56px;
+
+    &__icon {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  .recover_field {
+    height: 44px;
+  }
+
+  .recover_btn {
+    height: 44px;
+    margin-top: clamp(24px, 4vh, 40px);
+  }
+
+  .recover_form__back_link {
+    margin-top: clamp(16px, 2.2vh, 24px);
   }
 }
 </style>
