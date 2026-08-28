@@ -130,6 +130,12 @@ async function handleSubmit() {
     line-height: normal;
     color: #f7f7f7;
     text-align: center;
+    white-space: nowrap;
+
+    @media (max-width: 400px) {
+      white-space: normal;
+      max-width: 260px;
+    }
   }
 
   &__back_link {
