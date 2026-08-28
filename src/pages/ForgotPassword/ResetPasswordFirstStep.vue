@@ -39,7 +39,14 @@ async function handleSubmit() {
 
   <form class="recover_form" @submit.prevent="handleSubmit">
     <h1 class="recover_form__title">Recuperar a senha</h1>
-    <p class="recover_form__subtitle">Informe seu e-mail para recuperar a senha.</p>
+    <p class="recover_form__subtitle">
+      <span class="auth_subtitle-line auth_subtitle-line--desktop">
+        Informe seu e-mail para recuperar a senha.
+      </span>
+      <span class="auth_subtitle-line auth_subtitle-line--mobile">
+        Informe seu e-mail para<br />recuperar a senha.
+      </span>
+    </p>
 
     <label class="recover_field">
       <span class="recover_field__icon" aria-hidden="true">
@@ -66,6 +73,8 @@ async function handleSubmit() {
 </template>
 
 <style lang="scss" scoped>
+@import '@/styles/login-night-mobile.scss';
+
 .back_btn {
   position: absolute;
   z-index: 3;
@@ -78,6 +87,8 @@ async function handleSubmit() {
   justify-content: center;
   text-decoration: none;
   transition: opacity 0.15s ease;
+
+  @include login-mobile-back-btn;
 
   &:hover {
     opacity: 0.85;
@@ -99,6 +110,8 @@ async function handleSubmit() {
     transform: rotate(90deg);
     object-fit: contain;
     display: block;
+
+    @include login-mobile-back-btn-icon;
   }
 }
 
@@ -132,10 +145,7 @@ async function handleSubmit() {
     text-align: center;
     white-space: nowrap;
 
-    @media (max-width: 400px) {
-      white-space: normal;
-      max-width: 260px;
-    }
+    @include auth-subtitle-lines;
   }
 
   &__back_link {
@@ -228,7 +238,7 @@ async function handleSubmit() {
   }
 }
 
-@media (max-height: 820px) {
+@media (max-height: 820px) and (min-width: 769px) {
   .back_btn {
     top: clamp(16px, 2.5vh, 48px);
     left: clamp(16px, 4vw, 48px);
@@ -252,6 +262,40 @@ async function handleSubmit() {
 
   .recover_form__back_link {
     margin-top: clamp(16px, 2.2vh, 24px);
+  }
+}
+
+@media (max-width: 768px) {
+  .recover_form {
+    width: 100%;
+    max-width: 358px;
+    min-height: 100dvh;
+    margin: 0 auto;
+    padding: 69px 18px 40px;
+    box-sizing: border-box;
+    align-items: stretch;
+  }
+
+  .recover_form__subtitle {
+    margin-top: 26px;
+  }
+
+  .recover_form__back_link {
+    display: none;
+  }
+
+  .recover_field {
+    margin-top: 99px;
+    height: 49px;
+  }
+
+  .recover_btn {
+    margin-top: auto;
+    margin-left: auto;
+    margin-right: auto;
+    height: 49px;
+    font-size: 16px;
+    font-weight: 700;
   }
 }
 </style>

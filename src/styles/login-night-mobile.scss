@@ -1,0 +1,128 @@
+$login-mobile-bp: 768px;
+
+@mixin login-mobile-gradient {
+  @media (max-width: $login-mobile-bp) {
+    background: linear-gradient(98deg, #212121 0%, #ff00ff 90%);
+  }
+}
+
+@mixin login-mobile-shell {
+  @media (max-width: $login-mobile-bp) {
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@mixin login-mobile-watermark-hidden {
+  @media (max-width: $login-mobile-bp) {
+    display: none;
+  }
+}
+
+@mixin login-mobile-back-btn {
+  @media (max-width: $login-mobile-bp) {
+    top: 57px;
+    left: 18px;
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@mixin login-mobile-back-btn-icon {
+  @media (max-width: $login-mobile-bp) {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+@mixin auth-subtitle-lines {
+  .auth_subtitle-line--mobile {
+    display: none;
+  }
+
+  @media (max-width: $login-mobile-bp) {
+    white-space: normal;
+
+    .auth_subtitle-line--desktop {
+      display: none;
+    }
+
+    .auth_subtitle-line--mobile {
+      display: block;
+    }
+  }
+}
+
+@mixin login-form-mobile {
+  @media (max-width: $login-mobile-bp) {
+    width: 100%;
+    max-width: 358px;
+    max-height: none;
+    min-height: 100dvh;
+    margin: 0 auto;
+    padding: 90px 18px 40px;
+    box-sizing: border-box;
+
+    .login_form__logo {
+      width: 168px;
+      max-width: none;
+      margin-bottom: 85px;
+    }
+
+    .login_form__fields {
+      gap: 15px;
+    }
+
+    .login_form__links {
+      margin-top: 16px;
+    }
+
+    .login_form__actions {
+      margin-top: 47px;
+    }
+
+    .login_form__first_access {
+      display: block;
+      margin-top: 32px;
+      font-size: 13px;
+    }
+  }
+}
+
+@mixin auth-form-mobile {
+  @media (max-width: $login-mobile-bp) {
+    width: 100%;
+    max-width: 358px;
+    min-height: 100dvh;
+    margin: 0 auto;
+    padding: 69px 18px 40px;
+    box-sizing: border-box;
+    align-items: stretch;
+
+    .auth_form__title {
+      margin-top: 0;
+    }
+
+    .auth_form__subtitle {
+      margin-top: 26px;
+    }
+
+    .auth_form__field {
+      margin-top: 99px;
+    }
+
+    .auth_form__submit {
+      margin-top: auto;
+      margin-left: auto;
+      margin-right: auto;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .auth_form__back_link {
+      display: none;
+    }
+  }
+}

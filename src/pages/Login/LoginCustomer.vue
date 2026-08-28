@@ -92,6 +92,8 @@ async function handleLogin() {
 </template>
 
 <style lang="scss" scoped>
+@import '@/styles/login-night-mobile.scss';
+
 .login_page {
   --login-black: #212121;
   --login-magenta: #ff00ff;
@@ -107,6 +109,9 @@ async function handleLogin() {
   background: linear-gradient(119deg, var(--login-black) 0%, var(--login-magenta) 90%);
   font-family: 'Source Code Pro', monospace;
 
+  @include login-mobile-gradient;
+  @include login-mobile-shell;
+
   &__watermark {
     position: absolute;
     z-index: 0;
@@ -121,6 +126,8 @@ async function handleLogin() {
     pointer-events: none;
     user-select: none;
     white-space: nowrap;
+
+    @include login-mobile-watermark-hidden;
   }
 }
 
@@ -142,6 +149,8 @@ async function handleLogin() {
   flex-direction: column;
   align-items: center;
   padding: clamp(12px, 2.2vh, 24px) 16px clamp(16px, 4.4vh, 48px);
+
+  @include login-form-mobile;
 
   &__logo {
     width: clamp(180px, 22vw, 242px);

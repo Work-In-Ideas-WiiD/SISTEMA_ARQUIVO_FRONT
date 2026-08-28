@@ -10,6 +10,8 @@ import { RouterView } from 'vue-router'
 </template>
 
 <style lang="scss" scoped>
+@import '@/styles/login-night-mobile.scss';
+
 .forgot_password_page {
   --login-black: #212121;
   --login-magenta: #ff00ff;
@@ -23,6 +25,9 @@ import { RouterView } from 'vue-router'
   overflow: hidden;
   background: linear-gradient(119deg, var(--login-black) 0%, var(--login-magenta) 90%);
   font-family: 'Source Code Pro', monospace;
+
+  @include login-mobile-gradient;
+  @include login-mobile-shell;
 
   &__watermark {
     position: absolute;
@@ -38,6 +43,8 @@ import { RouterView } from 'vue-router'
     pointer-events: none;
     user-select: none;
     white-space: nowrap;
+
+    @include login-mobile-watermark-hidden;
   }
 }
 
