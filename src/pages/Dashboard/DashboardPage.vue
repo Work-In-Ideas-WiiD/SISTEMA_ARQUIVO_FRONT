@@ -24,7 +24,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main v-if="isReady" class="main">
+  <main v-if="isReady" class="main dashboard-night">
     <div class="aside_container">
       <Sidebar />
     </div>
@@ -54,6 +54,7 @@ onMounted(async () => {
   min-height: 100vh;
   display: flex;
   flex-direction: row;
+  background-color: #252525;
 
   .aside_container {
     min-height: 100vh;
@@ -63,6 +64,7 @@ onMounted(async () => {
   .outlat_container {
     min-height: 100vh;
     width: calc(100% - 364px);
+    background-color: #252525;
   }
 
   @media (max-width: 900px) {

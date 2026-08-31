@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth'
 import SidebarItem from './SidebarItem.vue'
 import type { TUserTypes } from '@/types/auth'
 import { isFeatureEnabled } from '@/config/features'
+import logoWiidocs from '@/assets/imgs/login/logo-wiidocs-white.png'
 
 interface IMenuItem {
   title: string
@@ -101,16 +102,16 @@ const menuItems: IMenuItem[] = [
     title: 'Perfil',
     icon: 'profile',
     path: '/dashboard/perfil',
-    roles: ['administrador', 'empresa']
-  },
-  {
-    title: 'Sair',
-    icon: 'logout',
-    path: '/logout',
-    classname: 'last_item',
-    roles: ['administrador', 'cliente', 'empresa']
+    roles: ['administrador', 'empresa', 'cliente']
   }
 ]
+
+const logoutItem: IMenuItem = {
+  title: 'Sair',
+  icon: 'logout',
+  path: '/logout',
+  roles: ['administrador', 'cliente', 'empresa']
+}
 
 function isActive(path: string): boolean {
   return route.path === path || route.path.startsWith(path + '/')
@@ -136,8 +137,8 @@ function shouldShowItem(item: IMenuItem): boolean {
 
 <template>
   <aside class="sidebar">
-    <img class="logo" src="@/assets/imgs/logo_sidebar.png" alt="logo" />
-    <nav>
+    <img class="logo" :src="logoWiidocs" alt="WiiDocs" />
+    <nav class="sidebar__nav">
       <template v-for="item in menuItems" :key="item.path">
         <SidebarItem
           v-if="shouldShowItem(item)"
@@ -150,31 +151,52 @@ function shouldShowItem(item: IMenuItem): boolean {
         />
       </template>
     </nav>
+    <div v-if="shouldShowItem(logoutItem)" class="sidebar__footer">
+      <SidebarItem
+        :title="logoutItem.title"
+        :icon="logoutItem.icon"
+        :path="logoutItem.path"
+        @click="handleClick(logoutItem)"
+      />
+    </div>
   </aside>
 </template>
 
 <style lang="scss" scoped>
 .sidebar {
   width: 364px;
-  height: 100%;
-  background-color: var(--color-blue-700);
+  min-height: 100vh;
+  background: linear-gradient(110deg, #212121 27%, #ff00ff 94%);
+  border-radius: 0 50px 50px 0;
   position: fixed;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
+  font-family: 'Source Code Pro', monospace;
+  display: flex;
+  flex-direction: column;
 
   .logo {
     display: block;
-    margin: 20px auto;
-    max-width: 200px;
+    margin: 75px auto 40px;
+    max-width: 191px;
+    width: 100%;
+    height: auto;
+    flex-shrink: 0;
   }
 
-  nav {
-    min-height: 500px;
+  &__nav {
+    flex: 1;
     width: 100%;
-    padding-left: 34px;
+    padding-left: 50px;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    overflow-y: auto;
+  }
+
+  &__footer {
+    flex-shrink: 0;
+    width: 100%;
+    padding: 24px 0 48px 50px;
   }
 
   @media (max-width: 900px) {

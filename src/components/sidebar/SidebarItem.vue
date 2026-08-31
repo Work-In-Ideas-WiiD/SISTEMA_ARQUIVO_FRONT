@@ -79,32 +79,50 @@ function handleClick() {
   display: flex;
   align-items: center;
   gap: 15px;
-  padding: 12px 20px;
+  padding: 12px 20px 12px 0;
   cursor: pointer;
   transition: all 0.2s ease;
-  border-radius: 8px 0 0 8px;
+  border-radius: 0;
   text-decoration: none;
+  position: relative;
 
   .icon-wrapper {
     color: white;
+    opacity: 0.6;
   }
 
   .title {
     color: white;
-    font-size: 1rem;
-    font-weight: 400;
+    font-size: 1.125rem;
+    font-weight: 500;
+    font-family: 'Source Code Pro', monospace;
+    opacity: 0.6;
   }
 
-  &:hover,
   &.active {
-    background-color: var(--color-white-100);
-
-    .icon-wrapper {
-      color: var(--color-blue-700);
+    .icon-wrapper,
+    .title {
+      opacity: 1;
+      font-weight: 700;
     }
 
+    &::before {
+      content: '';
+      position: absolute;
+      left: -50px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 11px;
+      height: 50px;
+      background-color: #ff00ff;
+      border-radius: 0 11px 11px 0;
+    }
+  }
+
+  &:hover:not(.active) {
+    .icon-wrapper,
     .title {
-      color: var(--color-blue-700);
+      opacity: 0.85;
     }
   }
 }

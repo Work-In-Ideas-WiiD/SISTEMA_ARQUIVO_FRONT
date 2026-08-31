@@ -1,0 +1,16 @@
+.dashboard-night {
+  --night-black: #212121;
+  --night-bg: #252525;
+  --night-gray: #f7f7f7;
+  --night-pink: #ff00ff;
+  --night-card: rgba(33, 33, 33, 0.5);
+  --night-font: 'Source Code Pro', monospace;
+
+  font-family: var(--night-font);
+
+  .dashboard_title {
+    color: var(--night-gray);
+    font-family: var(--night-font);
+    opacity: 0.7;
+  }
+}
