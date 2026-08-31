@@ -38,35 +38,10 @@ const menuItems: IMenuItem[] = [
     roles: ['administrador']
   },
   {
-    title: 'Planos',
-    icon: 'plans',
-    path: '/dashboard/planos',
-    roles: ['administrador']
-  },
-  {
-    title: 'Assinaturas SaaS',
-    icon: 'subscription',
-    path: '/dashboard/assinaturas-saas',
-    roles: ['administrador']
-  },
-  // {
-  //   title: 'Contratos',
-  //   icon: 'document',
-  //   path: '/dashboard/contratos',
-  //   roles: ['administrador', 'cliente', 'empresa']
-  // },
-  {
     title: 'Arquivos',
     icon: 'files',
     path: '/dashboard/arquivos',
     roles: ['administrador', 'cliente', 'empresa']
-  },
-  {
-    title: 'Assinaturas',
-    icon: 'pen',
-    path: '/dashboard/assinaturas',
-    roles: ['administrador', 'cliente', 'empresa'],
-    featureFlag: 'assinaturas' // Clicksign — NÃO misturar com SaaS
   },
   {
     title: 'Clientes',
@@ -97,6 +72,25 @@ const menuItems: IMenuItem[] = [
     icon: 'agrupamentos',
     path: '/dashboard/agrupamentos',
     roles: ['administrador', 'empresa']
+  },
+  {
+    title: 'Planos',
+    icon: 'plans',
+    path: '/dashboard/planos',
+    roles: ['administrador']
+  },
+  {
+    title: 'Assinaturas SaaS',
+    icon: 'subscription',
+    path: '/dashboard/assinaturas-saas',
+    roles: ['administrador']
+  },
+  {
+    title: 'Assinaturas',
+    icon: 'pen',
+    path: '/dashboard/assinaturas',
+    roles: ['administrador', 'cliente', 'empresa'],
+    featureFlag: 'assinaturas' // Clicksign — NÃO misturar com SaaS
   },
   {
     title: 'Perfil',
@@ -165,6 +159,8 @@ function shouldShowItem(item: IMenuItem): boolean {
 <style lang="scss" scoped>
 .sidebar {
   --sidebar-nav-pad: 50px;
+  /* item min 50px (barra ativa); gap menor mantém densidade parecida ao Figma */
+  --sidebar-nav-gap: 14px;
   width: 364px;
   height: 100vh;
   min-height: 100vh;
@@ -190,19 +186,32 @@ function shouldShowItem(item: IMenuItem): boolean {
 
   &__nav {
     flex: 1;
+    min-height: 0;
     width: 100%;
-    padding-left: var(--sidebar-nav-pad);
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: var(--sidebar-nav-gap);
+    /* visible: barra 50px do 1º item não é clipada; scroll só se ainda faltar altura */
+    overflow-x: hidden;
     overflow-y: auto;
-    padding-top: 8px;
+    padding: 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.35);
+      border-radius: 4px;
+    }
   }
 
   &__footer {
     flex-shrink: 0;
     width: 100%;
-    padding: 24px 0 56px var(--sidebar-nav-pad);
+    padding: 24px 0 56px;
   }
 
   @media (max-width: 1366px) {
@@ -211,6 +220,7 @@ function shouldShowItem(item: IMenuItem): boolean {
 
   @media (max-width: 1200px) {
     --sidebar-nav-pad: 36px;
+    --sidebar-nav-gap: 12px;
     width: 260px;
 
     .logo {
@@ -218,9 +228,34 @@ function shouldShowItem(item: IMenuItem): boolean {
       width: 150px;
       height: auto;
     }
+  }
 
-    &__nav {
-      gap: 22px;
+  /* Telas baixas: comprime logo/espaços pra caber sem scroll */
+  @media (max-height: 920px) {
+    .logo {
+      margin: 40px auto 20px;
+      width: 150px;
+      height: 100px;
+    }
+
+    --sidebar-nav-gap: 10px;
+
+    &__footer {
+      padding: 16px 0 32px;
+    }
+  }
+
+  @media (max-height: 800px) {
+    .logo {
+      margin: 24px auto 12px;
+      width: 120px;
+      height: 80px;
+    }
+
+    --sidebar-nav-gap: 6px;
+
+    &__footer {
+      padding: 12px 0 20px;
     }
   }
 

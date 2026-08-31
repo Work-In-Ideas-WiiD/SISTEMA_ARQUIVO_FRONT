@@ -10,6 +10,7 @@ import iconFuncoes from '@/assets/imgs/dashboard/icon-menu-funcoes.svg'
 import iconFuncionarios from '@/assets/imgs/dashboard/icon-menu-funcionarios.svg'
 import iconAgrupamentos from '@/assets/imgs/dashboard/icon-menu-agrupamentos.svg'
 import iconEmpresas from '@/assets/imgs/dashboard/icon-menu-empresas.svg'
+import iconAdmins from '@/assets/imgs/dashboard/icon-menu-admins.svg'
 
 defineProps<{
   title: string
@@ -34,9 +35,10 @@ const figmaIcons: Record<string, { src: string; w: number; h: number }> = {
   clientes: { src: iconClientes, w: 20, h: 20 },
   setores: { src: iconSetores, w: 23, h: 22 },
   funcoes: { src: iconFuncoes, w: 16, h: 22 },
-  funcionarios: { src: iconFuncionarios, w: 30, h: 20 },
+  funcionarios: { src: iconFuncionarios, w: 28, h: 19 },
   agrupamentos: { src: iconAgrupamentos, w: 22, h: 20 },
-  building: { src: iconEmpresas, w: 20, h: 23 }
+  building: { src: iconEmpresas, w: 20, h: 23 },
+  admin: { src: iconAdmins, w: 29, h: 23 }
 }
 </script>
 
@@ -103,28 +105,35 @@ const figmaIcons: Record<string, { src: string; w: number; h: number }> = {
   display: flex;
   align-items: center;
   gap: 22px;
-  min-height: 23px;
-  padding: 0;
+  min-height: 50px;
+  width: 100%;
+  padding: 0 0 0 var(--sidebar-nav-pad, 50px);
+  box-sizing: border-box;
   cursor: pointer;
   transition: opacity 0.2s ease;
   text-decoration: none;
   position: relative;
   opacity: 0.6;
   color: #ffffff;
+  flex-shrink: 0;
 
   .icon-wrapper {
     width: 32px;
     min-width: 32px;
-    height: 25px;
+    height: 28px;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     color: #ffffff;
     flex-shrink: 0;
 
-    img {
+    img,
+    svg {
       display: block;
+      max-width: 100%;
+      max-height: 100%;
       object-fit: contain;
+      flex-shrink: 0;
     }
   }
 
@@ -148,7 +157,7 @@ const figmaIcons: Record<string, { src: string; w: number; h: number }> = {
     &::before {
       content: '';
       position: absolute;
-      left: calc(-1 * var(--sidebar-nav-pad, 50px));
+      left: 0;
       top: 50%;
       transform: translateY(-50%);
       width: 11px;
@@ -163,7 +172,7 @@ const figmaIcons: Record<string, { src: string; w: number; h: number }> = {
 
     .icon-wrapper {
       width: 32px;
-      height: 25.25px;
+      height: 28px;
     }
 
     .title {
