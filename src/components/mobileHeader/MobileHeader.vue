@@ -48,7 +48,7 @@ const isAdmin = authStore.userRole === 'administrador'
 .mobile-header {
   display: none;
   padding: 15px;
-  background-color: var(--color-blue-700);
+  background: linear-gradient(110deg, #212121 27%, #ff00ff 94%);
 
   @media (max-width: 900px) {
     display: block;
@@ -66,7 +66,7 @@ const isAdmin = authStore.userRole === 'administrador'
     top: 54px;
     left: 0;
     right: 0;
-    background-color: var(--color-blue-700);
+    background: #212121;
     padding: 20px;
     z-index: 100;
 
@@ -74,6 +74,7 @@ const isAdmin = authStore.userRole === 'administrador'
       display: flex;
       flex-direction: column;
       gap: 15px;
+      font-family: 'Source Code Pro', monospace;
 
       a, button {
         color: white;
@@ -86,7 +87,7 @@ const isAdmin = authStore.userRole === 'administrador'
         cursor: pointer;
 
         &:hover {
-          background-color: rgba(255, 255, 255, 0.1);
+          background-color: rgba(255, 0, 255, 0.15);
           border-radius: 4px;
         }
       }

@@ -27,7 +27,7 @@ async function handleLogin() {
       <div class="login_form__fields">
         <label class="login_field">
           <span class="login_field__icon" aria-hidden="true">
-            <img :src="iconPerson" alt="" width="14" height="14" />
+            <img :src="iconPerson" alt="" width="13.27" height="13.27" />
           </span>
           <input
             v-model="email"
@@ -39,7 +39,7 @@ async function handleLogin() {
 
         <label class="login_field">
           <span class="login_field__icon" aria-hidden="true">
-            <img :src="iconLock" alt="" width="12" height="14" />
+            <img :src="iconLock" alt="" width="11.77" height="13.45" />
           </span>
           <input
             v-model="password"
@@ -220,20 +220,7 @@ async function handleLogin() {
   cursor: text;
 
   &__icon {
-    width: 18px;
-    height: 18px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    overflow: hidden;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-    }
+    @include login-field-icon;
   }
 
   input {
@@ -256,6 +243,7 @@ async function handleLogin() {
 .login_btn {
   width: 168px;
   height: 49px;
+  box-sizing: border-box;
   border-radius: 30px;
   display: inline-flex;
   align-items: center;
@@ -263,7 +251,8 @@ async function handleLogin() {
   font-family: 'Source Code Pro', monospace;
   font-size: 16px;
   font-weight: 800;
-  letter-spacing: 0.02em;
+  line-height: 1;
+  letter-spacing: 0;
   text-decoration: none;
   border: none;
   transition: opacity 0.15s ease;
@@ -278,14 +267,14 @@ async function handleLogin() {
   }
 
   &--primary {
-    background: var(--login-gray);
-    color: var(--login-black);
+    background: #f7f7f7;
+    color: #212121;
   }
 
   &--outline {
     background: transparent;
-    color: var(--login-gray);
-    border: 2px solid var(--login-gray);
+    color: #f7f7f7;
+    border: 2px solid #f7f7f7;
   }
 }
 

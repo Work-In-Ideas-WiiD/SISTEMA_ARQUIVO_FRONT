@@ -1,79 +1,147 @@
 <script setup lang="ts">
-defineProps<{
+import iconBuilding from '@/assets/imgs/dashboard/icon-card-building.svg'
+import iconPerson from '@/assets/imgs/dashboard/icon-card-person.svg'
+import iconDocument from '@/assets/imgs/dashboard/icon-card-document.svg'
+import iconPen from '@/assets/imgs/dashboard/icon-card-pen.svg'
+
+const props = defineProps<{
   icon: 'building' | 'person' | 'document' | 'pen'
   title: string
   value: string
 }>()
+
+const iconSrc: Record<typeof props.icon, string> = {
+  building: iconBuilding,
+  person: iconPerson,
+  document: iconDocument,
+  pen: iconPen
+}
+
+const iconSize: Record<typeof props.icon, { w: number; h: number }> = {
+  building: { w: 20, h: 23 },
+  person: { w: 20.72, h: 20.72 },
+  document: { w: 18, h: 24 },
+  pen: { w: 20.99, h: 21 }
+}
 </script>
 
 <template>
-  <div class="card">
-    <div class="icon_container">
-      <svg v-if="icon === 'building'" width="25" height="25" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/>
-      </svg>
-      <svg v-else-if="icon === 'person'" width="25" height="25" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-      </svg>
-      <svg v-else-if="icon === 'document'" width="25" height="25" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-      </svg>
-      <svg v-else-if="icon === 'pen'" width="25" height="25" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-      </svg>
+  <article class="card">
+    <div class="card__icon" aria-hidden="true">
+      <img
+        :src="iconSrc[icon]"
+        :width="iconSize[icon].w"
+        :height="iconSize[icon].h"
+        alt=""
+      />
     </div>
-    <div class="text_wrapper">
-      <label class="title">{{ title }}</label>
-      <label class="value">{{ value }}</label>
+    <div class="card__content">
+      <p class="card__label">{{ title }}</p>
+      <p class="card__value">{{ value }}</p>
     </div>
-  </div>
+  </article>
 </template>
 
 <style lang="scss" scoped>
 .card {
-  width: 290px;
-  min-width: 250px;
-  padding: 18px 14px 15px 14px;
-  filter: drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.01));
+  width: 100%;
+  min-width: 0;
+  height: 100px;
+  padding: 16px 18px;
   display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: flex-start;
-  gap: 17px;
-  background-color: rgba(207, 198, 188, 0.1);
+  gap: 16px;
+  border-radius: 30px;
+  background: rgba(121, 121, 121, 0.25);
 
-  .icon_container {
-    width: 50px;
-    height: 50px;
-    min-width: 50px;
+  &__icon {
+    width: 67px;
+    height: 67px;
+    min-width: 67px;
     border-radius: 50%;
-    background-color: var(--color-white-100);
     display: flex;
-    justify-content: center;
     align-items: center;
-    color: var(--color-blue-700);
+    justify-content: center;
+    background: rgba(121, 121, 121, 0.3);
+    border: none;
+
+    img {
+      display: block;
+      object-fit: contain;
+    }
   }
 
-  .text_wrapper {
+  &__content {
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    justify-content: center;
-    align-items: flex-start;
+    gap: 8px;
+  }
 
-    .title {
-      font-style: normal;
-      font-weight: 400;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      color: var(--color-blue-700);
+  &__label {
+    margin: 0;
+    font-family: 'Source Code Pro', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.15;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    color: #f7f7f7;
+    opacity: 0.7;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  &__value {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: 0;
+    color: #f7f7f7;
+  }
+
+  @media (max-width: 1440px) {
+    height: 92px;
+    padding: 12px 14px;
+    gap: 12px;
+
+    &__icon {
+      width: 56px;
+      height: 56px;
+      min-width: 56px;
     }
 
-    .value {
-      font-style: normal;
-      font-weight: 700;
-      font-size: 1.25rem;
-      color: var(--color-blue-700);
+    &__label {
+      font-size: 12px;
+    }
+
+    &__value {
+      font-size: 20px;
+    }
+  }
+
+  @media (max-width: 1280px) {
+    height: 84px;
+    padding: 10px 12px;
+    gap: 10px;
+    border-radius: 24px;
+
+    &__icon {
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+    }
+
+    &__label {
+      font-size: 11px;
+    }
+
+    &__value {
+      font-size: 18px;
     }
   }
 }

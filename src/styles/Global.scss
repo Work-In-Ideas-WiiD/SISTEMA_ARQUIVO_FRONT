@@ -97,17 +97,17 @@ a {
 
 .dashboard_padding {
   padding-top: 58px;
-  padding-left: 113px;
-  padding-right: 113px;
+  padding-left: 48px;
+  padding-right: 48px;
   padding-bottom: 90px;
-  overflow: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
 
   @media (max-width: 1250px) {
     padding-top: 58px;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 24px;
+    padding-right: 24px;
     padding-bottom: 90px;
-    overflow: auto;
   }
 
   @media (max-width: 420px) {
@@ -115,7 +115,6 @@ a {
     padding-left: 13px;
     padding-right: 13px;
     padding-bottom: 90px;
-    overflow: auto;
   }
 }
 

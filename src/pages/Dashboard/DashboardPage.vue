@@ -57,14 +57,30 @@ onMounted(async () => {
   background-color: #252525;
 
   .aside_container {
-    min-height: 100vh;
+    flex-shrink: 0;
     width: 364px;
+    min-height: 100vh;
   }
 
   .outlat_container {
+    flex: 1;
+    min-width: 0;
     min-height: 100vh;
-    width: calc(100% - 364px);
+    width: auto;
     background-color: #252525;
+    overflow-x: hidden;
+  }
+
+  @media (max-width: 1366px) {
+    .aside_container {
+      width: 300px;
+    }
+  }
+
+  @media (max-width: 1200px) {
+    .aside_container {
+      width: 260px;
+    }
   }
 
   @media (max-width: 900px) {

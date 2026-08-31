@@ -49,7 +49,7 @@ async function handleSubmit() {
 
       <label class="first_access_field">
         <span class="first_access_field__icon" aria-hidden="true">
-          <img :src="iconPerson" alt="" width="14" height="14" />
+          <img :src="iconPerson" alt="" width="13.27" height="13.27" />
         </span>
         <input
           v-model="email"
@@ -222,20 +222,7 @@ async function handleSubmit() {
   cursor: text;
 
   &__icon {
-    width: 18px;
-    height: 18px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    overflow: hidden;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-    }
+    @include login-field-icon;
   }
 
   input {

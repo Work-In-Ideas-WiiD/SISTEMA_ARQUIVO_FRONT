@@ -70,31 +70,31 @@ const menuItems: IMenuItem[] = [
   },
   {
     title: 'Clientes',
-    icon: 'person',
+    icon: 'clientes',
     path: '/dashboard/clientes',
     roles: ['administrador', 'cliente', 'empresa']
   },
   {
     title: 'Setores',
-    icon: 'folder',
+    icon: 'setores',
     path: '/dashboard/setores',
     roles: ['administrador', 'empresa']
   },
   {
     title: 'Funções',
-    icon: 'document',
+    icon: 'funcoes',
     path: '/dashboard/funcoes',
     roles: ['administrador', 'empresa']
   },
   {
     title: 'Funcionários',
-    icon: 'person',
+    icon: 'funcionarios',
     path: '/dashboard/funcionarios',
     roles: ['administrador', 'empresa']
   },
   {
     title: 'Agrupamentos',
-    icon: 'folder',
+    icon: 'agrupamentos',
     path: '/dashboard/agrupamentos',
     roles: ['administrador', 'empresa']
   },
@@ -164,39 +164,64 @@ function shouldShowItem(item: IMenuItem): boolean {
 
 <style lang="scss" scoped>
 .sidebar {
+  --sidebar-nav-pad: 50px;
   width: 364px;
+  height: 100vh;
   min-height: 100vh;
   background: linear-gradient(110deg, #212121 27%, #ff00ff 94%);
   border-radius: 0 50px 50px 0;
   position: fixed;
+  top: 0;
+  left: 0;
   overflow: hidden;
   font-family: 'Source Code Pro', monospace;
   display: flex;
   flex-direction: column;
+  z-index: 10;
 
   .logo {
     display: block;
     margin: 75px auto 40px;
-    max-width: 191px;
-    width: 100%;
-    height: auto;
+    width: 191px;
+    height: 126px;
+    object-fit: contain;
     flex-shrink: 0;
   }
 
   &__nav {
     flex: 1;
     width: 100%;
-    padding-left: 50px;
+    padding-left: var(--sidebar-nav-pad);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 28px;
     overflow-y: auto;
+    padding-top: 8px;
   }
 
   &__footer {
     flex-shrink: 0;
     width: 100%;
-    padding: 24px 0 48px 50px;
+    padding: 24px 0 56px var(--sidebar-nav-pad);
+  }
+
+  @media (max-width: 1366px) {
+    width: 300px;
+  }
+
+  @media (max-width: 1200px) {
+    --sidebar-nav-pad: 36px;
+    width: 260px;
+
+    .logo {
+      margin: 48px auto 28px;
+      width: 150px;
+      height: auto;
+    }
+
+    &__nav {
+      gap: 22px;
+    }
   }
 
   @media (max-width: 900px) {
