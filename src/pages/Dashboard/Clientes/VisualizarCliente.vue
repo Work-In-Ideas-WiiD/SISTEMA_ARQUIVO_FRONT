@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
+import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import { getCliente } from '@/services/http/clientes'
 
 const router = useRouter()
@@ -34,7 +35,7 @@ onMounted(async () => {
     cnpj.value = data.cnpj || ''
     email.value = data.email || ''
     contato.value = data.contato || ''
-    
+
     if (data.endereco && typeof data.endereco === 'object') {
       endereco.value = data.endereco.rua || ''
       numero.value = data.endereco.numero || ''
@@ -58,89 +59,92 @@ function goBack() {
 </script>
 
 <template>
-  <section class="new_form">
-    <div class="page_title">
-      <button class="back_btn" @click="goBack">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
-        </svg>
+  <section class="visualizar-cliente">
+    <div class="visualizar-cliente__heading">
+      <button
+        type="button"
+        class="visualizar-cliente__back"
+        aria-label="Voltar para Clientes"
+        @click="goBack"
+      >
+        <img :src="iconChevronLeft" width="24" height="24" alt="" />
       </button>
-      <h2 class="dashboard_title">CLIENTE</h2>
-    </div>
-    
-    <div v-if="loading" class="loading_container">
-      <p>Carregando...</p>
+      <h2 class="visualizar-cliente__title dashboard_title">CLIENTE</h2>
     </div>
 
-    <div v-else class="form_wrapper">
-      <form>
-        <div class="input_row">
-          <div class="form_group flex_3">
-            <label>Nome</label>
-            <input v-model="nome" type="text" disabled />
+    <div v-if="loading" class="visualizar-cliente__loading">
+      <p>Carregando…</p>
+    </div>
+
+    <div v-else class="visualizar-cliente__panel">
+      <form class="visualizar-cliente__form">
+        <div class="visualizar-cliente__row">
+          <div class="visualizar-cliente__field visualizar-cliente__field--wide">
+            <span class="visualizar-cliente__label night-field-label">NOME</span>
+            <input v-model="nome" type="text" class="visualizar-cliente__input" disabled />
           </div>
-          <div class="form_group flex_1">
-            <label>CPF</label>
-            <input v-model="cpf" type="text" disabled />
+          <div class="visualizar-cliente__field visualizar-cliente__field--narrow">
+            <span class="visualizar-cliente__label night-field-label">CPF</span>
+            <input v-model="cpf" type="text" class="visualizar-cliente__input" disabled />
           </div>
         </div>
 
-        <div class="input_row">
-          <div class="form_group flex_3">
-            <label>Nome da empresa</label>
-            <input v-model="nome_empresa" type="text" disabled />
+        <div class="visualizar-cliente__row">
+          <div class="visualizar-cliente__field visualizar-cliente__field--wide">
+            <span class="visualizar-cliente__label night-field-label">NOME DA EMPRESA</span>
+            <input v-model="nome_empresa" type="text" class="visualizar-cliente__input" disabled />
           </div>
-          <div class="form_group flex_1">
-            <label>CNPJ</label>
-            <input v-model="cnpj" type="text" disabled />
-          </div>
-        </div>
-
-        <div class="input_row">
-          <div class="form_group flex_1">
-            <label>E-mail</label>
-            <input v-model="email" type="email" disabled />
-          </div>
-          <div class="form_group flex_1">
-            <label>Celular</label>
-            <input v-model="contato" type="text" disabled />
+          <div class="visualizar-cliente__field visualizar-cliente__field--narrow">
+            <span class="visualizar-cliente__label night-field-label">CNPJ</span>
+            <input v-model="cnpj" type="text" class="visualizar-cliente__input" disabled />
           </div>
         </div>
 
-        <div class="input_row">
-          <div class="form_group flex_3">
-            <label>Endereço</label>
-            <input v-model="endereco" type="text" disabled />
+        <div class="visualizar-cliente__row">
+          <div class="visualizar-cliente__field visualizar-cliente__field--wide">
+            <span class="visualizar-cliente__label night-field-label">E-MAIL</span>
+            <input v-model="email" type="email" class="visualizar-cliente__input" disabled />
           </div>
-          <div class="form_group flex_1">
-            <label>Número</label>
-            <input v-model="numero" type="text" disabled />
-          </div>
-        </div>
-
-        <div class="input_row">
-          <div class="form_group flex_1">
-            <label>Bairro</label>
-            <input v-model="bairro" type="text" disabled />
-          </div>
-          <div class="form_group flex_1">
-            <label>Cidade</label>
-            <input v-model="cidade" type="text" disabled />
-          </div>
-          <div class="form_group flex_1">
-            <label>Estado</label>
-            <input v-model="estado" type="text" disabled />
+          <div class="visualizar-cliente__field visualizar-cliente__field--narrow">
+            <span class="visualizar-cliente__label night-field-label">CONTATO</span>
+            <input v-model="contato" type="text" class="visualizar-cliente__input" disabled />
           </div>
         </div>
 
-        <div class="input_row">
-          <div class="form_group flex_3">
-            <label>Complemento</label>
-            <input v-model="complemento" type="text" disabled />
+        <div class="visualizar-cliente__row">
+          <div class="visualizar-cliente__field visualizar-cliente__field--wide">
+            <span class="visualizar-cliente__label night-field-label">ENDEREÇO</span>
+            <input v-model="endereco" type="text" class="visualizar-cliente__input" disabled />
           </div>
-          <div class="form_group flex_1">
-            <label>CEP</label>
-            <input v-model="cep" type="text" disabled />
+          <div class="visualizar-cliente__field visualizar-cliente__field--narrow">
+            <span class="visualizar-cliente__label night-field-label">NÚMERO</span>
+            <input v-model="numero" type="text" class="visualizar-cliente__input" disabled />
+          </div>
+        </div>
+
+        <div class="visualizar-cliente__row visualizar-cliente__row--thirds">
+          <div class="visualizar-cliente__field">
+            <span class="visualizar-cliente__label night-field-label">BAIRRO</span>
+            <input v-model="bairro" type="text" class="visualizar-cliente__input" disabled />
+          </div>
+          <div class="visualizar-cliente__field">
+            <span class="visualizar-cliente__label night-field-label">CIDADE</span>
+            <input v-model="cidade" type="text" class="visualizar-cliente__input" disabled />
+          </div>
+          <div class="visualizar-cliente__field">
+            <span class="visualizar-cliente__label night-field-label">ESTADO</span>
+            <input v-model="estado" type="text" class="visualizar-cliente__input" disabled />
+          </div>
+        </div>
+
+        <div class="visualizar-cliente__row">
+          <div class="visualizar-cliente__field visualizar-cliente__field--wide">
+            <span class="visualizar-cliente__label night-field-label">COMPLEMENTO</span>
+            <input v-model="complemento" type="text" class="visualizar-cliente__input" disabled />
+          </div>
+          <div class="visualizar-cliente__field visualizar-cliente__field--narrow">
+            <span class="visualizar-cliente__label night-field-label">CEP</span>
+            <input v-model="cep" type="text" class="visualizar-cliente__input" disabled />
           </div>
         </div>
       </form>
@@ -149,103 +153,193 @@ function goBack() {
 </template>
 
 <style lang="scss" scoped>
-.new_form {
+.visualizar-cliente {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
 
-  .page_title {
+  &__heading {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 1px;
     margin-bottom: 42px;
+  }
 
-    .back_btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--color-orange-500);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+  &__back {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
     }
   }
 
-  .loading_container {
+  &__title {
+    margin: 0;
+  }
+
+  &__loading {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 200px;
-    
+
     p {
-      color: #666;
-      font-size: 16px;
+      font-family: 'Source Code Pro', monospace;
+      font-size: 14px;
+      color: #f7f7f7;
+      opacity: 0.7;
     }
   }
 
-  .form_wrapper {
-    background-color: rgba(207, 198, 188, 0.1);
-    padding: 45px 50px;
-    max-width: 1050px;
+  &__panel {
+    width: 1000px;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 48px 75px 40px;
+    background: rgba(121, 121, 121, 0.1);
+    border-radius: var(--night-radius, 30px);
+  }
 
-    @media (max-width: 900px) {
-      padding: 20px 13px;
-    }
+  &__form {
+    width: 850px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+  }
 
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 29px;
+  &__row {
+    display: flex;
+    gap: 13px;
+    width: 100%;
 
-      @media (max-width: 900px) {
-        gap: 10px;
-      }
-    }
-
-    .input_row {
-      display: flex;
-      gap: 37px;
-
-      @media (max-width: 900px) {
-        flex-direction: column;
-        gap: 10px;
-      }
-    }
-
-    .form_group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-
-      &.flex_1 {
+    &--thirds {
+      .visualizar-cliente__field {
         flex: 1;
+        min-width: 0;
       }
+    }
+  }
 
-      &.flex_3 {
-        flex: 3;
+  &__field {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    min-width: 0;
+
+    &--wide {
+      flex: 550;
+    }
+
+    &--narrow {
+      flex: 287;
+    }
+  }
+
+  &__label {
+    display: block;
+    flex-shrink: 0;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+    letter-spacing: 0;
+    color: rgba(247, 247, 247, 0.7);
+    text-transform: uppercase;
+  }
+
+  &__input {
+    width: 100%;
+    height: 49px;
+    box-sizing: border-box;
+    padding: 0 20px;
+    border: none;
+    border-radius: 30px;
+    background: rgba(121, 121, 121, 0.3);
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1;
+    color: #ffffff;
+    outline: none;
+
+    &:disabled {
+      opacity: 1;
+      cursor: default;
+      color: #ffffff;
+      -webkit-text-fill-color: #ffffff;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    &__panel {
+      width: 100%;
+      padding: 32px 24px 32px;
+    }
+
+    &__form {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    &__heading {
+      margin-bottom: 24px;
+    }
+
+    &__panel {
+      padding: 28px 20px 32px;
+    }
+
+    &__row {
+      flex-direction: column;
+      gap: 24px;
+
+      &--thirds {
+        flex-direction: column;
       }
+    }
 
-      label {
-        font-size: 0.875rem;
-        color: var(--color-blue-700);
-      }
+    &__field--wide,
+    &__field--narrow {
+      flex: unset;
+      width: 100%;
+    }
+  }
 
-      input {
-        height: 51px;
-        border: 1px solid var(--color-gray-500);
-        padding: 0 15px;
-        font-size: 0.938rem;
-        color: var(--color-blue-700);
-        outline: none;
-        background: white;
+  @media (max-width: 480px) {
+    &__heading {
+      margin-bottom: 16px;
+    }
 
-        &:disabled {
-          background: #f5f5f5;
-          color: var(--color-blue-700);
-        }
+    &__panel {
+      padding: 24px 16px 28px;
+      border-radius: 20px;
+    }
 
-        &::placeholder {
-          color: var(--color-gray-500);
-        }
-      }
+    &__form {
+      gap: 18px;
+    }
+
+    &__label {
+      font-size: 12px;
+    }
+
+    &__input {
+      height: 44px;
+      font-size: 13px;
     }
   }
 }
