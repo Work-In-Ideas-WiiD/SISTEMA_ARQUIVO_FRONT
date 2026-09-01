@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
+import TableEmptyMessage from '@/components/TableEmptyMessage/TableEmptyMessage.vue'
 import { getClientes, type IGetClientesDataRes } from '@/services/http/clientes'
 import { formatCnpjCpf } from '@/utils/formatCpfCnpj'
 
@@ -68,7 +69,11 @@ function navigateTo() {
         </table>
       </div>
 
-      <p v-if="noContent" class="home-table__empty">Nenhum cliente encontrado.</p>
+      <TableEmptyMessage
+        :show="noContent"
+        theme="night"
+        message="Nenhum cliente encontrado."
+      />
     </div>
   </section>
 </template>
@@ -274,14 +279,6 @@ function navigateTo() {
       height: 40px;
       font-size: 14px;
     }
-  }
-
-  &__empty {
-    margin: 0;
-    padding: 8px 38px 28px;
-    color: #f7f7f7;
-    opacity: 0.7;
-    font-family: 'Source Code Pro', monospace;
   }
 }
 </style>
