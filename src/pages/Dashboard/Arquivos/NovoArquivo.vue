@@ -385,6 +385,8 @@ function goBack() {
   &__label {
     display: block;
     height: 18px;
+    padding-left: 20px;
+    box-sizing: border-box;
     font-family: 'Source Code Pro', monospace;
     font-size: 14px;
     font-weight: 700;

@@ -326,6 +326,8 @@ function goBack() {
     flex-shrink: 0;
     width: 100%;
     margin: 0;
+    padding-left: 20px;
+    box-sizing: border-box;
     font-family: var(--night-font, 'Source Code Pro', monospace);
     font-size: 14px;
     font-weight: 700;

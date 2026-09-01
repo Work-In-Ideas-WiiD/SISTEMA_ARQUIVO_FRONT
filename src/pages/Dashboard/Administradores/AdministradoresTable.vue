@@ -168,7 +168,7 @@ function getDocumentId(item: IGetAdministradoresDataRes): string {
                   aria-label="Editar administrador"
                   @click="goToEditar(item.id)"
                 >
-                  <img :src="iconEdit" width="18" height="18" alt="" />
+                  <img :src="iconEdit" width="24" height="24" alt="" />
                 </button>
               </td>
             </tr>
@@ -468,6 +468,13 @@ function getDocumentId(item: IGetAdministradoresDataRes): string {
   justify-content: center;
   cursor: pointer;
   padding: 0;
+  flex-shrink: 0;
+
+  img {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
 
   &:hover {
     opacity: 0.85;
@@ -511,6 +518,16 @@ function getDocumentId(item: IGetAdministradoresDataRes): string {
     padding: 0 12px;
     font-size: 13px;
     gap: 8px;
+  }
+
+  .admins-action {
+    width: 34px;
+    height: 34px;
+
+    img {
+      width: 16px;
+      height: 16px;
+    }
   }
 }
 </style>

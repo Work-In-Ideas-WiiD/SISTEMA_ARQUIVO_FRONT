@@ -251,6 +251,8 @@ function goBack() {
   &__label {
     display: block;
     flex-shrink: 0;
+    padding-left: 20px;
+    box-sizing: border-box;
     font-family: 'Source Code Pro', monospace;
     font-size: 14px;
     font-weight: 700;

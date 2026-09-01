@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
-import CustomButton from '@/components/CustomButton/CustomButton.vue'
+import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import { postAdministrador } from '@/services/http/administradores'
 
 const router = useRouter()
@@ -16,12 +16,12 @@ const fetching = ref(false)
 
 async function handleSubmit() {
   if (fetching.value) return
-  
+
   if (!nome.value || !email.value || !cpf.value || !contato.value) {
     toast.error('Preencha todos os campos')
     return
   }
-  
+
   try {
     fetching.value = true
     await postAdministrador({
@@ -48,110 +48,259 @@ function goBack() {
 </script>
 
 <template>
-  <section class="new_form">
-    <div class="page_title">
-      <button class="back_btn" @click="goBack">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
-        </svg>
+  <section class="novo-admin">
+    <div class="novo-admin__heading">
+      <button
+        type="button"
+        class="novo-admin__back"
+        aria-label="Voltar para Administradores"
+        @click="goBack"
+      >
+        <img :src="iconChevronLeft" width="24" height="24" alt="" />
       </button>
-      <h2 class="dashboard_title">NOVO CADASTRO</h2>
+      <h2 class="novo-admin__title dashboard_title">NOVO CADASTRO</h2>
     </div>
-    
-    <div class="form_wrapper">
-      <form @submit.prevent="handleSubmit">
-        <div class="form_group">
-          <label>Nome do administrador</label>
-          <input v-model="nome" type="text" />
-        </div>
-        
-        <div class="form_group">
-          <label>E-mail</label>
-          <input v-model="email" type="email" />
-        </div>
-        
-        <div class="form_group">
-          <label>Contato</label>
-          <input v-model="contato" type="text" placeholder="(00) 00000-0000" />
-        </div>
-        
-        <div class="form_group">
-          <label>CPF</label>
-          <input v-model="cpf" type="text" placeholder="000.000.000-00" />
-        </div>
-        
-        <div class="btn_container">
-          <CustomButton
-            title="Adicionar administrador"
-            variation="2"
-            :loading="fetching"
-            @click="handleSubmit"
+
+    <div class="novo-admin__panel">
+      <form class="novo-admin__form" @submit.prevent="handleSubmit">
+        <div class="novo-admin__field">
+          <label class="novo-admin__label night-field-label" for="nome">NOME DO ADMINISTRADOR</label>
+          <input
+            id="nome"
+            v-model="nome"
+            type="text"
+            class="novo-admin__input"
+            placeholder="Nome completo"
           />
         </div>
+
+        <div class="novo-admin__field">
+          <label class="novo-admin__label night-field-label" for="email">E-MAIL</label>
+          <input
+            id="email"
+            v-model="email"
+            type="email"
+            class="novo-admin__input"
+            placeholder="contato@email.com"
+          />
+        </div>
+
+        <div class="novo-admin__field">
+          <label class="novo-admin__label night-field-label" for="contato">CONTATO</label>
+          <input
+            id="contato"
+            v-model="contato"
+            type="text"
+            class="novo-admin__input"
+            placeholder="(00) 00000-0000"
+          />
+        </div>
+
+        <div class="novo-admin__field">
+          <label class="novo-admin__label night-field-label" for="cpf">CPF</label>
+          <input
+            id="cpf"
+            v-model="cpf"
+            type="text"
+            class="novo-admin__input"
+            placeholder="000.000.000-00"
+          />
+        </div>
+
+        <button type="submit" class="novo-admin__submit" :disabled="fetching">
+          {{ fetching ? 'Salvando…' : 'ADICIONAR ADMINISTRADOR' }}
+        </button>
       </form>
     </div>
   </section>
 </template>
 
 <style lang="scss" scoped>
-.new_form {
+.novo-admin {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
 
-  .page_title {
+  &__heading {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 1px;
     margin-bottom: 42px;
+  }
 
-    .back_btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--color-orange-500);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+  &__back {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
     }
   }
 
-  .form_wrapper {
-    background-color: rgba(207, 198, 188, 0.1);
-    padding: 40px;
-    max-width: 600px;
+  &__title {
+    margin: 0;
+  }
 
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+  &__panel {
+    width: 800px;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 48px 75px 40px;
+    background: rgba(121, 121, 121, 0.1);
+    border-radius: var(--night-radius, 30px);
+  }
+
+  &__form {
+    width: 650px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  &__field {
+    width: 650px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  &__label {
+    display: block;
+    flex-shrink: 0;
+    width: 100%;
+    margin: 0;
+    padding-left: 20px;
+    box-sizing: border-box;
+    font-family: var(--night-font, 'Source Code Pro', monospace);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+    letter-spacing: 0;
+    color: var(--night-gray, #f7f7f7);
+    opacity: 0.7;
+    text-transform: uppercase;
+  }
+
+  &__input {
+    width: 100%;
+    height: 49px;
+    box-sizing: border-box;
+    padding: 0 20px;
+    border: none;
+    border-radius: 30px;
+    background: rgba(121, 121, 121, 0.3);
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1;
+    color: #ffffff;
+    outline: none;
+
+    &::placeholder {
+      color: #f7f7f7;
+      opacity: 0.6;
+    }
+  }
+
+  &__submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    min-width: 295px;
+    max-width: 100%;
+    height: 46px;
+    margin: 8px auto 0;
+    align-self: center;
+    padding: 0 28px;
+    border: none;
+    border-radius: 30px;
+    background: #ff00ff;
+    color: #ffffff;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      opacity: 0.92;
     }
 
-    .form_group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+    &:disabled {
+      opacity: 0.7;
+      cursor: wait;
+    }
+  }
 
-      label {
-        font-size: 0.875rem;
-        color: var(--color-blue-700);
-      }
-
-      input {
-        height: 51px;
-        border: 1px solid var(--color-gray-500);
-        padding: 0 15px;
-        font-size: 0.938rem;
-        color: var(--color-blue-700);
-        outline: none;
-        background: white;
-
-        &::placeholder {
-          color: var(--color-gray-500);
-        }
-      }
+  @media (max-width: 900px) {
+    &__panel {
+      width: 100%;
+      padding: 32px 24px 32px;
     }
 
-    .btn_container {
-      margin-top: 20px;
+    &__form,
+    &__field {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    &__heading {
+      margin-bottom: 24px;
+    }
+
+    &__panel {
+      padding: 28px 20px 32px;
+    }
+
+    &__submit {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    &__heading {
+      margin-bottom: 16px;
+    }
+
+    &__panel {
+      padding: 24px 16px 28px;
+      border-radius: 20px;
+    }
+
+    &__form {
+      gap: 18px;
+    }
+
+    &__label {
+      font-size: 12px;
+    }
+
+    &__input {
+      height: 44px;
+      font-size: 13px;
+    }
+
+    &__submit {
+      height: 44px;
+      font-size: 14px;
     }
   }
 }
