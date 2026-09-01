@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import TableEmptyMessage from '@/components/TableEmptyMessage/TableEmptyMessage.vue'
@@ -13,6 +13,15 @@ import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg
 import iconNewFolder from '@/assets/imgs/administradores/icon-new-folder.svg'
 import iconDownload from '@/assets/imgs/arquivos/download.svg'
 import iconDelete from '@/assets/imgs/agrupamentos/delete.svg'
+import iconGrid from '@/assets/imgs/arquivos/icon-grid.svg'
+import iconList from '@/assets/imgs/arquivos/icon-list.svg'
+import iconFolder from '@/assets/imgs/arquivos/folder.svg'
+import iconOptions from '@/assets/imgs/arquivos/Opções.svg'
+import iconUpload from '@/assets/imgs/arquivos/Upload.svg'
+import iconDownloadBlack from '@/assets/imgs/arquivos/download-black.svg'
+import iconDeleteBlack from '@/assets/imgs/arquivos/delete-black.svg'
+
+type ViewMode = 'list' | 'grid'
 
 const router = useRouter()
 const toast = useToast()
@@ -22,25 +31,44 @@ const pages = ref(0)
 const arquivos = ref<IGetArquivosDataRes[]>([])
 const noContent = ref(false)
 const search = ref('')
+const viewMode = ref<ViewMode>('list')
+const selectedId = ref<string | null>(null)
+const openMenuId = ref<string | null>(null)
 const searchPlaceholder = ref('Pesquisar por ID, nome, e-mail e número de documento…')
 
+const selectedArquivo = computed(() =>
+  arquivos.value.find((item) => item.id === selectedId.value) ?? null
+)
+
 let searchPlaceholderMql: MediaQueryList | null = null
+let searchPlaceholderTabletMql: MediaQueryList | null = null
 
 function updateSearchPlaceholder() {
-  searchPlaceholder.value = window.matchMedia('(max-width: 1200px)').matches
-    ? 'Pesquisar…'
-    : 'Pesquisar por ID, nome, e-mail e número de documento…'
+  if (window.matchMedia('(max-width: 768px)').matches) {
+    searchPlaceholder.value = 'Pesquisar…'
+    return
+  }
+  if (window.matchMedia('(max-width: 1200px)').matches) {
+    searchPlaceholder.value = 'Pesquisar por ID…'
+    return
+  }
+  searchPlaceholder.value = 'Pesquisar por ID, nome, e-mail e número de documento…'
 }
 
 onMounted(() => {
   searchPlaceholderMql = window.matchMedia('(max-width: 1200px)')
+  searchPlaceholderTabletMql = window.matchMedia('(max-width: 768px)')
   updateSearchPlaceholder()
   searchPlaceholderMql.addEventListener('change', updateSearchPlaceholder)
+  searchPlaceholderTabletMql.addEventListener('change', updateSearchPlaceholder)
+  document.addEventListener('click', closeTileMenu)
   getData(page.value, search.value)
 })
 
 onUnmounted(() => {
   searchPlaceholderMql?.removeEventListener('change', updateSearchPlaceholder)
+  searchPlaceholderTabletMql?.removeEventListener('change', updateSearchPlaceholder)
+  document.removeEventListener('click', closeTileMenu)
 })
 
 async function getData(pageParam: number, likeParam: string = '') {
@@ -83,6 +111,7 @@ async function removeArquivo(id: string) {
   try {
     await deleteArquivo(id)
     toast.success('Arquivo excluído.')
+    if (selectedId.value === id) selectedId.value = null
     getData(page.value, search.value)
   } catch (error) {
     toast.error('Erro ao deletar arquivo.')
@@ -112,24 +141,123 @@ function getFuncoes(item: IGetArquivosDataRes): string {
   if (!item.funcoes || item.funcoes.length === 0) return '—'
   return item.funcoes.map((f) => f.nome).join(', ')
 }
+
+function setViewMode(mode: ViewMode) {
+  viewMode.value = mode
+  if (mode === 'list') {
+    selectedId.value = null
+  }
+}
+
+function toggleViewMode() {
+  setViewMode(viewMode.value === 'list' ? 'grid' : 'list')
+}
+
+function handleBack() {
+  if (viewMode.value === 'grid') {
+    setViewMode('list')
+    return
+  }
+  router.push('/dashboard/home')
+}
+
+function selectArquivo(id: string) {
+  selectedId.value = id
+  closeTileMenu()
+}
+
+function toggleTileMenu(id: string, event: Event) {
+  event.stopPropagation()
+  selectedId.value = id
+  openMenuId.value = openMenuId.value === id ? null : id
+}
+
+function closeTileMenu() {
+  openMenuId.value = null
+}
+
+function downloadArquivo(item: IGetArquivosDataRes) {
+  closeTileMenu()
+  openFile(item.url)
+}
+
+function deleteFromMenu(item: IGetArquivosDataRes) {
+  closeTileMenu()
+  void removeArquivo(item.id)
+}
+
+function formatDate(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return '—'
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = String(date.getFullYear()).slice(-2)
+  return `${day}.${month}.${year}`
+}
+
+function getDisplayName(item: IGetArquivosDataRes): string {
+  if (item.descricao) return item.descricao
+  if (item.path) {
+    const parts = item.path.split('/')
+    return parts[parts.length - 1] || '—'
+  }
+  return '—'
+}
+
+function formatFileSize(bytes?: number | null): string {
+  if (!bytes) return '—'
+  if (bytes < 1024) return `${bytes}b`
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)}kb`
+  return `${(bytes / (1024 * 1024)).toLocaleString('pt-BR', { maximumFractionDigits: 0 })}mb`
+}
+
+watch(viewMode, () => {
+  closeTileMenu()
+})
 </script>
 
 <template>
   <section class="arquivos-page">
     <div class="arquivos-page__heading">
+      <div class="arquivos-page__heading-left">
+        <button
+          type="button"
+          class="arquivos-page__back"
+          :aria-label="viewMode === 'grid' ? 'Voltar para lista' : 'Voltar para Home'"
+          @click="handleBack"
+        >
+          <img :src="iconChevronLeft" width="24" height="24" alt="" />
+        </button>
+        <h2 class="arquivos-page__title dashboard_title">ARQUIVOS</h2>
+      </div>
+
       <button
         type="button"
-        class="arquivos-page__back"
-        aria-label="Voltar para Home"
-        @click="router.push('/dashboard/home')"
+        class="arquivos-page__view-btn"
+        :aria-label="viewMode === 'list' ? 'Alternar para grade' : 'Alternar para lista'"
+        @click="toggleViewMode"
       >
-        <img :src="iconChevronLeft" width="24" height="24" alt="" />
+        <img
+          :src="viewMode === 'list' ? iconGrid : iconList"
+          :width="viewMode === 'list' ? 22 : 18"
+          :height="viewMode === 'list' ? 14 : 12"
+          alt=""
+        />
       </button>
-      <h2 class="arquivos-page__title dashboard_title">ARQUIVOS</h2>
     </div>
 
-    <div class="arquivos-panel">
-      <form class="arquivos-toolbar" @submit.prevent="searchData">
+    <div
+      class="arquivos-panel"
+      :class="{
+        'arquivos-panel--grid': viewMode === 'grid',
+        'arquivos-panel--grid-selected': viewMode === 'grid' && selectedArquivo
+      }"
+    >
+      <form
+        class="arquivos-toolbar"
+        :class="{ 'arquivos-toolbar--grid': viewMode === 'grid' }"
+        @submit.prevent="searchData"
+      >
         <label class="arquivos-search">
           <button type="submit" class="arquivos-search__btn" aria-label="Pesquisar">
             <img :src="iconSearch" width="18" height="18" alt="" />
@@ -142,13 +270,30 @@ function getFuncoes(item: IGetArquivosDataRes): string {
           />
         </label>
 
-        <button type="button" class="arquivos-cta" @click="goToNovo">
-          <img :src="iconNewFolder" width="20" height="16" alt="" />
-          <span>NOVO CADASTRO</span>
-        </button>
+        <div class="arquivos-toolbar__actions">
+          <button
+            v-if="viewMode === 'grid'"
+            type="button"
+            class="arquivos-upload"
+            @click="goToNovo"
+          >
+            <img :src="iconUpload" width="24" height="24" alt="" />
+            <span>Fazer upload do arquivo</span>
+          </button>
+
+          <button
+            type="button"
+            class="arquivos-cta"
+            :class="{ 'arquivos-cta--folder': viewMode === 'grid' }"
+            @click="goToNovo"
+          >
+            <img :src="iconNewFolder" width="20" height="16" alt="" />
+            <span>{{ viewMode === 'grid' ? 'NOVA PASTA' : 'NOVO CADASTRO' }}</span>
+          </button>
+        </div>
       </form>
 
-      <div class="arquivos-scroll">
+      <div v-if="viewMode === 'list'" class="arquivos-scroll">
         <table class="arquivos-grid">
           <thead>
             <tr>
@@ -192,8 +337,90 @@ function getFuncoes(item: IGetArquivosDataRes): string {
         </table>
       </div>
 
+      <div v-if="viewMode === 'grid'" class="arquivos-grade__tiles">
+        <div
+          v-for="item in arquivos"
+          :key="item.id"
+          class="arquivos-tile"
+          role="button"
+          tabindex="0"
+          :aria-label="`Selecionar ${item.descricao}`"
+          @click="selectArquivo(item.id)"
+          @keydown.enter="selectArquivo(item.id)"
+        >
+          <div
+            class="arquivos-tile__box"
+            :class="{ 'arquivos-tile__box--active': selectedId === item.id }"
+          >
+            <button
+              type="button"
+              class="arquivos-tile__options-btn"
+              aria-label="Opções do arquivo"
+              @click="toggleTileMenu(item.id, $event)"
+            >
+              <img :src="iconOptions" width="3" height="15" alt="" />
+            </button>
+
+            <div
+              v-if="openMenuId === item.id"
+              class="arquivos-tile__menu"
+              @click.stop
+            >
+              <button
+                type="button"
+                class="arquivos-tile__menu-item"
+                @click="downloadArquivo(item)"
+              >
+                <img :src="iconDownloadBlack" width="24" height="24" alt="" />
+                <span>Baixar</span>
+              </button>
+              <button
+                type="button"
+                class="arquivos-tile__menu-item"
+                @click="deleteFromMenu(item)"
+              >
+                <img :src="iconDeleteBlack" width="24" height="24" alt="" />
+                <span>Apagar</span>
+              </button>
+            </div>
+
+            <img class="arquivos-tile__icon" :src="iconFolder" width="40" height="40" alt="" />
+          </div>
+
+          <span class="arquivos-tile__name" :title="item.descricao">{{ item.descricao }}</span>
+        </div>
+      </div>
+
+      <aside v-if="viewMode === 'grid' && selectedArquivo" class="arquivos-grade__sidebar">
+        <h3 class="arquivos-grade__sidebar-title">informações</h3>
+
+        <div class="arquivos-grade__info">
+          <p class="arquivos-grade__info-line">
+            <strong>Nome</strong>
+            {{ getDisplayName(selectedArquivo) }}
+          </p>
+          <p class="arquivos-grade__info-line">
+            <strong>Empresa</strong>
+            {{ getEmpresaName(selectedArquivo) }}
+          </p>
+          <p class="arquivos-grade__info-line">
+            <strong>CPF/CNPJ</strong>
+            {{ getEmpresaCnpj(selectedArquivo) }}
+          </p>
+          <p class="arquivos-grade__info-line">
+            <strong>Data de inclusão</strong>
+            {{ formatDate(selectedArquivo.created_at) }}
+          </p>
+          <p class="arquivos-grade__info-line">
+            <strong>Tamanho total</strong>
+            {{ formatFileSize(selectedArquivo.tamanho_bytes) }}
+          </p>
+        </div>
+      </aside>
+
       <TableEmptyMessage :show="noContent" theme="night" class="arquivos-empty" />
       <TablePaginator
+        v-if="viewMode === 'list'"
         class="arquivos-paginator"
         theme="night"
         :page-count="pages"
@@ -209,12 +436,41 @@ function getFuncoes(item: IGetArquivosDataRes): string {
   width: 100%;
   max-width: 100%;
   min-width: 0;
+  overflow-x: clip;
 
   &__heading {
     display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 42px;
+  }
+
+  &__heading-left {
+    display: flex;
     align-items: center;
     gap: 1px;
-    margin-bottom: 42px;
+    min-width: 0;
+  }
+
+  &__view-btn {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    margin-top: 5px; /* Figma: top 63px = padding 58px + 5px */
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.15s ease;
+
+    &:hover {
+      opacity: 0.85;
+    }
   }
 
   &__back {
@@ -243,7 +499,98 @@ function getFuncoes(item: IGetArquivosDataRes): string {
 .arquivos-panel {
   background: var(--night-surface, rgba(121, 121, 121, 0.25));
   border-radius: var(--night-radius, 30px);
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
+  max-width: 100%;
+
+  &--grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    min-height: auto;
+    padding-right: 0;
+    box-sizing: border-box;
+
+    .arquivos-toolbar {
+      grid-column: 1;
+      grid-row: 1;
+      min-width: 0;
+      padding: 30px 38px 24px 38px;
+      flex-wrap: wrap;
+      row-gap: 12px;
+    }
+
+    .arquivos-search {
+      flex: 1 1 180px;
+      width: auto;
+      max-width: 518px;
+      min-width: 0;
+    }
+
+    .arquivos-toolbar__actions {
+      flex-shrink: 0;
+    }
+
+    .arquivos-grade__tiles {
+      grid-column: 1;
+      grid-row: 2;
+      min-width: 0;
+      padding: 0 38px 32px 38px;
+      min-height: 0;
+      align-self: start;
+    }
+
+    .arquivos-empty {
+      grid-column: 1;
+      grid-row: 2;
+    }
+  }
+
+  &--grid-selected {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    column-gap: 24px;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      'toolbar sidebar'
+      'tiles sidebar';
+    align-items: start;
+
+    .arquivos-toolbar {
+      grid-area: toolbar;
+      padding: 30px 0 16px 38px;
+      flex-wrap: wrap;
+      row-gap: 12px;
+      min-width: 0;
+    }
+
+    .arquivos-grade__tiles {
+      grid-area: tiles;
+      padding: 0 0 32px 38px;
+      min-width: 0;
+      margin-top: 0;
+    }
+
+    .arquivos-grade__sidebar {
+      grid-area: sidebar;
+      align-self: stretch;
+      flex: unset;
+      width: 100%;
+      min-width: 0;
+      max-width: none;
+      min-height: auto;
+      height: auto;
+      margin: 0;
+      box-sizing: border-box;
+      border-top-right-radius: var(--night-radius, 30px);
+      border-bottom-right-radius: var(--night-radius, 30px);
+      border-top-left-radius: 29px;
+      border-bottom-left-radius: 29px;
+    }
+
+    .arquivos-empty {
+      grid-area: tiles;
+    }
+  }
 }
 
 .arquivos-toolbar {
@@ -252,13 +599,25 @@ function getFuncoes(item: IGetArquivosDataRes): string {
   align-items: center;
   gap: 15px;
   padding: 30px 38px 32px;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
 }
 
 .arquivos-search {
-  flex: 0 0 518px;
-  width: 518px;
+  flex: 1 1 180px;
+  width: auto;
   max-width: 518px;
+  min-width: 0;
   height: 49px;
   display: flex;
   align-items: center;
@@ -299,11 +658,45 @@ function getFuncoes(item: IGetArquivosDataRes): string {
   }
 }
 
+.arquivos-upload {
+  flex: 0 0 auto;
+  height: 49px;
+  max-width: 100%;
+  padding: 0 20px;
+  border: 3px solid #f7f7f7;
+  border-radius: 30px;
+  background: rgba(121, 121, 121, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  min-width: 0;
+
+  span {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    color: #f7f7f7;
+    text-transform: uppercase;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
 .arquivos-cta {
   flex: 0 0 223px;
   width: 223px;
   height: 46px;
-  margin-left: auto;
+  margin-left: 0;
   padding: 0 18px;
   border: none;
   border-radius: 30px;
@@ -325,6 +718,224 @@ function getFuncoes(item: IGetArquivosDataRes): string {
   &:hover {
     opacity: 0.92;
   }
+
+  &--folder {
+    flex: 0 0 187px;
+    width: 187px;
+  }
+}
+
+.arquivos-grade {
+  &__tiles {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 110px);
+    gap: 16px;
+    align-content: start;
+    padding: 0;
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+
+  &__sidebar {
+    flex: unset;
+    width: 100%;
+    min-width: 0;
+    min-height: auto;
+    padding: 28px 24px 32px;
+    border-radius: 29px;
+    background: rgba(121, 121, 121, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-sizing: border-box;
+  }
+
+  &__sidebar-title {
+    margin: 0;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1;
+    color: #f7f7f7;
+    opacity: 0.7;
+    text-transform: uppercase;
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: visible;
+  }
+
+  &__info-line {
+    margin: 0;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.28;
+    color: #ffffff;
+    word-break: break-word;
+
+    strong {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+  }
+
+  &__empty-info {
+    margin: 0;
+    flex: 1;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 300;
+    color: #f7f7f7;
+    opacity: 0.6;
+  }
+}
+
+.arquivos-tile {
+  position: relative;
+  width: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+
+  &__box {
+    position: relative;
+    width: 110px;
+    height: 94px;
+    border-radius: 15px;
+    background: rgba(121, 121, 121, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, outline 0.15s ease;
+
+    &--active {
+      background: rgba(121, 121, 121, 0.5);
+      outline: 2px solid rgba(247, 247, 247, 0.35);
+    }
+  }
+
+  &:hover &__box {
+    background: rgba(121, 121, 121, 0.45);
+  }
+
+  &:hover &__box--active {
+    background: rgba(121, 121, 121, 0.5);
+  }
+
+  &__options-btn {
+    position: absolute;
+    top: 13px;
+    right: 10px;
+    z-index: 2;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    img {
+      width: 3px;
+      height: 15px;
+      flex-shrink: 0;
+    }
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+
+  &__menu {
+    position: absolute;
+    top: 28px;
+    right: 0;
+    left: auto;
+    z-index: 20;
+    width: 123px;
+    min-height: 95px;
+    padding: 16px 14px;
+    border-radius: 13px;
+    background: #d9d9d9;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  }
+
+  &__menu-item {
+    border: none;
+    background: transparent;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 13px;
+    width: 100%;
+    cursor: pointer;
+    padding: 0;
+
+    img {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+    }
+
+    span {
+      font-family: 'Source Code Pro', monospace;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 18px;
+      color: #212121;
+      white-space: nowrap;
+    }
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    pointer-events: none;
+  }
+
+  &__name {
+    width: 110px;
+    max-width: 100%;
+    min-height: 18px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: 0;
+    color: #ffffff;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    pointer-events: none;
+  }
 }
 
 .arquivos-scroll {
@@ -333,6 +944,10 @@ function getFuncoes(item: IGetArquivosDataRes): string {
   min-width: 0;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+
+  .arquivos-grid {
+    min-width: 640px;
+  }
 }
 
 .arquivos-grid {
@@ -506,15 +1121,194 @@ function getFuncoes(item: IGetArquivosDataRes): string {
   width: 100%;
 }
 
+@media (min-width: 769px) and (max-width: 1200px) {
+  .arquivos-page__heading {
+    margin-bottom: 24px;
+  }
+
+  .arquivos-panel--grid {
+    .arquivos-toolbar {
+      padding: 20px 16px 14px;
+    }
+
+    .arquivos-grade__tiles {
+      padding: 0 16px 20px;
+    }
+  }
+
+  .arquivos-panel--grid-selected {
+    grid-template-columns: minmax(0, 1fr) 260px;
+    column-gap: 16px;
+    grid-template-areas:
+      'toolbar sidebar'
+      'tiles sidebar';
+
+    .arquivos-toolbar {
+      grid-area: toolbar;
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 10px;
+      padding: 20px 0 12px 16px;
+    }
+
+    .arquivos-grade__tiles {
+      grid-area: tiles;
+      padding: 0 0 20px 16px;
+      margin-top: 0;
+    }
+
+    .arquivos-grade__sidebar {
+      grid-area: sidebar;
+      align-self: stretch;
+      flex: unset;
+      width: 100%;
+      min-width: 0;
+      max-width: none;
+      margin: 0;
+      padding: 20px 16px 24px;
+      border-top-right-radius: var(--night-radius, 30px);
+      border-bottom-right-radius: var(--night-radius, 30px);
+    }
+
+    .arquivos-search {
+      flex: 1 1 auto;
+      width: auto;
+      min-width: 0;
+      max-width: none;
+      height: 44px;
+      padding: 0 14px;
+
+      input {
+        font-size: 12px;
+      }
+    }
+
+    .arquivos-toolbar__actions {
+      flex: 0 0 auto;
+      width: auto;
+      margin-left: 0;
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .arquivos-upload {
+      flex: 0 0 auto;
+      width: auto;
+      max-width: none;
+      min-width: 0;
+      height: 44px;
+      padding: 0 14px;
+
+      span {
+        font-size: 11px;
+      }
+    }
+
+    .arquivos-cta--folder {
+      flex: 0 0 auto;
+      width: auto;
+      min-width: 0;
+      height: 44px;
+      padding: 0 14px;
+      font-size: 12px;
+    }
+  }
+
+  .arquivos-panel--grid:not(.arquivos-panel--grid-selected) {
+    .arquivos-search {
+      flex: 1 1 100%;
+      width: 100%;
+      max-width: none;
+      height: 44px;
+    }
+
+    .arquivos-toolbar__actions {
+      flex: 1 1 100%;
+      width: 100%;
+      margin-left: 0;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+  }
+
+  .arquivos-grade__tiles {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 110px));
+    gap: 12px;
+  }
+
+  .arquivos-grade__sidebar-title {
+    font-size: 18px;
+  }
+
+  .arquivos-grade__info-line {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 1500px) {
+  .arquivos-panel--grid,
+  .arquivos-panel--grid-selected {
+    min-height: auto;
+  }
+}
+
 @media (max-width: 1200px) {
-  .arquivos-toolbar {
-    flex-wrap: nowrap;
-    gap: 10px;
+  .arquivos-panel--grid:not(.arquivos-panel--grid-selected) {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    min-height: auto;
+    padding-right: 0;
+
+    .arquivos-toolbar {
+      grid-column: 1;
+      grid-row: 1;
+      padding: 24px 16px 20px;
+    }
+
+    .arquivos-grade__tiles {
+      grid-column: 1;
+      grid-row: 2;
+      padding: 0 16px 24px;
+    }
+
+    .arquivos-empty {
+      grid-column: 1;
+      grid-row: 2;
+    }
+  }
+
+  .arquivos-panel--grid.arquivos-panel--grid-selected {
+    .arquivos-toolbar {
+      padding-bottom: 12px;
+    }
+
+    .arquivos-grade__tiles {
+      padding-top: 0;
+    }
+  }
+
+  .arquivos-grade__tiles {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  }
+
+  .arquivos-cta--folder {
+    min-width: 140px;
+    width: auto;
+    flex: 0 0 auto;
+  }
+
+  .arquivos-panel--grid:not(.arquivos-panel--grid-selected) .arquivos-toolbar {
+    flex-wrap: wrap;
+    gap: 12px;
     padding: 24px 16px 28px;
   }
 
-  .arquivos-search {
-    flex: 1 1 auto;
+  .arquivos-panel--grid:not(.arquivos-panel--grid-selected) .arquivos-search {
+    flex: 1 1 220px;
     width: auto;
     max-width: none;
     min-width: 0;
@@ -523,6 +1317,27 @@ function getFuncoes(item: IGetArquivosDataRes): string {
 
     input {
       font-size: 12px;
+    }
+  }
+
+  .arquivos-panel--grid:not(.arquivos-panel--grid-selected) .arquivos-toolbar__actions {
+    flex: 1 1 auto;
+    min-width: 0;
+    justify-content: flex-end;
+  }
+
+  .arquivos-upload {
+    height: 44px;
+    padding: 0 12px;
+    gap: 8px;
+
+    span {
+      font-size: 11px;
+    }
+
+    img {
+      width: 18px !important;
+      height: 18px !important;
     }
   }
 
@@ -549,6 +1364,142 @@ function getFuncoes(item: IGetArquivosDataRes): string {
 
   .arquivos-actions {
     gap: 6px;
+  }
+}
+
+@media (max-width: 768px) {
+  .arquivos-panel--grid-selected {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+
+    .arquivos-toolbar {
+      grid-column: 1;
+      grid-row: 1;
+      padding: 20px 16px 14px !important;
+    }
+
+    .arquivos-grade__tiles {
+      grid-column: 1;
+      grid-row: 2;
+      padding: 0 16px 16px;
+    }
+
+    .arquivos-grade__sidebar {
+      grid-column: 1;
+      grid-row: 3;
+      width: 100%;
+      margin: 0 0 16px;
+      padding: 20px 16px 22px;
+    }
+
+    .arquivos-empty {
+      grid-column: 1;
+      grid-row: 2;
+    }
+  }
+
+  .arquivos-page__heading {
+    margin-bottom: 20px;
+  }
+
+  .arquivos-page__view-btn {
+    width: 44px;
+    height: 44px;
+    margin-top: 0;
+  }
+
+  .arquivos-toolbar {
+    padding: 20px 16px 16px !important;
+  }
+
+  .arquivos-search {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .arquivos-toolbar__actions {
+    flex: 1 1 100%;
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .arquivos-panel--grid .arquivos-toolbar__actions,
+  .arquivos-panel--grid-selected .arquivos-toolbar__actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .arquivos-grade__tiles {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+  }
+
+  .arquivos-tile {
+    width: 100%;
+    max-width: none;
+
+    &__box {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 110 / 94;
+    }
+
+    &__name {
+      width: 100%;
+    }
+  }
+
+  .arquivos-tile__menu {
+    top: 28px;
+    right: 0;
+    left: auto;
+  }
+
+  .arquivos-grade__sidebar {
+    padding: 20px 16px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .arquivos-page__heading {
+    margin-bottom: 16px;
+  }
+
+  .arquivos-toolbar__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .arquivos-upload,
+  .arquivos-cta,
+  .arquivos-cta--folder {
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
+  }
+
+  .arquivos-upload span {
+    font-size: 11px;
+  }
+
+  .arquivos-grade__tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .arquivos-panel--grid-selected .arquivos-grade__sidebar {
+    margin: 0 0 12px;
+  }
+
+  .arquivos-panel--grid .arquivos-toolbar,
+  .arquivos-panel--grid .arquivos-grade__tiles {
+    padding-left: 12px;
+    padding-right: 12px;
   }
 }
 </style>

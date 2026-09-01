@@ -11,5 +11,9 @@ import { RouterView } from 'vue-router'
 <style lang="scss" scoped>
 .page {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+  box-sizing: border-box;
 }
 </style>

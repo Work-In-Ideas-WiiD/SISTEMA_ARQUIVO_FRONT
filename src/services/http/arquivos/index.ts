@@ -34,6 +34,7 @@ export interface IGetArquivosDataRes {
   setores?: IArquivoVinculo[]
   funcoes?: IArquivoVinculo[]
   path: string
+  tamanho_bytes?: number
   status: 'pendente' | 'assinado'
   created_at: string
   updated_at: string

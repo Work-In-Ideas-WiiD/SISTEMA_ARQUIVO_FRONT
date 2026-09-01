@@ -5,8 +5,10 @@ import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
 import { useUploadProgressStore } from '@/stores/uploadProgress'
 import { usePageFileDrop } from '@/composables/usePageFileDrop'
-import CustomButton from '@/components/CustomButton/CustomButton.vue'
 import UploadDropOverlay from '@/components/UploadDropOverlay/UploadDropOverlay.vue'
+import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
+import iconChevronDown from '@/assets/imgs/administradores/icon-chevron-down.svg'
+import iconUpload from '@/assets/imgs/arquivos/Upload.svg'
 import { postArquivo } from '@/services/http/arquivos'
 import { getAllEmpresas } from '@/services/http/empresas'
 import { postAddEmpresaToArquivo } from '@/services/http/administradores'
@@ -194,48 +196,68 @@ function goBack() {
 </script>
 
 <template>
-  <section class="new_form">
+  <section class="novo-arquivo">
     <UploadDropOverlay :visible="isDragging" />
 
-    <div class="page_title">
-      <button class="back_btn" type="button" @click="goBack">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-        </svg>
+    <div class="novo-arquivo__heading">
+      <button
+        type="button"
+        class="novo-arquivo__back"
+        aria-label="Voltar para Arquivos"
+        @click="goBack"
+      >
+        <img :src="iconChevronLeft" width="24" height="24" alt="" />
       </button>
-      <h2 class="dashboard_title">NOVO ARQUIVO</h2>
+      <h2 class="novo-arquivo__title dashboard_title">NOVO ARQUIVO</h2>
     </div>
 
-    <div class="form_wrapper">
-      <form @submit.prevent="handleSubmit">
-        <div class="form_group">
-          <label>Nome</label>
-          <input v-model="nome" type="text" placeholder="Nome do arquivo" />
+    <div class="novo-arquivo__panel">
+      <form class="novo-arquivo__form" @submit.prevent="handleSubmit">
+        <div class="novo-arquivo__field">
+          <label class="novo-arquivo__label" for="nome">NOME</label>
+          <input
+            id="nome"
+            v-model="nome"
+            type="text"
+            class="novo-arquivo__input"
+            placeholder="Nome do arquivo"
+          />
         </div>
 
-        <div class="form_group">
-          <label for="empresa">Empresa *</label>
-          <select id="empresa" v-model="empresaId" required>
-            <option value="">Selecione uma empresa</option>
-            <option v-for="emp in empresas" :key="emp.id" :value="emp.id">
-              {{ emp.nome }}
-            </option>
-          </select>
+        <div v-if="isAdmin" class="novo-arquivo__field">
+          <label class="novo-arquivo__label" for="empresa">EMPRESA</label>
+          <div class="novo-arquivo__select-wrap">
+            <select id="empresa" v-model="empresaId" class="novo-arquivo__select" required>
+              <option value="">Empresa (opcional)</option>
+              <option v-for="emp in empresas" :key="emp.id" :value="emp.id">
+                {{ emp.nome }}
+              </option>
+            </select>
+            <img
+              class="novo-arquivo__select-icon"
+              :src="iconChevronDown"
+              width="16"
+              height="9"
+              alt=""
+            />
+          </div>
         </div>
 
-        <div class="form_group">
-          <label>Setor <span class="optional">(opcional)</span></label>
-          <div class="checkbox_list">
-            <div v-if="!empresaId" class="empty_message">
+        <div class="novo-arquivo__field">
+          <label class="novo-arquivo__label">
+            Setor <span class="novo-arquivo__optional">(opcional)</span>
+          </label>
+          <div class="novo-arquivo__checks">
+            <div v-if="!empresaId" class="novo-arquivo__checks-empty">
               Selecione uma empresa primeiro
             </div>
-            <div v-else-if="setoresDisponiveis.length === 0" class="empty_message">
+            <div v-else-if="setoresDisponiveis.length === 0" class="novo-arquivo__checks-empty">
               Nenhum setor cadastrado
             </div>
             <label
               v-for="setor in setoresDisponiveis"
               :key="setor.id"
-              class="checkbox_item"
+              class="novo-arquivo__check"
             >
               <input
                 type="checkbox"
@@ -247,19 +269,21 @@ function goBack() {
           </div>
         </div>
 
-        <div class="form_group">
-          <label>Função <span class="optional">(opcional)</span></label>
-          <div class="checkbox_list">
-            <div v-if="!empresaId" class="empty_message">
+        <div class="novo-arquivo__field">
+          <label class="novo-arquivo__label">
+            Função <span class="novo-arquivo__optional">(opcional)</span>
+          </label>
+          <div class="novo-arquivo__checks">
+            <div v-if="!empresaId" class="novo-arquivo__checks-empty">
               Selecione uma empresa primeiro
             </div>
-            <div v-else-if="funcoesDisponiveis.length === 0" class="empty_message">
+            <div v-else-if="funcoesDisponiveis.length === 0" class="novo-arquivo__checks-empty">
               Nenhuma função cadastrada
             </div>
             <label
               v-for="funcao in funcoesDisponiveis"
               :key="funcao.id"
-              class="checkbox_item"
+              class="novo-arquivo__check"
             >
               <input
                 type="checkbox"
@@ -271,17 +295,11 @@ function goBack() {
           </div>
         </div>
 
-        <div class="upload_area">
-          <label class="upload_label">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" />
-            </svg>
-            <span>
-              {{
-                arquivo
-                  ? arquivo.name
-                  : 'Upload do arquivo (ou arraste e solte)'
-              }}
+        <div class="novo-arquivo__upload-wrap">
+          <label class="novo-arquivo__upload">
+            <img class="novo-arquivo__upload-icon" :src="iconUpload" width="24" height="24" alt="" />
+            <span class="novo-arquivo__upload-text">
+              {{ arquivo ? arquivo.name : 'Fazer upload do arquivo' }}
             </span>
             <input
               ref="fileInputRef"
@@ -293,142 +311,345 @@ function goBack() {
           </label>
         </div>
 
-        <div class="btn_container">
-          <CustomButton
-            title="Adicionar arquivo"
-            variation="2"
-            :loading="fetching"
-            @click="handleSubmit"
-          />
-        </div>
+        <button type="submit" class="novo-arquivo__submit" :disabled="fetching">
+          {{ fetching ? 'Enviando…' : 'ADICIONAR ARQUIVO' }}
+        </button>
       </form>
     </div>
   </section>
 </template>
 
 <style lang="scss" scoped>
-.new_form {
+.novo-arquivo {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
 
-  .page_title {
+  &__heading {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 1px;
     margin-bottom: 42px;
+  }
 
-    .back_btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--color-orange-500);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+  &__back {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
     }
   }
 
-  .form_wrapper {
-    background-color: rgba(207, 198, 188, 0.1);
-    padding: 40px;
-    max-width: 600px;
+  &__title {
+    margin: 0;
+  }
 
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+  &__panel {
+    width: 800px;
+    max-width: 100%;
+    min-height: 481px;
+    box-sizing: border-box;
+    padding: 48px 75px 56px;
+    background: rgba(121, 121, 121, 0.1);
+    border-radius: var(--night-radius, 30px);
+  }
+
+  &__form {
+    width: 650px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  &__field {
+    width: 650px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  &__label {
+    display: block;
+    height: 18px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    font-style: normal;
+    line-height: 18px;
+    letter-spacing: 0;
+    color: #f7f7f7;
+    opacity: 0.7;
+    text-transform: uppercase;
+  }
+
+  &__optional {
+    font-weight: 400;
+    text-transform: none;
+    opacity: 0.8;
+  }
+
+  &__input,
+  &__select {
+    width: 650px;
+    max-width: 100%;
+    height: 49px;
+    box-sizing: border-box;
+    padding: 0 20px;
+    border: none;
+    border-radius: 30px;
+    background: rgba(121, 121, 121, 0.3);
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1;
+    color: #ffffff;
+    outline: none;
+    appearance: none;
+
+    &::placeholder {
+      color: #ffffff;
+      opacity: 0.6;
     }
 
-    .form_group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-
-      label {
-        font-size: 0.875rem;
-        color: var(--color-blue-700);
-
-        .optional {
-          font-weight: 400;
-          color: var(--color-gray-500, #888);
-        }
-      }
-
-      input,
-      select {
-        height: 51px;
-        border: 1px solid var(--color-gray-500);
-        padding: 0 15px;
-        font-size: 0.938rem;
-        color: var(--color-blue-700);
-        outline: none;
-        background: white;
-
-        &::placeholder {
-          color: var(--color-gray-500);
-        }
-      }
+    option {
+      color: #212121;
+      background: #f7f7f7;
     }
+  }
 
-    .checkbox_list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      padding: 12px;
-      border: 1px solid rgba(207, 198, 188, 0.5);
-      border-radius: 4px;
-      max-height: 200px;
-      overflow-y: auto;
-      background: #fff;
+  &__select-wrap {
+    position: relative;
+    width: 650px;
+    max-width: 100%;
+  }
 
-      .empty_message {
-        color: #888;
-        font-style: italic;
-        font-size: 0.875rem;
-      }
-    }
+  &__select {
+    padding-right: 44px;
+    cursor: pointer;
+  }
 
-    .checkbox_item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+  &__select-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%) rotate(-90deg);
+    pointer-events: none;
+    opacity: 0.7;
+  }
+
+  &__checks {
+    width: 650px;
+    max-width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px 16px;
+    min-height: 49px;
+    border-radius: 30px;
+    background: rgba(121, 121, 121, 0.3);
+    max-height: 160px;
+    overflow-y: auto;
+  }
+
+  &__checks-empty {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 13px;
+    font-weight: 300;
+    color: #f7f7f7;
+    opacity: 0.6;
+    font-style: italic;
+  }
+
+  &__check {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: rgba(33, 33, 33, 0.4);
+    cursor: pointer;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 13px;
+    font-weight: 300;
+    color: #f7f7f7;
+
+    input {
       cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 0.875rem;
-      color: var(--color-blue-700);
+    }
+  }
 
-      &:hover {
-        background-color: rgba(207, 198, 188, 0.2);
-      }
+  &__upload-wrap {
+    width: 650px;
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    padding-top: 8px;
+  }
 
-      input[type='checkbox'] {
-        width: auto;
-        height: auto;
-        cursor: pointer;
-      }
+  &__upload {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-width: 281px;
+    max-width: 100%;
+    height: 49px;
+    padding: 0 24px;
+    border: 3px solid #f7f7f7;
+    border-radius: 30px;
+    background: rgba(121, 121, 121, 0.3);
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  &__upload-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+  }
+
+  &__upload-text {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    color: #f7f7f7;
+    text-transform: uppercase;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__submit {
+    width: 243px;
+    height: 46px;
+    margin-top: 16px;
+    align-self: center;
+    border: none;
+    border-radius: 30px;
+    background: #ff00ff;
+    color: #ffffff;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      opacity: 0.92;
     }
 
-    .upload_area {
-      display: flex;
-      justify-content: center;
-      padding: 20px 0;
+    &:disabled {
+      opacity: 0.7;
+      cursor: wait;
+    }
+  }
 
-      .upload_label {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: var(--color-orange-500);
-        cursor: pointer;
-        font-size: 0.938rem;
-
-        &:hover {
-          opacity: 0.8;
-        }
-      }
+  @media (max-width: 900px) {
+    &__panel {
+      width: 100%;
+      min-height: auto;
+      padding: 32px 24px 40px;
     }
 
-    .btn_container {
-      margin-top: 20px;
+    &__form,
+    &__field,
+    &__input,
+    &__select,
+    &__select-wrap,
+    &__checks,
+    &__upload-wrap {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    &__heading {
+      margin-bottom: 24px;
+    }
+
+    &__panel {
+      padding: 28px 20px 32px;
+    }
+
+    &__upload-wrap {
+      justify-content: stretch;
+    }
+
+    &__upload {
+      width: 100%;
+      min-width: 0;
+    }
+
+    &__submit {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    &__heading {
+      margin-bottom: 16px;
+    }
+
+    &__panel {
+      padding: 24px 16px 28px;
+      border-radius: 20px;
+    }
+
+    &__form {
+      gap: 18px;
+    }
+
+    &__label {
+      font-size: 12px;
+    }
+
+    &__input,
+    &__select {
+      height: 44px;
+      font-size: 13px;
+    }
+
+    &__checks {
+      padding: 12px 14px;
+      max-height: 140px;
+    }
+
+    &__upload {
+      height: 44px;
+      padding: 0 16px;
+    }
+
+    &__upload-text {
+      font-size: 12px;
+    }
+
+    &__submit {
+      height: 44px;
+      margin-top: 8px;
+      font-size: 14px;
     }
   }
 }
