@@ -5,7 +5,8 @@ import { useToast } from 'vue-toastification'
 import TableEmptyMessage from '@/components/TableEmptyMessage/TableEmptyMessage.vue'
 import TablePaginator from '@/components/TablePaginator/TablePaginator.vue'
 import { getAdministradores, type IGetAdministradoresDataRes } from '@/services/http/administradores'
-import { formatCnpjCpf } from '@/utils/formatCpfCnpj'
+import { formatCnpjCpf, maskCpf } from '@/utils/formatCpfCnpj'
+import { formatPhone, maskPhone, stripDigits } from '@/utils/formatPhone'
 import { useDebouncedSearch } from '@/composables/useDebouncedSearch'
 import iconSearch from '@/assets/imgs/administradores/icon-search.svg'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
@@ -108,6 +109,10 @@ function getDocumentId(item: IGetAdministradoresDataRes): string {
   if (item.cpf && item.cpf.trim() !== '') return formatCnpjCpf(item.cpf)
   return 'n/a'
 }
+
+function getContato(item: IGetAdministradoresDataRes): string {
+  return formatPhone(item.contato)
+}
 </script>
 
 <template>
@@ -160,7 +165,7 @@ function getDocumentId(item: IGetAdministradoresDataRes): string {
               <td :title="item.nome">{{ item.nome }}</td>
               <td :title="getDocumentId(item)">{{ getDocumentId(item) }}</td>
               <td :title="item.email || 'n/a'">{{ item.email || 'n/a' }}</td>
-              <td :title="item.contato || 'n/a'">{{ item.contato || 'n/a' }}</td>
+              <td :title="getContato(item)">{{ getContato(item) }}</td>
               <td>
                 <button
                   type="button"

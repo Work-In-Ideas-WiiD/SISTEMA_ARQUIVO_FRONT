@@ -4,6 +4,8 @@ import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import { postAdministrador } from '@/services/http/administradores'
+import { maskCpf } from '@/utils/formatCpfCnpj'
+import { maskPhone, stripDigits } from '@/utils/formatPhone'
 
 const router = useRouter()
 const toast = useToast()
@@ -14,21 +16,42 @@ const contato = ref('')
 const cpf = ref('')
 const fetching = ref(false)
 
+function onCpfInput(event: Event) {
+  cpf.value = maskCpf((event.target as HTMLInputElement).value)
+}
+
+function onContatoInput(event: Event) {
+  contato.value = maskPhone((event.target as HTMLInputElement).value)
+}
+
 async function handleSubmit() {
   if (fetching.value) return
 
-  if (!nome.value || !email.value || !cpf.value || !contato.value) {
+  const cpfDigits = stripDigits(cpf.value)
+  const contatoDigits = stripDigits(contato.value)
+
+  if (!nome.value.trim() || !email.value.trim() || !cpfDigits || !contatoDigits) {
     toast.error('Preencha todos os campos')
+    return
+  }
+
+  if (cpfDigits.length !== 11) {
+    toast.error('CPF inválido')
+    return
+  }
+
+  if (contatoDigits.length < 10 || contatoDigits.length > 11) {
+    toast.error('Contato inválido')
     return
   }
 
   try {
     fetching.value = true
     await postAdministrador({
-      nome: nome.value,
-      email: email.value,
-      cpf: cpf.value,
-      contato: contato.value
+      nome: nome.value.trim(),
+      email: email.value.trim().toLowerCase(),
+      cpf: cpfDigits,
+      contato: contatoDigits
     })
     toast.success('Administrador cadastrado')
     setTimeout(() => {
@@ -93,6 +116,9 @@ function goBack() {
             type="text"
             class="novo-admin__input"
             placeholder="(00) 00000-0000"
+            inputmode="tel"
+            autocomplete="tel"
+            @input="onContatoInput"
           />
         </div>
 
@@ -104,6 +130,9 @@ function goBack() {
             type="text"
             class="novo-admin__input"
             placeholder="000.000.000-00"
+            inputmode="numeric"
+            autocomplete="off"
+            @input="onCpfInput"
           />
         </div>
 

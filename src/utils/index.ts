@@ -1,4 +1,5 @@
 export * from './formatCpfCnpj'
+export * from './formatPhone'
 export * from './openFile'
 export * from './clicksign'
 export * from './apiError'

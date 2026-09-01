@@ -5,6 +5,7 @@ import { useToast } from 'vue-toastification'
 import TableEmptyMessage from '@/components/TableEmptyMessage/TableEmptyMessage.vue'
 import { getClientes, type IGetClientesDataRes } from '@/services/http/clientes'
 import { formatCnpjCpf } from '@/utils/formatCpfCnpj'
+import { formatPhone } from '@/utils/formatPhone'
 
 const router = useRouter()
 const toast = useToast()
@@ -28,9 +29,13 @@ async function getData() {
 }
 
 function getDocumentId(item: IGetClientesDataRes): string {
-  if (item.cnpj) return formatCnpjCpf(item.cnpj)
-  if (item.cpf) return formatCnpjCpf(item.cpf)
+  if (item.cnpj && item.cnpj.trim() !== '') return formatCnpjCpf(item.cnpj)
+  if (item.cpf && item.cpf.trim() !== '') return formatCnpjCpf(item.cpf)
   return 'n/a'
+}
+
+function getContato(item: IGetClientesDataRes): string {
+  return formatPhone(item.contato)
 }
 
 function navigateTo() {
@@ -63,7 +68,7 @@ function navigateTo() {
               <td :title="item.nome_empresa || 'n/a'">{{ item.nome_empresa || 'n/a' }}</td>
               <td :title="getDocumentId(item)">{{ getDocumentId(item) }}</td>
               <td :title="item.email || 'n/a'">{{ item.email || 'n/a' }}</td>
-              <td :title="item.contato || 'n/a'">{{ item.contato || 'n/a' }}</td>
+              <td :title="getContato(item)">{{ getContato(item) }}</td>
             </tr>
           </tbody>
         </table>
