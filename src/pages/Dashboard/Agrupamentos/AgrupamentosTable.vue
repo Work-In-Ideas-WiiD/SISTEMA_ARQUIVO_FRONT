@@ -5,6 +5,7 @@ import { useToast } from 'vue-toastification'
 import TableEmptyMessage from '@/components/TableEmptyMessage/TableEmptyMessage.vue'
 import TablePaginator from '@/components/TablePaginator/TablePaginator.vue'
 import { getAgrupamentos, deleteAgrupamento, type IAgrupamento } from '@/services/http/agrupamentos'
+import { useDebouncedSearch } from '@/composables/useDebouncedSearch'
 import iconSearch from '@/assets/imgs/administradores/icon-search.svg'
 import iconChevronDown from '@/assets/imgs/administradores/icon-chevron-down.svg'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
@@ -15,7 +16,6 @@ import iconDelete from '@/assets/imgs/agrupamentos/delete.svg'
 const router = useRouter()
 const toast = useToast()
 
-const searchFetching = ref(false)
 const page = ref(1)
 const pages = ref(0)
 const agrupamentos = ref<IAgrupamento[]>([])
@@ -66,11 +66,9 @@ onUnmounted(() => {
 async function getData(
   pageParam: number,
   likeParam: string = '',
-  tipoParam: '' | 'individual' | 'setor' = tipo.value,
-  showSearchLoader = false
+  tipoParam: '' | 'individual' | 'setor' = tipo.value
 ) {
   try {
-    if (showSearchLoader) searchFetching.value = true
     const { data } = await getAgrupamentos(pageParam, likeParam, undefined, tipoParam || undefined)
     pages.value = data.last_page
     agrupamentos.value = data.data
@@ -78,15 +76,21 @@ async function getData(
   } catch (error) {
     console.error(error)
     toast.error('Erro ao carregar agrupamentos')
-  } finally {
-    if (showSearchLoader) searchFetching.value = false
   }
 }
 
 function searchData() {
-  page.value = 1
-  getData(page.value, search.value, tipo.value, true)
+  debouncedSearch.flush()
 }
+
+function onSearchInput() {
+  debouncedSearch.schedule()
+}
+
+const debouncedSearch = useDebouncedSearch(() => {
+  page.value = 1
+  getData(page.value, search.value, tipo.value)
+})
 
 function onTipoChange() {
   page.value = 1
@@ -164,14 +168,14 @@ function getMembrosInfo(item: IAgrupamento): string {
       <form class="agrup-toolbar" @submit.prevent="searchData">
         <div class="agrup-toolbar__left">
           <label class="agrup-search">
-            <button v-if="searchFetching" type="button" class="agrup-search__loader" aria-hidden="true" />
-            <button v-else type="submit" class="agrup-search__btn" aria-label="Pesquisar">
+            <button type="submit" class="agrup-search__btn" aria-label="Pesquisar">
               <img :src="iconSearch" width="18" height="18" alt="" />
             </button>
             <input
               v-model="search"
               type="text"
               :placeholder="searchPlaceholder"
+              @input="onSearchInput"
             />
           </label>
 
@@ -346,8 +350,7 @@ function getMembrosInfo(item: IAgrupamento): string {
   border-radius: 30px;
   cursor: text;
 
-  &__btn,
-  &__loader {
+  &__btn {
     flex-shrink: 0;
     border: none;
     background: transparent;
@@ -356,16 +359,6 @@ function getMembrosInfo(item: IAgrupamento): string {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-  }
-
-  &__loader {
-    width: 18px;
-    height: 18px;
-    border: 2px solid rgba(247, 247, 247, 0.3);
-    border-top-color: #f7f7f7;
-    border-radius: 50%;
-    animation: agrup-spin 0.8s linear infinite;
-    cursor: default;
   }
 
   input {
@@ -716,12 +709,6 @@ function getMembrosInfo(item: IAgrupamento): string {
 
 .agrup-paginator {
   width: 100%;
-}
-
-@keyframes agrup-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 @media (max-width: 1200px) {

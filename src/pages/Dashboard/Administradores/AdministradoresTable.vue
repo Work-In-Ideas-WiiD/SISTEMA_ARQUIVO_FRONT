@@ -6,6 +6,7 @@ import TableEmptyMessage from '@/components/TableEmptyMessage/TableEmptyMessage.
 import TablePaginator from '@/components/TablePaginator/TablePaginator.vue'
 import { getAdministradores, type IGetAdministradoresDataRes } from '@/services/http/administradores'
 import { formatCnpjCpf } from '@/utils/formatCpfCnpj'
+import { useDebouncedSearch } from '@/composables/useDebouncedSearch'
 import iconSearch from '@/assets/imgs/administradores/icon-search.svg'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import iconNewFolder from '@/assets/imgs/administradores/icon-new-folder.svg'
@@ -14,7 +15,6 @@ import iconEdit from '@/assets/imgs/administradores/icon-edit.svg'
 const router = useRouter()
 const toast = useToast()
 
-const searchFetching = ref(false)
 const page = ref(1)
 const pages = ref(0)
 const admins = ref<IGetAdministradoresDataRes[]>([])
@@ -62,28 +62,33 @@ onUnmounted(() => {
   searchPlaceholderMql?.removeEventListener('change', updateSearchPlaceholder)
 })
 
-async function getData(pageParam: number, likeParam: string = '', showSearchLoader = false) {
+async function getData(pageParam: number, likeParam: string = '') {
   try {
-    if (showSearchLoader) searchFetching.value = true
     const { data } = await getAdministradores(pageParam, likeParam)
     pages.value = data.last_page
     admins.value = data.data
     noContent.value = data.data.length === 0
-    if (noContent.value) applyMockAdmins()
+    if (noContent.value && !likeParam.trim()) applyMockAdmins()
   } catch (error) {
     console.error(error)
-    if (!applyMockAdmins()) {
+    if (!likeParam.trim() && applyMockAdmins()) {
       toast.error('Erro ao carregar administradores')
     }
-  } finally {
-    if (showSearchLoader) searchFetching.value = false
   }
 }
 
 function searchData() {
-  page.value = 1
-  getData(page.value, search.value, true)
+  debouncedSearch.flush()
 }
+
+function onSearchInput() {
+  debouncedSearch.schedule()
+}
+
+const debouncedSearch = useDebouncedSearch(() => {
+  page.value = 1
+  getData(page.value, search.value)
+})
 
 function onPageChange(newPage: number) {
   page.value = newPage
@@ -122,14 +127,14 @@ function getDocumentId(item: IGetAdministradoresDataRes): string {
     <div class="admins-panel">
       <form class="admins-toolbar" @submit.prevent="searchData">
         <label class="admins-search">
-          <button v-if="searchFetching" type="button" class="admins-search__loader" aria-hidden="true" />
-          <button v-else type="submit" class="admins-search__btn" aria-label="Pesquisar">
+          <button type="submit" class="admins-search__btn" aria-label="Pesquisar">
             <img :src="iconSearch" width="18" height="18" alt="" />
           </button>
           <input
             v-model="search"
             type="text"
             :placeholder="searchPlaceholder"
+            @input="onSearchInput"
           />
         </label>
 
@@ -247,8 +252,7 @@ function getDocumentId(item: IGetAdministradoresDataRes): string {
   border-radius: 30px;
   cursor: text;
 
-  &__btn,
-  &__loader {
+  &__btn {
     flex-shrink: 0;
     border: none;
     background: transparent;
@@ -257,16 +261,6 @@ function getDocumentId(item: IGetAdministradoresDataRes): string {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-  }
-
-  &__loader {
-    width: 18px;
-    height: 18px;
-    border: 2px solid rgba(247, 247, 247, 0.3);
-    border-top-color: #f7f7f7;
-    border-radius: 50%;
-    animation: admins-spin 0.8s linear infinite;
-    cursor: default;
   }
 
   input {
@@ -486,12 +480,6 @@ function getDocumentId(item: IGetAdministradoresDataRes): string {
 
 .admins-paginator {
   width: 100%;
-}
-
-@keyframes admins-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 @media (max-width: 1200px) {
