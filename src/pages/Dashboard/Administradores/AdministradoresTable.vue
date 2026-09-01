@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import TableEmptyMessage from '@/components/TableEmptyMessage/TableEmptyMessage.vue'
@@ -21,6 +21,15 @@ const pages = ref(0)
 const admins = ref<IGetAdministradoresDataRes[]>([])
 const noContent = ref(false)
 const search = ref('')
+const searchPlaceholder = ref('Pesquisar por ID, nome, e-mail e número de documento…')
+
+let searchPlaceholderMql: MediaQueryList | null = null
+
+function updateSearchPlaceholder() {
+  searchPlaceholder.value = window.matchMedia('(max-width: 1200px)').matches
+    ? 'Pesquisar…'
+    : 'Pesquisar por ID, nome, e-mail e número de documento…'
+}
 
 const mockAdmins: IGetAdministradoresDataRes[] = [
   { id: 'mock-1', nome: 'Allan Ferreira Neto', email: 'marisa124123@gmail.com', cpf: '05529884130', cnpj: null, contato: '062 9852-5468', nome_empresa: null },
@@ -44,7 +53,14 @@ function applyMockAdmins() {
 }
 
 onMounted(() => {
+  searchPlaceholderMql = window.matchMedia('(max-width: 1200px)')
+  updateSearchPlaceholder()
+  searchPlaceholderMql.addEventListener('change', updateSearchPlaceholder)
   getData(page.value, search.value)
+})
+
+onUnmounted(() => {
+  searchPlaceholderMql?.removeEventListener('change', updateSearchPlaceholder)
 })
 
 async function getData(pageParam: number, likeParam: string = '') {
@@ -106,22 +122,24 @@ function getDocumentId(item: IGetAdministradoresDataRes): string {
 
     <div class="admins-panel">
       <form class="admins-toolbar" @submit.prevent="searchData">
-        <label class="admins-search">
-          <button v-if="fetching" type="button" class="admins-search__loader" aria-hidden="true" />
-          <button v-else type="submit" class="admins-search__btn" aria-label="Pesquisar">
-            <img :src="iconSearch" width="18" height="18" alt="" />
-          </button>
-          <input
-            v-model="search"
-            type="text"
-            placeholder="Pesquisar por ID, nome, e-mail e número de documento…"
-          />
-        </label>
+        <div class="admins-toolbar__left">
+          <label class="admins-search">
+            <button v-if="fetching" type="button" class="admins-search__loader" aria-hidden="true" />
+            <button v-else type="submit" class="admins-search__btn" aria-label="Pesquisar">
+              <img :src="iconSearch" width="18" height="18" alt="" />
+            </button>
+            <input
+              v-model="search"
+              type="text"
+              :placeholder="searchPlaceholder"
+            />
+          </label>
 
-        <button type="button" class="admins-filter" aria-hidden="true">
-          <span>Tipo</span>
-          <img :src="iconChevronDown" width="16" height="9" alt="" />
-        </button>
+          <button type="button" class="admins-filter" aria-hidden="true">
+            <span>Tipo</span>
+            <img :src="iconChevronDown" width="16" height="9" alt="" />
+          </button>
+        </div>
 
         <button type="button" class="admins-cta" @click="goToNovo">
           <img :src="iconNewFolder" width="20" height="16" alt="" />
@@ -222,6 +240,10 @@ function getDocumentId(item: IGetAdministradoresDataRes): string {
   gap: 15px;
   padding: 30px 38px 32px;
   flex-wrap: nowrap;
+
+  &__left {
+    display: contents;
+  }
 }
 
 .admins-search {
@@ -506,25 +528,48 @@ function getDocumentId(item: IGetAdministradoresDataRes): string {
 
 @media (max-width: 1200px) {
   .admins-toolbar {
-    flex-wrap: wrap;
-    gap: 12px;
-    padding: 24px 24px 28px;
+    flex-wrap: nowrap;
+    gap: 10px;
+    padding: 24px 16px 28px;
+
+    &__left {
+      display: flex;
+      flex: 1;
+      min-width: 0;
+      align-items: center;
+      gap: 10px;
+    }
   }
 
   .admins-search {
-    flex: 1 1 100%;
-    width: 100%;
+    flex: 1 1 auto;
+    width: auto;
     max-width: none;
+    min-width: 0;
+    height: 44px;
+    padding: 0 14px;
+
+    input {
+      font-size: 12px;
+    }
   }
 
   .admins-filter {
-    flex: 0 0 130px;
+    flex: 0 0 100px;
+    width: 100px;
+    height: 44px;
+    font-size: 12px;
   }
 
   .admins-cta {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 140px;
+    height: 44px;
     margin-left: 0;
-    flex: 1 1 auto;
-    min-width: 200px;
+    padding: 0 12px;
+    font-size: 13px;
+    gap: 8px;
   }
 }
 </style>
