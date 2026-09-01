@@ -219,6 +219,7 @@ async function handleSubmit() {
   padding: 0 22px;
   border-radius: 30px;
   background: rgba(255, 255, 255, 0.2);
+  overflow: hidden;
   cursor: text;
 
   &__icon {
@@ -239,6 +240,8 @@ async function handleSubmit() {
     &::placeholder {
       color: rgba(255, 255, 255, 0.85);
     }
+
+    @include login-input-autofill(#fff);
   }
 }
 

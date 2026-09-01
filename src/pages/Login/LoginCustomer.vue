@@ -230,6 +230,7 @@ async function handleLogin() {
   padding: 0 22px;
   border-radius: 30px;
   background: var(--login-input-bg);
+  overflow: hidden;
   cursor: text;
 
   &__icon {
@@ -250,6 +251,8 @@ async function handleLogin() {
     &::placeholder {
       color: rgba(255, 255, 255, 0.85);
     }
+
+    @include login-input-autofill(#fff);
   }
 }
 

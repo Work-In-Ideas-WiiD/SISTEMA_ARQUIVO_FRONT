@@ -56,6 +56,29 @@ $login-mobile-bp: 768px;
   }
 }
 
+@mixin login-input-autofill($color: #fff) {
+  transition: background-color 99999s ease-out 0s, color 99999s ease-out 0s;
+
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus,
+  &:-webkit-autofill:active {
+    -webkit-text-fill-color: #{$color} !important;
+    caret-color: #{$color};
+    background-color: transparent !important;
+    -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+    box-shadow: 0 0 0 1000px transparent inset !important;
+    transition: background-color 99999s ease-out 0s, color 99999s ease-out 0s;
+  }
+
+  &:autofill {
+    -webkit-text-fill-color: #{$color} !important;
+    caret-color: #{$color};
+    background-color: transparent !important;
+    box-shadow: 0 0 0 1000px transparent inset !important;
+  }
+}
+
 @mixin auth-subtitle-lines {
   .auth_subtitle-line--mobile {
     display: none;
