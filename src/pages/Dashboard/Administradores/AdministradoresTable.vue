@@ -7,7 +7,6 @@ import TablePaginator from '@/components/TablePaginator/TablePaginator.vue'
 import { getAdministradores, type IGetAdministradoresDataRes } from '@/services/http/administradores'
 import { formatCnpjCpf } from '@/utils/formatCpfCnpj'
 import iconSearch from '@/assets/imgs/administradores/icon-search.svg'
-import iconChevronDown from '@/assets/imgs/administradores/icon-chevron-down.svg'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import iconNewFolder from '@/assets/imgs/administradores/icon-new-folder.svg'
 import iconEdit from '@/assets/imgs/administradores/icon-edit.svg'
@@ -15,7 +14,7 @@ import iconEdit from '@/assets/imgs/administradores/icon-edit.svg'
 const router = useRouter()
 const toast = useToast()
 
-const fetching = ref(false)
+const searchFetching = ref(false)
 const page = ref(1)
 const pages = ref(0)
 const admins = ref<IGetAdministradoresDataRes[]>([])
@@ -63,9 +62,9 @@ onUnmounted(() => {
   searchPlaceholderMql?.removeEventListener('change', updateSearchPlaceholder)
 })
 
-async function getData(pageParam: number, likeParam: string = '') {
+async function getData(pageParam: number, likeParam: string = '', showSearchLoader = false) {
   try {
-    fetching.value = true
+    if (showSearchLoader) searchFetching.value = true
     const { data } = await getAdministradores(pageParam, likeParam)
     pages.value = data.last_page
     admins.value = data.data
@@ -77,13 +76,13 @@ async function getData(pageParam: number, likeParam: string = '') {
       toast.error('Erro ao carregar administradores')
     }
   } finally {
-    fetching.value = false
+    if (showSearchLoader) searchFetching.value = false
   }
 }
 
 function searchData() {
   page.value = 1
-  getData(page.value, search.value)
+  getData(page.value, search.value, true)
 }
 
 function onPageChange(newPage: number) {
@@ -122,24 +121,17 @@ function getDocumentId(item: IGetAdministradoresDataRes): string {
 
     <div class="admins-panel">
       <form class="admins-toolbar" @submit.prevent="searchData">
-        <div class="admins-toolbar__left">
-          <label class="admins-search">
-            <button v-if="fetching" type="button" class="admins-search__loader" aria-hidden="true" />
-            <button v-else type="submit" class="admins-search__btn" aria-label="Pesquisar">
-              <img :src="iconSearch" width="18" height="18" alt="" />
-            </button>
-            <input
-              v-model="search"
-              type="text"
-              :placeholder="searchPlaceholder"
-            />
-          </label>
-
-          <button type="button" class="admins-filter" aria-hidden="true">
-            <span>Tipo</span>
-            <img :src="iconChevronDown" width="16" height="9" alt="" />
+        <label class="admins-search">
+          <button v-if="searchFetching" type="button" class="admins-search__loader" aria-hidden="true" />
+          <button v-else type="submit" class="admins-search__btn" aria-label="Pesquisar">
+            <img :src="iconSearch" width="18" height="18" alt="" />
           </button>
-        </div>
+          <input
+            v-model="search"
+            type="text"
+            :placeholder="searchPlaceholder"
+          />
+        </label>
 
         <button type="button" class="admins-cta" @click="goToNovo">
           <img :src="iconNewFolder" width="20" height="16" alt="" />
@@ -240,10 +232,6 @@ function getDocumentId(item: IGetAdministradoresDataRes): string {
   gap: 15px;
   padding: 30px 38px 32px;
   flex-wrap: nowrap;
-
-  &__left {
-    display: contents;
-  }
 }
 
 .admins-search {
@@ -299,26 +287,6 @@ function getDocumentId(item: IGetAdministradoresDataRes): string {
       opacity: 1;
     }
   }
-}
-
-.admins-filter {
-  flex: 0 0 130px;
-  width: 130px;
-  height: 49px;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: rgba(121, 121, 121, 0.3);
-  border-radius: 30px;
-  font-family: 'Source Code Pro', monospace;
-  font-size: 14px;
-  font-weight: 300;
-  line-height: 1;
-  color: #f7f7f7;
-  cursor: default;
-  padding: 0;
 }
 
 .admins-cta {
@@ -531,14 +499,6 @@ function getDocumentId(item: IGetAdministradoresDataRes): string {
     flex-wrap: nowrap;
     gap: 10px;
     padding: 24px 16px 28px;
-
-    &__left {
-      display: flex;
-      flex: 1;
-      min-width: 0;
-      align-items: center;
-      gap: 10px;
-    }
   }
 
   .admins-search {
@@ -552,13 +512,6 @@ function getDocumentId(item: IGetAdministradoresDataRes): string {
     input {
       font-size: 12px;
     }
-  }
-
-  .admins-filter {
-    flex: 0 0 100px;
-    width: 100px;
-    height: 44px;
-    font-size: 12px;
   }
 
   .admins-cta {
