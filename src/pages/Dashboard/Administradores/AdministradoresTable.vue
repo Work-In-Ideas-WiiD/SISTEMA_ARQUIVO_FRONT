@@ -333,7 +333,6 @@ function getDocumentId(item: IGetAdministradoresDataRes): string {
   min-width: 0;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 16px;
 }
 
 .admins-grid {

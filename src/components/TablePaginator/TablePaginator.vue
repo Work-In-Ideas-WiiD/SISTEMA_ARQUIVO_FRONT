@@ -100,7 +100,8 @@ function goToPage(page: number) {
   &--night {
     min-width: 0;
     background: transparent;
-    padding: 16px 38px 24px;
+    justify-content: center;
+    padding: 8px 16px 12px;
     gap: 4px;
 
     .nav_btn,
