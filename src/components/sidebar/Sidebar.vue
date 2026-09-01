@@ -191,10 +191,10 @@ function shouldShowItem(item: IMenuItem): boolean {
     display: flex;
     flex-direction: column;
     gap: var(--sidebar-nav-gap);
-    /* visible: barra 50px do 1º item não é clipada; scroll só se ainda faltar altura */
     overflow-x: hidden;
     overflow-y: auto;
-    padding: 0;
+    overscroll-behavior-y: contain;
+    padding: 0 0 8px;
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
 
@@ -211,7 +211,38 @@ function shouldShowItem(item: IMenuItem): boolean {
   &__footer {
     flex-shrink: 0;
     width: 100%;
-    padding: 24px 0 56px;
+    padding: 16px 0 40px;
+  }
+
+  /* Full HD (1080p): comprime para caber sem scroll ou com scroll mínimo */
+  @media (min-height: 921px) and (max-height: 1080px) {
+    .logo {
+      margin: 52px auto 24px;
+      width: 160px;
+      height: 105px;
+    }
+
+    --sidebar-nav-gap: 8px;
+
+    &__nav {
+      padding-bottom: 4px;
+    }
+
+    &__footer {
+      padding: 12px 0 36px;
+    }
+
+    :deep(.sidebar-item) {
+      min-height: 44px;
+
+      .title {
+        font-size: 16px;
+      }
+
+      &.active::before {
+        height: 44px;
+      }
+    }
   }
 
   @media (max-width: 1366px) {
@@ -243,6 +274,14 @@ function shouldShowItem(item: IMenuItem): boolean {
     &__footer {
       padding: 16px 0 32px;
     }
+
+    :deep(.sidebar-item) {
+      min-height: 44px;
+
+      &.active::before {
+        height: 44px;
+      }
+    }
   }
 
   @media (max-height: 800px) {
@@ -256,6 +295,18 @@ function shouldShowItem(item: IMenuItem): boolean {
 
     &__footer {
       padding: 12px 0 20px;
+    }
+
+    :deep(.sidebar-item) {
+      min-height: 40px;
+
+      .title {
+        font-size: 15px;
+      }
+
+      &.active::before {
+        height: 40px;
+      }
     }
   }
 
