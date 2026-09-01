@@ -64,6 +64,14 @@ button {
   font: 400 1rem 'Inter', sans-serif;
 }
 
+body {
+  min-height: 100vh;
+}
+
+#app {
+  min-height: 100vh;
+}
+
 button {
   cursor: pointer;
 }

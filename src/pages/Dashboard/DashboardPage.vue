@@ -4,6 +4,7 @@ import { RouterView, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import Sidebar from '@/components/sidebar/Sidebar.vue'
 import MobileHeader from '@/components/mobileHeader/MobileHeader.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -33,20 +34,32 @@ onMounted(async () => {
       <RouterView />
     </div>
   </main>
-  <div v-else class="loading">
-    <span>Carregando...</span>
+  <div v-else class="dashboard-loading dashboard-night">
+    <LoadingSpinner theme="night" size="lg" />
+    <span class="dashboard-loading__text">Carregando...</span>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.loading {
+.dashboard-loading {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: var(--color-blue-700);
-  color: white;
-  font-size: 1.2rem;
+  gap: 20px;
+  background-color: var(--night-bg, #252525);
+
+  &__text {
+    font-family: var(--night-font, 'Source Code Pro', monospace);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: 0;
+    color: var(--night-gray, #f7f7f7);
+    opacity: 0.7;
+    text-transform: uppercase;
+  }
 }
 
 .main {

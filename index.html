@@ -8,9 +8,67 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700&family=Source+Code+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <title>WiiDocs</title>
+    <style>
+      html.boot-dashboard,
+      html.boot-dashboard body {
+        background-color: #252525;
+        min-height: 100%;
+        margin: 0;
+      }
+
+      html.boot-dashboard #app {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .app-boot {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .app-boot__ring {
+        width: 48px;
+        height: 48px;
+        border: 4px solid rgba(121, 121, 121, 0.3);
+        border-top-color: #ff00ff;
+        border-radius: 50%;
+        animation: app-boot-spin 0.9s linear infinite;
+      }
+
+      .app-boot__text {
+        font-family: 'Source Code Pro', monospace;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1;
+        color: #f7f7f7;
+        opacity: 0.7;
+        text-transform: uppercase;
+      }
+
+      @keyframes app-boot-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </head>
   <body>
     <div id="app"></div>
+    <script>
+      (function () {
+        if (!location.pathname.startsWith('/dashboard')) return
+        document.documentElement.classList.add('boot-dashboard')
+        var app = document.getElementById('app')
+        app.innerHTML =
+          '<div class="app-boot" role="status" aria-label="Carregando">' +
+          '<div class="app-boot__ring" aria-hidden="true"></div>' +
+          '<span class="app-boot__text">Carregando...</span></div>'
+      })()
+    </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
