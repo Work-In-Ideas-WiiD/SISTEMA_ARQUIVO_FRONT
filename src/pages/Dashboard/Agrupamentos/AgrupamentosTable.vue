@@ -538,8 +538,7 @@ function getMembrosInfo(item: IAgrupamento): string {
 
   th:last-child {
     text-align: center;
-    width: 110px;
-    min-width: 110px;
+    width: 96px;
   }
 
   td {
@@ -559,39 +558,39 @@ function getMembrosInfo(item: IAgrupamento): string {
   }
 
   td:nth-child(2) {
-    overflow: visible;
+    overflow: hidden;
   }
 
   td:last-child {
-    width: 110px;
-    min-width: 110px;
+    width: 96px;
     overflow: visible;
   }
 
   th:nth-child(1),
   td:nth-child(1) {
-    width: 18%;
+    width: 17%;
   }
 
   th:nth-child(2),
   td:nth-child(2) {
-    width: 14%;
+    width: 15%;
+    padding-right: 10px;
   }
 
   th:nth-child(3),
   td:nth-child(3) {
     width: 14%;
+    padding-left: 4px;
   }
 
   th:nth-child(4),
   td:nth-child(4) {
-    width: 36%;
+    width: 34%;
   }
 
   th:nth-child(5),
   td:nth-child(5) {
-    width: 18%;
-    min-width: 110px;
+    width: 20%;
   }
 
   tbody tr:nth-child(odd) {
@@ -636,6 +635,16 @@ function getMembrosInfo(item: IAgrupamento): string {
       padding-right: 16px;
     }
 
+    th:nth-child(2),
+    td:nth-child(2) {
+      padding-right: 8px;
+    }
+
+    th:nth-child(3),
+    td:nth-child(3) {
+      padding-left: 6px;
+    }
+
     td {
       padding: 0 8px;
       font-size: 11px;
@@ -648,9 +657,12 @@ function getMembrosInfo(item: IAgrupamento): string {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 114px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 114px;
+  min-width: 0;
   height: 26px;
-  padding: 0 12px;
+  padding: 0 10px;
   border-radius: 30px;
   font-family: 'Montserrat', sans-serif;
   font-size: 12px;
@@ -659,6 +671,8 @@ function getMembrosInfo(item: IAgrupamento): string {
   letter-spacing: 0;
   text-transform: uppercase;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   &--funcionario {
     background: #ffed82;
@@ -771,10 +785,24 @@ function getMembrosInfo(item: IAgrupamento): string {
   }
 
   .agrup-badge {
-    min-width: 96px;
-    height: 24px;
-    font-size: 10px;
-    padding: 0 8px;
+    max-width: 100%;
+    height: 22px;
+    font-size: 9px;
+    padding: 0 6px;
+  }
+
+  .agrup-action {
+    width: 34px;
+    height: 34px;
+
+    img {
+      width: 16px !important;
+      height: 16px !important;
+    }
+  }
+
+  .agrup-actions {
+    gap: 6px;
   }
 }
 </style>
