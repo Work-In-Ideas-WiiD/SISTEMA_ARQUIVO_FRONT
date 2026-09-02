@@ -695,7 +695,7 @@ function goBack() {
       min-height: 49px;
       max-height: 49px;
       padding: 0 20px;
-      background: rgba(33, 33, 33, 0.2);
+      background: #212121;
       overflow: hidden;
     }
   }
