@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
-import CustomButton from '@/components/CustomButton/CustomButton.vue'
-import { postAgrupamento } from '@/services/http/agrupamentos'
+import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
+import iconChevronDown from '@/assets/imgs/administradores/icon-chevron-down.svg'
+import iconRadio from '@/assets/imgs/agrupamentos/icon-radio.svg'
+import iconRadioSelected from '@/assets/imgs/agrupamentos/icon-radio-selected.svg'
+import { postAgrupamento, type IPostAgrupamentoModel } from '@/services/http/agrupamentos'
 import { getAllSetores, type ISetor } from '@/services/http/setores'
 import { getAllFuncionarios, type IFuncionario } from '@/services/http/funcionarios'
 import { getAllEmpresas } from '@/services/http/empresas'
@@ -18,6 +21,8 @@ const loadingData = ref(true)
 const empresas = ref<{ id: string; nome: string }[]>([])
 const setoresDisponiveis = ref<ISetor[]>([])
 const funcionariosDisponiveis = ref<IFuncionario[]>([])
+const empresaOpen = ref(false)
+const empresaFilterRef = ref<HTMLElement | null>(null)
 
 const form = ref({
   nome: '',
@@ -32,12 +37,16 @@ const isAdmin = computed(() => authStore.userRole === 'administrador')
 const showFuncionarios = computed(() => form.value.tipo === 'individual')
 const showSetores = computed(() => form.value.tipo === 'setor')
 
-// Recarrega setores e funcionários quando empresa muda
-watch(() => form.value.empresa_id, async (empresaId) => {
-  if (isAdmin.value && empresaId) {
-    await loadSetoresFuncionarios(empresaId)
-  }
+const empresaLabel = computed(() => {
+  if (!form.value.empresa_id) return 'Selecione uma empresa'
+  return empresas.value.find((e) => e.id === form.value.empresa_id)?.nome ?? 'Selecione uma empresa'
 })
+
+function onDocumentClick(event: MouseEvent) {
+  if (empresaFilterRef.value && !empresaFilterRef.value.contains(event.target as Node)) {
+    empresaOpen.value = false
+  }
+}
 
 async function loadSetoresFuncionarios(empresaId?: string) {
   try {
@@ -52,7 +61,23 @@ async function loadSetoresFuncionarios(empresaId?: string) {
   }
 }
 
+watch(
+  () => form.value.empresa_id,
+  async (empresaId) => {
+    form.value.funcionarios = []
+    form.value.setores = []
+    setoresDisponiveis.value = []
+    funcionariosDisponiveis.value = []
+
+    if (isAdmin.value && empresaId) {
+      await loadSetoresFuncionarios(empresaId)
+    }
+  }
+)
+
 onMounted(async () => {
+  document.addEventListener('click', onDocumentClick)
+
   try {
     if (isAdmin.value) {
       const { data } = await getAllEmpresas()
@@ -68,8 +93,48 @@ onMounted(async () => {
   }
 })
 
+onUnmounted(() => {
+  document.removeEventListener('click', onDocumentClick)
+})
+
+function toggleEmpresaMenu() {
+  empresaOpen.value = !empresaOpen.value
+}
+
+function selectEmpresa(id: string) {
+  form.value.empresa_id = id
+  empresaOpen.value = false
+}
+
+function selectTipo(tipo: 'individual' | 'setor') {
+  if (form.value.tipo === tipo) return
+  form.value.tipo = tipo
+  form.value.funcionarios = []
+  form.value.setores = []
+}
+
+function toggleFuncionario(id: string) {
+  const index = form.value.funcionarios.indexOf(id)
+  if (index > -1) {
+    form.value.funcionarios.splice(index, 1)
+  } else {
+    form.value.funcionarios.push(id)
+  }
+}
+
+function toggleSetor(id: string) {
+  const index = form.value.setores.indexOf(id)
+  if (index > -1) {
+    form.value.setores.splice(index, 1)
+  } else {
+    form.value.setores.push(id)
+  }
+}
+
 async function handleSubmit() {
-  if (!form.value.nome) {
+  if (loading.value) return
+
+  if (!form.value.nome.trim()) {
     toast.error('Nome é obrigatório')
     return
   }
@@ -91,18 +156,15 @@ async function handleSubmit() {
 
   try {
     loading.value = true
-    const payload: any = {
-      nome: form.value.nome,
-      descricao: form.value.descricao || undefined,
+    const payload: IPostAgrupamentoModel = {
+      nome: form.value.nome.trim(),
+      ...(form.value.descricao.trim() ? { descricao: form.value.descricao.trim() } : {}),
       tipo: form.value.tipo,
-      funcionarios: form.value.tipo === 'individual' ? form.value.funcionarios : undefined,
-      setores: form.value.tipo === 'setor' ? form.value.setores : undefined
+      ...(form.value.tipo === 'individual' ? { funcionarios: [...form.value.funcionarios] } : {}),
+      ...(form.value.tipo === 'setor' ? { setores: [...form.value.setores] } : {}),
+      ...(isAdmin.value ? { empresa_id: form.value.empresa_id } : {})
     }
-    
-    if (isAdmin.value) {
-      payload.empresa_id = form.value.empresa_id
-    }
-    
+
     await postAgrupamento(payload)
     toast.success('Agrupamento criado com sucesso')
     router.push('/dashboard/agrupamentos')
@@ -117,278 +179,689 @@ async function handleSubmit() {
 function goBack() {
   router.push('/dashboard/agrupamentos')
 }
-
-function toggleFuncionario(id: string) {
-  const index = form.value.funcionarios.indexOf(id)
-  if (index > -1) {
-    form.value.funcionarios.splice(index, 1)
-  } else {
-    form.value.funcionarios.push(id)
-  }
-}
-
-function toggleSetor(id: string) {
-  const index = form.value.setores.indexOf(id)
-  if (index > -1) {
-    form.value.setores.splice(index, 1)
-  } else {
-    form.value.setores.push(id)
-  }
-}
-
-function onTipoChange() {
-  // Limpar seleções ao trocar de tipo
-  form.value.funcionarios = []
-  form.value.setores = []
-}
 </script>
 
 <template>
-  <section class="form_section">
-    <h2 class="title dashboard_title">NOVO AGRUPAMENTO</h2>
-    
-    <div v-if="loadingData" class="loading">Carregando...</div>
-    
-    <form v-else class="form_container" @submit.prevent="handleSubmit">
-      <div v-if="isAdmin" class="form_group">
-        <label for="empresa">Empresa *</label>
-        <select
-          id="empresa"
-          v-model="form.empresa_id"
-          required
-        >
-          <option value="">Selecione uma empresa</option>
-          <option v-for="empresa in empresas" :key="empresa.id" :value="empresa.id">
-            {{ empresa.nome }}
-          </option>
-        </select>
-      </div>
+  <section class="novo-agrupamento">
+    <div class="novo-agrupamento__heading">
+      <button
+        type="button"
+        class="novo-agrupamento__back"
+        aria-label="Voltar para Agrupamentos"
+        @click="goBack"
+      >
+        <img :src="iconChevronLeft" width="24" height="24" alt="" />
+      </button>
+      <h2 class="novo-agrupamento__title dashboard_title">NOVO AGRUPAMENTO</h2>
+    </div>
 
-      <div class="form_group">
-        <label for="nome">Nome *</label>
-        <input
-          id="nome"
-          v-model="form.nome"
-          type="text"
-          placeholder="Nome do agrupamento"
-          required
-        />
-      </div>
+    <div v-if="loadingData" class="novo-agrupamento__loading">
+      <p>Carregando…</p>
+    </div>
 
-      <div class="form_group">
-        <label for="descricao">Descrição</label>
-        <textarea
-          id="descricao"
-          v-model="form.descricao"
-          placeholder="Descrição do agrupamento (opcional)"
-          rows="3"
-        />
-      </div>
+    <div v-else class="novo-agrupamento__panel">
+      <form class="novo-agrupamento__form" @submit.prevent="handleSubmit">
+        <div v-if="isAdmin" class="novo-agrupamento__field">
+          <span class="novo-agrupamento__label night-field-label" id="empresa-label">EMPRESA*</span>
+          <div ref="empresaFilterRef" class="novo-agrupamento__select">
+            <button
+              type="button"
+              class="novo-agrupamento__select-trigger"
+              :class="{ 'is-placeholder': !form.empresa_id }"
+              aria-haspopup="listbox"
+              aria-labelledby="empresa-label"
+              :aria-expanded="empresaOpen"
+              @click.stop="toggleEmpresaMenu"
+            >
+              <span>{{ empresaLabel }}</span>
+              <img
+                class="novo-agrupamento__select-chevron"
+                :class="{ 'novo-agrupamento__select-chevron--open': empresaOpen }"
+                :src="iconChevronDown"
+                width="16"
+                height="9"
+                alt=""
+              />
+            </button>
 
-      <div class="form_group">
-        <label>Tipo de Agrupamento *</label>
-        <div class="radio_group">
-          <label class="radio_item">
-            <input
-              type="radio"
-              v-model="form.tipo"
-              value="individual"
-              @change="onTipoChange"
-            />
-            <span>Individual (selecionar funcionários um a um)</span>
-          </label>
-          <label class="radio_item">
-            <input
-              type="radio"
-              v-model="form.tipo"
-              value="setor"
-              @change="onTipoChange"
-            />
-            <span>Por Setor (incluir todos de um ou mais setores)</span>
-          </label>
-        </div>
-      </div>
-
-      <div v-if="showFuncionarios" class="form_group">
-        <label>Funcionários *</label>
-        <div class="checkbox_list">
-          <div v-if="funcionariosDisponiveis.length === 0" class="empty_message">
-            Nenhum funcionário cadastrado
+            <ul
+              v-if="empresaOpen"
+              class="novo-agrupamento__select-menu"
+              role="listbox"
+              aria-labelledby="empresa-label"
+            >
+              <li>
+                <button
+                  type="button"
+                  class="novo-agrupamento__select-option"
+                  role="option"
+                  :aria-selected="!form.empresa_id"
+                  :class="{ 'is-active': !form.empresa_id }"
+                  @click="selectEmpresa('')"
+                >
+                  Selecione uma empresa
+                </button>
+              </li>
+              <li v-for="empresa in empresas" :key="empresa.id">
+                <button
+                  type="button"
+                  class="novo-agrupamento__select-option"
+                  role="option"
+                  :aria-selected="form.empresa_id === empresa.id"
+                  :class="{ 'is-active': form.empresa_id === empresa.id }"
+                  @click="selectEmpresa(empresa.id)"
+                >
+                  {{ empresa.nome }}
+                </button>
+              </li>
+            </ul>
           </div>
-          <label
-            v-for="funcionario in funcionariosDisponiveis"
-            :key="funcionario.id"
-            class="checkbox_item"
-          >
-            <input
-              type="checkbox"
-              :checked="form.funcionarios.includes(funcionario.id)"
-              @change="toggleFuncionario(funcionario.id)"
-            />
-            <span>{{ funcionario.nome }}</span>
-          </label>
         </div>
-        <small class="helper_text">{{ form.funcionarios.length }} funcionário(s) selecionado(s)</small>
-      </div>
 
-      <div v-if="showSetores" class="form_group">
-        <label>Setores *</label>
-        <div class="checkbox_list">
-          <div v-if="setoresDisponiveis.length === 0" class="empty_message">
-            Nenhum setor cadastrado
+        <div class="novo-agrupamento__field">
+          <label class="novo-agrupamento__label night-field-label" for="nome">NOME*</label>
+          <input
+            id="nome"
+            v-model="form.nome"
+            type="text"
+            class="novo-agrupamento__input"
+            placeholder="Nome do agrupamento"
+            required
+          />
+        </div>
+
+        <div class="novo-agrupamento__field">
+          <label class="novo-agrupamento__label night-field-label" for="descricao">DESCRIÇÃO</label>
+          <textarea
+            id="descricao"
+            v-model="form.descricao"
+            class="novo-agrupamento__textarea"
+            placeholder="Descrição do agrupamento (opcional)"
+            rows="4"
+          />
+        </div>
+
+        <div class="novo-agrupamento__field">
+          <span class="novo-agrupamento__label night-field-label">TIPO DE AGRUPAMENTO</span>
+          <div class="novo-agrupamento__radios" role="radiogroup" aria-label="Tipo de agrupamento">
+            <button
+              type="button"
+              class="novo-agrupamento__radio"
+              :class="{ 'is-selected': form.tipo === 'individual' }"
+              role="radio"
+              :aria-checked="form.tipo === 'individual'"
+              @click="selectTipo('individual')"
+            >
+              <span class="novo-agrupamento__radio-text">
+                Individual (selecionar funcionário um a um)
+              </span>
+              <img
+                :src="form.tipo === 'individual' ? iconRadioSelected : iconRadio"
+                width="24"
+                height="24"
+                alt=""
+              />
+            </button>
+
+            <button
+              type="button"
+              class="novo-agrupamento__radio"
+              :class="{ 'is-selected': form.tipo === 'setor' }"
+              role="radio"
+              :aria-checked="form.tipo === 'setor'"
+              @click="selectTipo('setor')"
+            >
+              <span class="novo-agrupamento__radio-text">
+                Por setor (incluir todos de um ou mais setores)
+              </span>
+              <img
+                :src="form.tipo === 'setor' ? iconRadioSelected : iconRadio"
+                width="24"
+                height="24"
+                alt=""
+              />
+            </button>
           </div>
-          <label
-            v-for="setor in setoresDisponiveis"
-            :key="setor.id"
-            class="checkbox_item"
-          >
-            <input
-              type="checkbox"
-              :checked="form.setores.includes(setor.id)"
-              @change="toggleSetor(setor.id)"
-            />
-            <span>{{ setor.nome }}</span>
-          </label>
         </div>
-        <small class="helper_text">{{ form.setores.length }} setor(es) selecionado(s)</small>
-      </div>
 
-      <div class="form_actions">
-        <CustomButton
-          title="CANCELAR"
-          type="button"
-          variant="secondary"
-          @click="goBack"
-        />
-        <CustomButton
-          title="SALVAR"
-          type="submit"
-          :loading="loading"
-        />
-      </div>
-    </form>
+        <div v-if="showFuncionarios" class="novo-agrupamento__field">
+          <span class="novo-agrupamento__label night-field-label">FUNCIONÁRIOS*</span>
+          <div
+            class="novo-agrupamento__checks"
+            :class="{
+              'novo-agrupamento__checks--empty':
+                (isAdmin && !form.empresa_id) || funcionariosDisponiveis.length === 0
+            }"
+          >
+            <p v-if="isAdmin && !form.empresa_id" class="novo-agrupamento__checks-empty">
+              Selecione uma empresa primeiro
+            </p>
+            <p
+              v-else-if="funcionariosDisponiveis.length === 0"
+              class="novo-agrupamento__checks-empty"
+            >
+              Nenhum funcionário cadastrado
+            </p>
+            <label
+              v-for="funcionario in funcionariosDisponiveis"
+              :key="funcionario.id"
+              class="novo-agrupamento__check"
+            >
+              <input
+                type="checkbox"
+                :checked="form.funcionarios.includes(funcionario.id)"
+                @change="toggleFuncionario(funcionario.id)"
+              />
+              <span>{{ funcionario.nome }}</span>
+            </label>
+          </div>
+          <small class="novo-agrupamento__helper">
+            {{ funcionariosDisponiveis.length }} funcionário(s) cadastrado(s)
+          </small>
+        </div>
+
+        <div v-if="showSetores" class="novo-agrupamento__field">
+          <span class="novo-agrupamento__label night-field-label">SETORES*</span>
+          <div
+            class="novo-agrupamento__checks"
+            :class="{
+              'novo-agrupamento__checks--empty':
+                (isAdmin && !form.empresa_id) || setoresDisponiveis.length === 0
+            }"
+          >
+            <p v-if="isAdmin && !form.empresa_id" class="novo-agrupamento__checks-empty">
+              Selecione uma empresa primeiro
+            </p>
+            <p v-else-if="setoresDisponiveis.length === 0" class="novo-agrupamento__checks-empty">
+              Nenhum setor cadastrado
+            </p>
+            <label
+              v-for="setor in setoresDisponiveis"
+              :key="setor.id"
+              class="novo-agrupamento__check"
+            >
+              <input
+                type="checkbox"
+                :checked="form.setores.includes(setor.id)"
+                @change="toggleSetor(setor.id)"
+              />
+              <span>{{ setor.nome }}</span>
+            </label>
+          </div>
+          <small class="novo-agrupamento__helper">
+            {{ setoresDisponiveis.length }} setor(es) cadastrado(s)
+          </small>
+        </div>
+
+        <div class="novo-agrupamento__actions">
+          <button type="button" class="novo-agrupamento__cancel" @click="goBack">
+            CANCELAR
+          </button>
+          <button type="submit" class="novo-agrupamento__submit" :disabled="loading">
+            {{ loading ? 'Salvando…' : 'SALVAR' }}
+          </button>
+        </div>
+      </form>
+    </div>
   </section>
 </template>
 
 <style lang="scss" scoped>
-.form_section {
+.novo-agrupamento {
   width: 100%;
-  max-width: 800px;
+  max-width: 100%;
+  min-width: 0;
 
-  .title {
+  &__heading {
+    display: flex;
+    align-items: center;
+    gap: 1px;
     margin-bottom: 42px;
   }
 
-  .loading {
-    padding: 40px;
-    text-align: center;
+  &__back {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
+    }
   }
 
-  .form_container {
-    background-color: rgba(207, 198, 188, 0.1);
-    padding: 38px;
-    border-radius: 8px;
+  &__title {
+    margin: 0;
   }
 
-  .form_group {
-    margin-bottom: 20px;
+  &__loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
 
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
+    p {
+      font-family: 'Source Code Pro', monospace;
+      font-size: 14px;
+      color: #f7f7f7;
+      opacity: 0.7;
+    }
+  }
+
+  &__panel {
+    width: 800px;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 48px 75px 40px;
+    background: rgba(121, 121, 121, 0.1);
+    border-radius: var(--night-radius, 30px);
+  }
+
+  &__form {
+    width: 650px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+  }
+
+  &__field {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  &__label {
+    display: block;
+    flex-shrink: 0;
+    width: 100%;
+    margin: 0;
+    padding-left: 20px;
+    box-sizing: border-box;
+    font-family: var(--night-font, 'Source Code Pro', monospace);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+    letter-spacing: 0;
+    color: var(--night-gray, #f7f7f7);
+    opacity: 0.7;
+    text-transform: uppercase;
+  }
+
+  &__input,
+  &__textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    border-radius: 30px;
+    background: rgba(121, 121, 121, 0.3);
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.4;
+    color: #ffffff;
+    outline: none;
+    -webkit-text-fill-color: #ffffff;
+
+    &::placeholder {
+      color: #f7f7f7;
+      opacity: 0.6;
+      -webkit-text-fill-color: #f7f7f7;
+    }
+  }
+
+  &__input {
+    height: 49px;
+    padding: 0 20px;
+    line-height: 1;
+  }
+
+  &__textarea {
+    min-height: 120px;
+    padding: 16px 20px;
+    resize: vertical;
+  }
+
+  &__select {
+    position: relative;
+    width: 100%;
+    z-index: 5;
+  }
+
+  &__select-trigger {
+    width: 100%;
+    height: 49px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 20px;
+    background: rgba(121, 121, 121, 0.3);
+    border-radius: 30px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1;
+    color: #ffffff;
+    cursor: pointer;
+    text-align: left;
+
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    input[type="text"], textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid rgba(207, 198, 188, 0.5);
-      border-radius: 4px;
-      font-size: 14px;
+    &.is-placeholder {
+      color: #f7f7f7;
+      opacity: 0.85;
 
-      &:focus {
-        outline: none;
-        border-color: #C7633B;
+      span {
+        opacity: 0.7;
       }
     }
+
+    &:hover {
+      background: rgba(121, 121, 121, 0.4);
+    }
   }
 
-  .radio_group {
+  &__select-chevron {
+    flex-shrink: 0;
+    opacity: 0.7;
+    transition: transform 0.2s ease;
+
+    &--open {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__select-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 100%;
+    max-height: 240px;
+    margin: 0;
+    padding: 10px;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+    background: rgba(33, 33, 33, 0.96);
+    border: 1px solid rgba(121, 121, 121, 0.45);
+    border-radius: 16px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+    z-index: 10;
+  }
+
+  &__select-option {
+    width: 100%;
+    border: none;
+    background: transparent;
+    text-align: left;
+    padding: 10px 14px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.2;
+    color: #f7f7f7;
+    border-radius: 10px;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(121, 121, 121, 0.35);
+    }
+
+    &.is-active {
+      background: #ff00ff;
+      color: #ffffff;
+      font-weight: 400;
+    }
+  }
+
+  &__radios {
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 12px;
   }
 
-  .radio_item {
+  &__radio {
+    width: 100%;
+    min-height: 49px;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 20px;
+    border: 1px solid transparent;
+    border-radius: 30px;
+    background: rgba(33, 33, 33, 0.2);
     cursor: pointer;
-    padding: 12px;
-    border: 1px solid rgba(207, 198, 188, 0.5);
-    border-radius: 4px;
-    transition: all 0.2s;
+    text-align: left;
 
-    &:hover {
-      background-color: rgba(207, 198, 188, 0.2);
+    &.is-selected {
+      background: rgba(121, 121, 121, 0.3);
+      border-color: #797979;
     }
 
-    &:has(input:checked) {
-      border-color: #C7633B;
-      background-color: rgba(199, 99, 59, 0.1);
+    &:hover:not(.is-selected) {
+      background: rgba(33, 33, 33, 0.35);
     }
 
-    input[type="radio"] {
-      cursor: pointer;
+    img {
+      flex-shrink: 0;
     }
   }
 
-  .checkbox_list {
+  &__radio-text {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1;
+    color: #f7f7f7;
+  }
+
+  &__checks {
+    width: 100%;
+    box-sizing: border-box;
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    padding: 12px;
-    border: 1px solid rgba(207, 198, 188, 0.5);
-    border-radius: 4px;
-    max-height: 300px;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    min-height: 49px;
+    border-radius: 30px;
+    background: rgba(121, 121, 121, 0.3);
+    max-height: 200px;
     overflow-y: auto;
 
-    .empty_message {
-      color: #888;
-      font-style: italic;
+    &--empty {
+      height: 49px;
+      min-height: 49px;
+      max-height: 49px;
+      padding: 0 20px;
+      background: rgba(33, 33, 33, 0.2);
+      overflow: hidden;
     }
   }
 
-  .checkbox_item {
-    display: flex;
+  &__checks-empty {
+    margin: 0;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: 0;
+    color: #f7f7f7;
+  }
+
+  &__check {
+    display: inline-flex;
     align-items: center;
     gap: 8px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: rgba(33, 33, 33, 0.4);
     cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 4px;
-    transition: background-color 0.2s;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 13px;
+    font-weight: 300;
+    color: #f7f7f7;
 
-    &:hover {
-      background-color: rgba(207, 198, 188, 0.2);
-    }
-
-    input[type="checkbox"] {
+    input {
       cursor: pointer;
     }
   }
 
-  .helper_text {
+  &__helper {
     display: block;
-    margin-top: 8px;
-    color: #666;
-    font-size: 12px;
+    margin: 0;
+    padding-left: 20px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: 0;
+    color: #1e3f49;
   }
 
-  .form_actions {
+  &__actions {
     display: flex;
-    gap: 16px;
-    justify-content: flex-end;
-    margin-top: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  &__cancel,
+  &__submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 140px;
+    height: 46px;
+    padding: 0 28px;
+    border-radius: 30px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  &__cancel {
+    border: 1px solid rgba(247, 247, 247, 0.7);
+    background: transparent;
+    color: #ffffff;
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+
+  &__submit {
+    border: none;
+    background: #ff00ff;
+    color: #ffffff;
+
+    &:hover:not(:disabled) {
+      opacity: 0.92;
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: wait;
+    }
+  }
+
+  @media (max-width: 900px) {
+    &__panel {
+      width: 100%;
+      padding: 32px 24px;
+    }
+
+    &__form {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    &__heading {
+      margin-bottom: 24px;
+    }
+
+    &__panel {
+      padding: 28px 20px 32px;
+    }
+
+    &__actions {
+      flex-direction: column-reverse;
+    }
+
+    &__cancel,
+    &__submit {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    &__heading {
+      margin-bottom: 16px;
+    }
+
+    &__panel {
+      padding: 24px 16px 28px;
+      border-radius: 20px;
+    }
+
+    &__form {
+      gap: 18px;
+    }
+
+    &__label {
+      font-size: 12px;
+    }
+
+    &__input,
+    &__select-trigger,
+    &__radio {
+      min-height: 44px;
+      font-size: 13px;
+    }
+
+    &__radio-text {
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    &__textarea {
+      min-height: 100px;
+      font-size: 13px;
+    }
+
+    &__cancel,
+    &__submit {
+      height: 44px;
+      font-size: 14px;
+    }
   }
 }
 </style>
