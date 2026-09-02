@@ -1,26 +1,55 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
-import CustomButton from '@/components/CustomButton/CustomButton.vue'
-import { getSetor, patchSetor } from '@/services/http/setores'
+import { useAuthStore } from '@/stores/auth'
+import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
+import iconChevronDown from '@/assets/imgs/administradores/icon-chevron-down.svg'
+import { getSetor, patchSetor, type IPostSetorModel } from '@/services/http/setores'
+import { getAllEmpresas } from '@/services/http/empresas'
 
 const router = useRouter()
 const route = useRoute()
 const toast = useToast()
+const authStore = useAuthStore()
 
 const loading = ref(false)
 const fetching = ref(true)
+const empresas = ref<{ id: string; nome: string }[]>([])
+const empresaOpen = ref(false)
+const empresaFilterRef = ref<HTMLElement | null>(null)
 const form = ref({
   nome: '',
-  descricao: ''
+  descricao: '',
+  empresa_id: ''
 })
 
+const isAdmin = computed(() => authStore.userRole === 'administrador')
+
+const empresaLabel = computed(() => {
+  if (!form.value.empresa_id) return 'Selecione uma empresa'
+  return empresas.value.find((e) => e.id === form.value.empresa_id)?.nome ?? 'Selecione uma empresa'
+})
+
+function onDocumentClick(event: MouseEvent) {
+  if (empresaFilterRef.value && !empresaFilterRef.value.contains(event.target as Node)) {
+    empresaOpen.value = false
+  }
+}
+
 onMounted(async () => {
+  document.addEventListener('click', onDocumentClick)
+
   try {
+    if (isAdmin.value) {
+      const { data } = await getAllEmpresas()
+      empresas.value = data.data
+    }
+
     const { data } = await getSetor(route.params.id as string)
     form.value.nome = data.nome
     form.value.descricao = data.descricao || ''
+    form.value.empresa_id = data.empresa_id || ''
   } catch (error) {
     console.error(error)
     toast.error('Erro ao carregar setor')
@@ -30,15 +59,41 @@ onMounted(async () => {
   }
 })
 
+onUnmounted(() => {
+  document.removeEventListener('click', onDocumentClick)
+})
+
+function toggleEmpresaMenu() {
+  empresaOpen.value = !empresaOpen.value
+}
+
+function selectEmpresa(id: string) {
+  form.value.empresa_id = id
+  empresaOpen.value = false
+}
+
 async function handleSubmit() {
-  if (!form.value.nome) {
+  if (loading.value) return
+
+  if (!form.value.nome.trim()) {
     toast.error('Nome é obrigatório')
+    return
+  }
+
+  if (isAdmin.value && !form.value.empresa_id) {
+    toast.error('Selecione uma empresa')
     return
   }
 
   try {
     loading.value = true
-    await patchSetor(form.value, route.params.id as string)
+    const payload: Partial<IPostSetorModel> = {
+      nome: form.value.nome.trim(),
+      descricao: form.value.descricao.trim() || undefined,
+      ...(isAdmin.value ? { empresa_id: form.value.empresa_id } : {})
+    }
+
+    await patchSetor(payload, route.params.id as string)
     toast.success('Setor atualizado com sucesso')
     router.push('/dashboard/setores')
   } catch (error) {
@@ -55,98 +110,461 @@ function goBack() {
 </script>
 
 <template>
-  <section class="form_section">
-    <h2 class="title dashboard_title">EDITAR SETOR</h2>
-    
-    <div v-if="fetching" class="loading">Carregando...</div>
-    
-    <form v-else class="form_container" @submit.prevent="handleSubmit">
-      <div class="form_group">
-        <label for="nome">Nome *</label>
-        <input
-          id="nome"
-          v-model="form.nome"
-          type="text"
-          placeholder="Nome do setor"
-          required
-        />
-      </div>
+  <section class="edit-setor">
+    <div class="edit-setor__heading">
+      <button
+        type="button"
+        class="edit-setor__back"
+        aria-label="Voltar para Setores"
+        @click="goBack"
+      >
+        <img :src="iconChevronLeft" width="24" height="24" alt="" />
+      </button>
+      <h2 class="edit-setor__title dashboard_title">EDITAR SETOR</h2>
+    </div>
 
-      <div class="form_group">
-        <label for="descricao">Descrição</label>
-        <textarea
-          id="descricao"
-          v-model="form.descricao"
-          placeholder="Descrição do setor (opcional)"
-          rows="3"
-        />
-      </div>
+    <div v-if="fetching" class="edit-setor__loading">
+      <p>Carregando…</p>
+    </div>
 
-      <div class="form_actions">
-        <CustomButton
-          title="CANCELAR"
-          type="button"
-          variant="secondary"
-          @click="goBack"
-        />
-        <CustomButton
-          title="SALVAR"
-          type="submit"
-          :loading="loading"
-        />
-      </div>
-    </form>
+    <div v-else class="edit-setor__panel">
+      <form class="edit-setor__form" @submit.prevent="handleSubmit">
+        <div v-if="isAdmin" class="edit-setor__field">
+          <span class="edit-setor__label night-field-label" id="empresa-label">EMPRESA*</span>
+          <div ref="empresaFilterRef" class="edit-setor__select">
+            <button
+              type="button"
+              class="edit-setor__select-trigger"
+              :class="{ 'is-placeholder': !form.empresa_id }"
+              aria-haspopup="listbox"
+              aria-labelledby="empresa-label"
+              :aria-expanded="empresaOpen"
+              @click.stop="toggleEmpresaMenu"
+            >
+              <span>{{ empresaLabel }}</span>
+              <img
+                class="edit-setor__select-chevron"
+                :class="{ 'edit-setor__select-chevron--open': empresaOpen }"
+                :src="iconChevronDown"
+                width="16"
+                height="9"
+                alt=""
+              />
+            </button>
+
+            <ul
+              v-if="empresaOpen"
+              class="edit-setor__select-menu"
+              role="listbox"
+              aria-labelledby="empresa-label"
+            >
+              <li>
+                <button
+                  type="button"
+                  class="edit-setor__select-option"
+                  role="option"
+                  :aria-selected="!form.empresa_id"
+                  :class="{ 'is-active': !form.empresa_id }"
+                  @click="selectEmpresa('')"
+                >
+                  Selecione uma empresa
+                </button>
+              </li>
+              <li v-for="empresa in empresas" :key="empresa.id">
+                <button
+                  type="button"
+                  class="edit-setor__select-option"
+                  role="option"
+                  :aria-selected="form.empresa_id === empresa.id"
+                  :class="{ 'is-active': form.empresa_id === empresa.id }"
+                  @click="selectEmpresa(empresa.id)"
+                >
+                  {{ empresa.nome }}
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="edit-setor__field">
+          <label class="edit-setor__label night-field-label" for="nome">NOME*</label>
+          <input
+            id="nome"
+            v-model="form.nome"
+            type="text"
+            class="edit-setor__input"
+            placeholder="Nome do setor"
+            required
+          />
+        </div>
+
+        <div class="edit-setor__field">
+          <label class="edit-setor__label night-field-label" for="descricao">DESCRIÇÃO</label>
+          <textarea
+            id="descricao"
+            v-model="form.descricao"
+            class="edit-setor__textarea"
+            placeholder="Descrição do setor (opcional)"
+            rows="4"
+          />
+        </div>
+
+        <div class="edit-setor__actions">
+          <button type="button" class="edit-setor__cancel" @click="goBack">
+            CANCELAR
+          </button>
+          <button type="submit" class="edit-setor__submit" :disabled="loading">
+            {{ loading ? 'Salvando…' : 'SALVAR' }}
+          </button>
+        </div>
+      </form>
+    </div>
   </section>
 </template>
 
 <style lang="scss" scoped>
-.form_section {
+.edit-setor {
   width: 100%;
-  max-width: 600px;
+  max-width: 100%;
+  min-width: 0;
 
-  .title {
+  &__heading {
+    display: flex;
+    align-items: center;
+    gap: 1px;
     margin-bottom: 42px;
   }
 
-  .loading {
-    padding: 40px;
-    text-align: center;
+  &__back {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
+    }
   }
 
-  .form_container {
-    background-color: rgba(207, 198, 188, 0.1);
-    padding: 38px;
-    border-radius: 8px;
+  &__title {
+    margin: 0;
   }
 
-  .form_group {
-    margin-bottom: 20px;
+  &__loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
 
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
+    p {
+      font-family: 'Source Code Pro', monospace;
+      font-size: 14px;
+      color: #f7f7f7;
+      opacity: 0.7;
+    }
+  }
+
+  &__panel {
+    width: 800px;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 48px 75px 40px;
+    background: rgba(121, 121, 121, 0.1);
+    border-radius: var(--night-radius, 30px);
+  }
+
+  &__form {
+    width: 650px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+  }
+
+  &__field {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  &__label {
+    display: block;
+    flex-shrink: 0;
+    width: 100%;
+    margin: 0;
+    padding-left: 20px;
+    box-sizing: border-box;
+    font-family: var(--night-font, 'Source Code Pro', monospace);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+    letter-spacing: 0;
+    color: var(--night-gray, #f7f7f7);
+    opacity: 0.7;
+    text-transform: uppercase;
+  }
+
+  &__input,
+  &__textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    border-radius: 30px;
+    background: rgba(121, 121, 121, 0.3);
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.4;
+    color: #ffffff;
+    outline: none;
+    -webkit-text-fill-color: #ffffff;
+
+    &::placeholder {
+      color: #f7f7f7;
+      opacity: 0.6;
+      -webkit-text-fill-color: #f7f7f7;
+    }
+  }
+
+  &__input {
+    height: 49px;
+    padding: 0 20px;
+    line-height: 1;
+  }
+
+  &__select {
+    position: relative;
+    width: 100%;
+    z-index: 5;
+  }
+
+  &__select-trigger {
+    width: 100%;
+    height: 49px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 20px;
+    background: rgba(121, 121, 121, 0.3);
+    border-radius: 30px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1;
+    color: #ffffff;
+    cursor: pointer;
+    text-align: left;
+
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    input, textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid rgba(207, 198, 188, 0.5);
-      border-radius: 4px;
-      font-size: 14px;
+    &.is-placeholder {
+      color: #f7f7f7;
+      opacity: 0.85;
 
-      &:focus {
-        outline: none;
-        border-color: #C7633B;
+      span {
+        opacity: 0.7;
       }
     }
+
+    &:hover {
+      background: rgba(121, 121, 121, 0.4);
+    }
   }
 
-  .form_actions {
+  &__select-chevron {
+    flex-shrink: 0;
+    opacity: 0.7;
+    transition: transform 0.2s ease;
+
+    &--open {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__select-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 100%;
+    max-height: 240px;
+    margin: 0;
+    padding: 10px;
+    list-style: none;
     display: flex;
-    gap: 16px;
-    justify-content: flex-end;
-    margin-top: 32px;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+    background: rgba(33, 33, 33, 0.96);
+    border: 1px solid rgba(121, 121, 121, 0.45);
+    border-radius: 16px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+    z-index: 10;
+  }
+
+  &__select-option {
+    width: 100%;
+    border: none;
+    background: transparent;
+    text-align: left;
+    padding: 10px 14px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.2;
+    color: #f7f7f7;
+    border-radius: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover {
+      background: rgba(121, 121, 121, 0.35);
+    }
+
+    &.is-active {
+      background: #ff00ff;
+      color: #ffffff;
+      font-weight: 400;
+    }
+  }
+
+  &__textarea {
+    min-height: 120px;
+    padding: 16px 20px;
+    resize: vertical;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  &__cancel,
+  &__submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 140px;
+    height: 46px;
+    padding: 0 28px;
+    border-radius: 30px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  &__cancel {
+    border: 1px solid rgba(247, 247, 247, 0.7);
+    background: transparent;
+    color: #ffffff;
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+
+  &__submit {
+    border: none;
+    background: #ff00ff;
+    color: #ffffff;
+
+    &:hover:not(:disabled) {
+      opacity: 0.92;
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: wait;
+    }
+  }
+
+  @media (max-width: 900px) {
+    &__panel {
+      width: 100%;
+      padding: 32px 24px;
+    }
+
+    &__form {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    &__heading {
+      margin-bottom: 24px;
+    }
+
+    &__panel {
+      padding: 28px 20px 32px;
+    }
+
+    &__actions {
+      flex-direction: column-reverse;
+    }
+
+    &__cancel,
+    &__submit {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    &__heading {
+      margin-bottom: 16px;
+    }
+
+    &__panel {
+      padding: 24px 16px 28px;
+      border-radius: 20px;
+    }
+
+    &__form {
+      gap: 18px;
+    }
+
+    &__label {
+      font-size: 12px;
+    }
+
+    &__input,
+    &__select-trigger {
+      height: 44px;
+      font-size: 13px;
+    }
+
+    &__textarea {
+      min-height: 100px;
+      font-size: 13px;
+    }
+
+    &__cancel,
+    &__submit {
+      height: 44px;
+      font-size: 14px;
+    }
   }
 }
 </style>
