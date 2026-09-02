@@ -202,9 +202,19 @@ function shouldShowItem(item: IMenuItem): boolean {
       width: 4px;
     }
 
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
     &::-webkit-scrollbar-thumb {
       background: rgba(255, 255, 255, 0.35);
       border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-button {
+      display: none;
+      width: 0;
+      height: 0;
     }
   }
 
