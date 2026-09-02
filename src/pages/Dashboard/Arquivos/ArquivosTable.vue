@@ -420,7 +420,6 @@ watch(viewMode, () => {
 
       <TableEmptyMessage :show="noContent" theme="night" class="arquivos-empty" />
       <TablePaginator
-        v-if="viewMode === 'list'"
         class="arquivos-paginator"
         theme="night"
         :page-count="pages"

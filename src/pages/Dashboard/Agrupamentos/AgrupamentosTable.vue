@@ -383,8 +383,8 @@ function getMembrosInfo(item: IAgrupamento): string {
 
 .agrup-filter {
   position: relative;
-  flex: 0 0 130px;
-  width: 130px;
+  flex: 0 0 156px;
+  width: 156px;
   height: 49px;
   z-index: 5;
 
@@ -424,15 +424,20 @@ function getMembrosInfo(item: IAgrupamento): string {
     position: absolute;
     top: calc(100% + 8px);
     left: 0;
-    width: 100%;
+    width: max(100%, 168px);
+    min-width: 168px;
     margin: 0;
-    padding: 6px;
+    padding: 10px;
     list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
     background: rgba(33, 33, 33, 0.96);
     border: 1px solid rgba(121, 121, 121, 0.45);
     border-radius: 16px;
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
     overflow: hidden;
+    box-sizing: border-box;
   }
 
   &__option {
@@ -448,6 +453,7 @@ function getMembrosInfo(item: IAgrupamento): string {
     color: #f7f7f7;
     border-radius: 10px;
     cursor: pointer;
+    white-space: nowrap;
 
     &:hover {
       background: rgba(121, 121, 121, 0.35);
@@ -740,14 +746,19 @@ function getMembrosInfo(item: IAgrupamento): string {
   }
 
   .agrup-filter {
-    flex: 0 0 100px;
-    width: 100px;
+    flex: 0 0 148px;
+    width: 148px;
     height: 44px;
 
     &__trigger {
       gap: 8px;
       padding: 0 10px;
       font-size: 12px;
+    }
+
+    &__menu {
+      width: max(100%, 160px);
+      min-width: 160px;
     }
 
     &__chevron {

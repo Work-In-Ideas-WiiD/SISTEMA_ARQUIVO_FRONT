@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
@@ -27,6 +27,8 @@ const isAdmin = computed(() => authStore.userRole === 'administrador')
 const nome = ref('')
 const empresaId = ref('')
 const empresas = ref<{ id: string; nome: string }[]>([])
+const empresaOpen = ref(false)
+const empresaFilterRef = ref<HTMLElement | null>(null)
 const arquivo = ref<File | null>(null)
 const fetching = ref(false)
 const fileInputRef = ref<HTMLInputElement | null>(null)
@@ -36,11 +38,24 @@ const funcoesDisponiveis = ref<IFuncao[]>([])
 const setoresSelecionados = ref<string[]>([])
 const funcoesSelecionadas = ref<string[]>([])
 
+const empresaLabel = computed(() => {
+  if (!empresaId.value) return 'Empresa (opcional)'
+  return empresas.value.find((e) => e.id === empresaId.value)?.nome ?? 'Empresa (opcional)'
+})
+
 const { isDragging } = usePageFileDrop((file) => {
   applySelectedFile(file, true)
 })
 
+function onDocumentClick(event: MouseEvent) {
+  if (empresaFilterRef.value && !empresaFilterRef.value.contains(event.target as Node)) {
+    empresaOpen.value = false
+  }
+}
+
 onMounted(async () => {
+  document.addEventListener('click', onDocumentClick)
+
   try {
     if (isAdmin.value) {
       const { data } = await getAllEmpresas()
@@ -50,6 +65,10 @@ onMounted(async () => {
     console.error(error)
     toast.error('Erro ao carregar empresas')
   }
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', onDocumentClick)
 })
 
 watch(empresaId, async (id) => {
@@ -62,6 +81,15 @@ watch(empresaId, async (id) => {
     await loadSetoresFuncoes(id)
   }
 })
+
+function toggleEmpresaMenu() {
+  empresaOpen.value = !empresaOpen.value
+}
+
+function selectEmpresa(id: string) {
+  empresaId.value = id
+  empresaOpen.value = false
+}
 
 async function loadSetoresFuncoes(empresa: string) {
   try {
@@ -225,21 +253,59 @@ function goBack() {
         </div>
 
         <div v-if="isAdmin" class="novo-arquivo__field">
-          <label class="novo-arquivo__label" for="empresa">EMPRESA</label>
-          <div class="novo-arquivo__select-wrap">
-            <select id="empresa" v-model="empresaId" class="novo-arquivo__select" required>
-              <option value="">Empresa (opcional)</option>
-              <option v-for="emp in empresas" :key="emp.id" :value="emp.id">
-                {{ emp.nome }}
-              </option>
-            </select>
-            <img
-              class="novo-arquivo__select-icon"
-              :src="iconChevronDown"
-              width="16"
-              height="9"
-              alt=""
-            />
+          <span class="novo-arquivo__label" id="empresa-label">EMPRESA</span>
+          <div ref="empresaFilterRef" class="novo-arquivo__select">
+            <button
+              type="button"
+              class="novo-arquivo__select-trigger"
+              :class="{ 'is-placeholder': !empresaId }"
+              aria-haspopup="listbox"
+              aria-labelledby="empresa-label"
+              :aria-expanded="empresaOpen"
+              @click.stop="toggleEmpresaMenu"
+            >
+              <span>{{ empresaLabel }}</span>
+              <img
+                class="novo-arquivo__select-chevron"
+                :class="{ 'novo-arquivo__select-chevron--open': empresaOpen }"
+                :src="iconChevronDown"
+                width="16"
+                height="9"
+                alt=""
+              />
+            </button>
+
+            <ul
+              v-if="empresaOpen"
+              class="novo-arquivo__select-menu"
+              role="listbox"
+              aria-labelledby="empresa-label"
+            >
+              <li>
+                <button
+                  type="button"
+                  class="novo-arquivo__select-option"
+                  role="option"
+                  :aria-selected="!empresaId"
+                  :class="{ 'is-active': !empresaId }"
+                  @click="selectEmpresa('')"
+                >
+                  Empresa (opcional)
+                </button>
+              </li>
+              <li v-for="emp in empresas" :key="emp.id">
+                <button
+                  type="button"
+                  class="novo-arquivo__select-option"
+                  role="option"
+                  :aria-selected="empresaId === emp.id"
+                  :class="{ 'is-active': empresaId === emp.id }"
+                  @click="selectEmpresa(emp.id)"
+                >
+                  {{ emp.nome }}
+                </button>
+              </li>
+            </ul>
           </div>
         </div>
 
@@ -404,8 +470,7 @@ function goBack() {
     opacity: 0.8;
   }
 
-  &__input,
-  &__select {
+  &__input {
     width: 650px;
     max-width: 100%;
     height: 49px;
@@ -426,31 +491,108 @@ function goBack() {
       color: #ffffff;
       opacity: 0.6;
     }
-
-    option {
-      color: #212121;
-      background: #f7f7f7;
-    }
-  }
-
-  &__select-wrap {
-    position: relative;
-    width: 650px;
-    max-width: 100%;
   }
 
   &__select {
-    padding-right: 44px;
-    cursor: pointer;
+    position: relative;
+    width: 650px;
+    max-width: 100%;
+    z-index: 5;
   }
 
-  &__select-icon {
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%) rotate(-90deg);
-    pointer-events: none;
+  &__select-trigger {
+    width: 100%;
+    height: 49px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 20px;
+    background: rgba(121, 121, 121, 0.3);
+    border-radius: 30px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1;
+    color: #ffffff;
+    cursor: pointer;
+    text-align: left;
+
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &.is-placeholder {
+      color: #f7f7f7;
+
+      span {
+        opacity: 0.7;
+      }
+    }
+
+    &:hover {
+      background: rgba(121, 121, 121, 0.4);
+    }
+  }
+
+  &__select-chevron {
+    flex-shrink: 0;
     opacity: 0.7;
+    transition: transform 0.2s ease;
+
+    &--open {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__select-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 100%;
+    max-height: 240px;
+    margin: 0;
+    padding: 10px;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+    background: rgba(33, 33, 33, 0.96);
+    border: 1px solid rgba(121, 121, 121, 0.45);
+    border-radius: 16px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+    z-index: 10;
+    box-sizing: border-box;
+  }
+
+  &__select-option {
+    width: 100%;
+    border: none;
+    background: transparent;
+    text-align: left;
+    padding: 10px 14px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.2;
+    color: #f7f7f7;
+    border-radius: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover {
+      background: rgba(121, 121, 121, 0.35);
+    }
+
+    &.is-active {
+      background: #ff00ff;
+      color: #ffffff;
+      font-weight: 400;
+    }
   }
 
   &__checks {
@@ -578,7 +720,6 @@ function goBack() {
     &__field,
     &__input,
     &__select,
-    &__select-wrap,
     &__checks,
     &__upload-wrap {
       width: 100%;
@@ -629,7 +770,7 @@ function goBack() {
     }
 
     &__input,
-    &__select {
+    &__select-trigger {
       height: 44px;
       font-size: 13px;
     }

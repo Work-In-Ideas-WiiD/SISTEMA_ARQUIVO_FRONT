@@ -32,7 +32,7 @@ function goToPage(page: number) {
 </script>
 
 <template>
-  <div v-if="pageCount > 0" class="paginator" :class="`paginator--${theme}`">
+  <div v-if="pageCount > 1" class="paginator" :class="`paginator--${theme}`">
     <button
       class="nav_btn"
       :disabled="currentPage <= 1"
