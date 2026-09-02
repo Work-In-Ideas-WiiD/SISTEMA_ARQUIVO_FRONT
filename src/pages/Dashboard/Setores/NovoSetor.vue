@@ -5,7 +5,7 @@ import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import iconChevronDown from '@/assets/imgs/administradores/icon-chevron-down.svg'
-import { postSetor } from '@/services/http/setores'
+import { postSetor, type IPostSetorModel } from '@/services/http/setores'
 import { getAllEmpresas } from '@/services/http/empresas'
 
 const router = useRouter()
@@ -76,16 +76,10 @@ async function handleSubmit() {
 
   try {
     loading.value = true
-    const payload: Record<string, string> = {
-      nome: form.value.nome.trim()
-    }
-
-    if (form.value.descricao.trim()) {
-      payload.descricao = form.value.descricao.trim()
-    }
-
-    if (isAdmin.value) {
-      payload.empresa_id = form.value.empresa_id
+    const payload: IPostSetorModel = {
+      nome: form.value.nome.trim(),
+      ...(form.value.descricao.trim() ? { descricao: form.value.descricao.trim() } : {}),
+      ...(isAdmin.value ? { empresa_id: form.value.empresa_id } : {})
     }
 
     await postSetor(payload)
