@@ -691,8 +691,33 @@ function goBack() {
     font-weight: 300;
     color: #f7f7f7;
 
-    input {
+    input[type='checkbox'] {
+      appearance: none;
+      -webkit-appearance: none;
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      box-sizing: border-box;
+      border: 1.5px solid rgba(247, 247, 247, 0.55);
+      border-radius: 4px;
+      background: transparent;
       cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+
+      &:checked {
+        border-color: #ff00ff;
+        background-color: #ff00ff;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M2.5 6.2l2.4 2.4 4.6-4.8'/%3E%3C/svg%3E");
+        background-size: 12px 12px;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      &:focus-visible {
+        outline: 2px solid rgba(255, 0, 255, 0.45);
+        outline-offset: 2px;
+      }
     }
   }
 

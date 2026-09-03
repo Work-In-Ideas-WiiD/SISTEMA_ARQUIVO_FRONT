@@ -69,7 +69,9 @@ function dismiss(id: string) {
           </div>
 
           <div class="upload_item__footer">
-            <span class="upload_item__status">{{ statusLabel(item) }}</span>
+            <span class="upload_item__status" :title="statusLabel(item)">
+              {{ statusLabel(item) }}
+            </span>
             <span v-if="item.status === 'uploading'" class="upload_item__percent">
               {{ Math.min(item.progress, 99) }}%
             </span>
@@ -88,10 +90,10 @@ function dismiss(id: string) {
   bottom: 16px;
   width: min(30vw, 420px);
   max-height: 20vh;
-  background: #fff;
-  border: 1px solid rgba(207, 198, 188, 0.7);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  background: rgba(33, 33, 33, 0.98);
+  border: 1px solid rgba(121, 121, 121, 0.45);
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
   overflow: hidden;
 
   &--compact {
@@ -122,16 +124,17 @@ function dismiss(id: string) {
 .upload_item {
   min-width: 0;
   padding: 10px;
-  border-radius: 6px;
-  background: var(--color-white-300, #f8f8f8);
-  border: 1px solid rgba(207, 198, 188, 0.45);
+  border-radius: 12px;
+  background: rgba(121, 121, 121, 0.2);
+  border: 1px solid rgba(121, 121, 121, 0.35);
 
   &--success {
-    border-color: var(--color-green-400, #5c7866);
+    border-color: rgba(76, 175, 80, 0.55);
   }
 
   &--error {
-    border-color: var(--color-red-500, #d64646);
+    border-color: rgba(220, 53, 69, 0.65);
+    background: rgba(220, 53, 69, 0.12);
   }
 
   &__header {
@@ -144,8 +147,10 @@ function dismiss(id: string) {
   &__name {
     margin: 0;
     flex: 1;
+    font-family: 'Source Code Pro', monospace;
     font-size: 0.75rem;
-    color: var(--color-blue-700);
+    font-weight: 400;
+    color: #f7f7f7;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -154,33 +159,37 @@ function dismiss(id: string) {
   &__close {
     border: none;
     background: transparent;
-    color: var(--color-gray-500);
+    color: rgba(247, 247, 247, 0.65);
     cursor: pointer;
     line-height: 1;
     font-size: 1rem;
     padding: 0;
+
+    &:hover {
+      color: #ffffff;
+    }
   }
 
   &__bar {
     height: 6px;
     border-radius: 999px;
-    background: rgba(207, 198, 188, 0.45);
+    background: rgba(121, 121, 121, 0.45);
     overflow: hidden;
   }
 
   &__bar_fill {
     height: 100%;
     border-radius: inherit;
-    background: var(--color-orange-500);
+    background: #ff00ff;
     transition: width 0.15s ease;
   }
 
   &--success &__bar_fill {
-    background: var(--color-green-400, #5c7866);
+    background: rgba(76, 175, 80, 0.9);
   }
 
   &--error &__bar_fill {
-    background: var(--color-red-500, #d64646);
+    background: rgba(220, 53, 69, 0.85);
   }
 
   &__footer {
@@ -192,16 +201,25 @@ function dismiss(id: string) {
 
   &__status,
   &__percent {
+    font-family: 'Source Code Pro', monospace;
     font-size: 0.6875rem;
-    color: var(--color-gray-500);
+    font-weight: 300;
+    color: rgba(247, 247, 247, 0.65);
+  }
+
+  &__status {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &--success &__status {
-    color: var(--color-green-400, #5c7866);
+    color: rgba(76, 175, 80, 0.95);
   }
 
   &--error &__status {
-    color: var(--color-red-500, #d64646);
+    color: rgba(255, 140, 150, 0.95);
   }
 }
 

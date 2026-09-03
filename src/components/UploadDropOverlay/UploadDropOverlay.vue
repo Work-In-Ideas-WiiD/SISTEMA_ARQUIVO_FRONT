@@ -34,7 +34,7 @@ defineProps<{
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(30, 63, 73, 0.72);
+  background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(2px);
   pointer-events: all;
 
@@ -44,22 +44,25 @@ defineProps<{
     align-items: center;
     gap: 16px;
     padding: 40px 48px;
-    border: 2px dashed var(--color-orange-500);
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.96);
-    color: var(--color-blue-700);
+    border: 2px dashed rgba(255, 0, 255, 0.65);
+    border-radius: 24px;
+    background: rgba(33, 33, 33, 0.96);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    color: #f7f7f7;
     max-width: min(90vw, 420px);
     text-align: center;
   }
 
   &__icon {
-    color: var(--color-orange-500);
+    color: #ff00ff;
   }
 
   &__text {
     margin: 0;
-    font-size: 1.25rem;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 1.125rem;
     font-weight: 600;
+    color: #f7f7f7;
   }
 }
 </style>
