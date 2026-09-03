@@ -12,9 +12,18 @@ import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg
 import iconNewFolder from '@/assets/imgs/administradores/icon-new-folder.svg'
 import iconEdit from '@/assets/imgs/administradores/icon-edit.svg'
 import iconDelete from '@/assets/imgs/agrupamentos/delete.svg'
+import NightConfirmModal from '@/components/NightConfirmModal/NightConfirmModal.vue'
+import { useNightConfirm } from '@/composables/useNightConfirm'
 
 const router = useRouter()
 const toast = useToast()
+const {
+  open: confirmOpen,
+  options: confirmOptions,
+  askConfirm,
+  onConfirm,
+  onCancel
+} = useNightConfirm()
 
 const page = ref(1)
 const pages = ref(0)
@@ -81,7 +90,13 @@ function goToEditar(id: string) {
 }
 
 async function removeEmpresa(id: string) {
-  if (!confirm('Tem certeza que deseja excluir esta empresa?')) return
+  const ok = await askConfirm({
+    title: 'Excluir empresa',
+    body: 'Tem certeza que deseja excluir esta empresa?',
+    confirmLabel: 'EXCLUIR',
+    danger: true
+  })
+  if (!ok) return
 
   try {
     await deleteEmpresa(id)
@@ -187,6 +202,17 @@ function getDocumentId(item: IGetEmpresasDataRes): string {
         @page-change="onPageChange"
       />
     </div>
+
+    <NightConfirmModal
+      :open="confirmOpen"
+      :title="confirmOptions.title"
+      :body="confirmOptions.body"
+      :confirm-label="confirmOptions.confirmLabel"
+      :cancel-label="confirmOptions.cancelLabel"
+      :danger="confirmOptions.danger"
+      @confirm="onConfirm"
+      @cancel="onCancel"
+    />
   </section>
 </template>
 

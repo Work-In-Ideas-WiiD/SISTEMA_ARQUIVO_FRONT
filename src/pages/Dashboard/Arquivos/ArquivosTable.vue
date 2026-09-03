@@ -20,11 +20,20 @@ import iconOptions from '@/assets/imgs/arquivos/Opções.svg'
 import iconUpload from '@/assets/imgs/arquivos/Upload.svg'
 import iconDownloadBlack from '@/assets/imgs/arquivos/download-black.svg'
 import iconDeleteBlack from '@/assets/imgs/arquivos/delete-black.svg'
+import NightConfirmModal from '@/components/NightConfirmModal/NightConfirmModal.vue'
+import { useNightConfirm } from '@/composables/useNightConfirm'
 
 type ViewMode = 'list' | 'grid'
 
 const router = useRouter()
 const toast = useToast()
+const {
+  open: confirmOpen,
+  options: confirmOptions,
+  askConfirm,
+  onConfirm,
+  onCancel
+} = useNightConfirm()
 
 const page = ref(1)
 const pages = ref(0)
@@ -118,7 +127,13 @@ function goToNovo() {
 }
 
 async function removeArquivo(id: string) {
-  if (!confirm('Tem certeza que deseja excluir este arquivo?')) return
+  const ok = await askConfirm({
+    title: 'Excluir arquivo',
+    body: 'Tem certeza que deseja excluir este arquivo?',
+    confirmLabel: 'EXCLUIR',
+    danger: true
+  })
+  if (!ok) return
 
   try {
     await deleteArquivo(id)
@@ -495,6 +510,17 @@ watch(viewMode, () => {
         @page-change="onPageChange"
       />
     </div>
+
+    <NightConfirmModal
+      :open="confirmOpen"
+      :title="confirmOptions.title"
+      :body="confirmOptions.body"
+      :confirm-label="confirmOptions.confirmLabel"
+      :cancel-label="confirmOptions.cancelLabel"
+      :danger="confirmOptions.danger"
+      @confirm="onConfirm"
+      @cancel="onCancel"
+    />
   </section>
 </template>
 

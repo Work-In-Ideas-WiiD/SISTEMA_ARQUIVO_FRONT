@@ -13,9 +13,18 @@ import iconNewFolder from '@/assets/imgs/administradores/icon-new-folder.svg'
 import iconEdit from '@/assets/imgs/administradores/icon-edit.svg'
 import iconView from '@/assets/imgs/clientes/icon-view.svg'
 import iconDelete from '@/assets/imgs/agrupamentos/delete.svg'
+import NightConfirmModal from '@/components/NightConfirmModal/NightConfirmModal.vue'
+import { useNightConfirm } from '@/composables/useNightConfirm'
 
 const router = useRouter()
 const toast = useToast()
+const {
+  open: confirmOpen,
+  options: confirmOptions,
+  askConfirm,
+  onConfirm,
+  onCancel
+} = useNightConfirm()
 
 const fetching = ref(false)
 const page = ref(1)
@@ -92,7 +101,13 @@ async function toggleStatus(item: IPlano) {
 }
 
 async function handleDelete(id: string) {
-  if (!confirm('Tem certeza que deseja excluir este plano?')) return
+  const ok = await askConfirm({
+    title: 'Excluir plano',
+    body: 'Tem certeza que deseja excluir este plano?',
+    confirmLabel: 'EXCLUIR',
+    danger: true
+  })
+  if (!ok) return
 
   try {
     await deletePlano(id)
@@ -214,6 +229,17 @@ async function handleDelete(id: string) {
         @page-change="onPageChange"
       />
     </div>
+
+    <NightConfirmModal
+      :open="confirmOpen"
+      :title="confirmOptions.title"
+      :body="confirmOptions.body"
+      :confirm-label="confirmOptions.confirmLabel"
+      :cancel-label="confirmOptions.cancelLabel"
+      :danger="confirmOptions.danger"
+      @confirm="onConfirm"
+      @cancel="onCancel"
+    />
   </section>
 </template>
 
