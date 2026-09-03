@@ -16,6 +16,7 @@ import iconSearch from '@/assets/imgs/administradores/icon-search.svg'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import iconChevronDown from '@/assets/imgs/administradores/icon-chevron-down.svg'
 import iconView from '@/assets/imgs/clientes/icon-view.svg'
+import NightDateRangePicker from '@/components/inputs/NightDateRangePicker/NightDateRangePicker.vue'
 
 const router = useRouter()
 const toast = useToast()
@@ -57,6 +58,22 @@ const statusLabel = computed(
 const planoLabel = computed(() => {
   if (!planoId.value) return 'Todos os planos'
   return planos.value.find((p) => p.id === planoId.value)?.nome ?? 'Todos os planos'
+})
+
+const criadoRange = computed({
+  get: () => ({ from: criadoDe.value, to: criadoAte.value }),
+  set: (value: { from: string; to: string }) => {
+    criadoDe.value = value.from
+    criadoAte.value = value.to
+  }
+})
+
+const proximaRange = computed({
+  get: () => ({ from: proximaDe.value, to: proximaAte.value }),
+  set: (value: { from: string; to: string }) => {
+    proximaDe.value = value.from
+    proximaAte.value = value.to
+  }
 })
 
 function onDocumentClick(event: MouseEvent) {
@@ -303,42 +320,16 @@ function statusClass(s?: string) {
         </div>
 
         <div class="saas-toolbar__dates">
-          <label class="saas-date">
-            <span class="saas-date__label">Criado de</span>
-            <input
-              v-model="criadoDe"
-              type="date"
-              class="saas-date__input"
-              @change="onDateChange"
-            />
-          </label>
-          <label class="saas-date">
-            <span class="saas-date__label">Criado até</span>
-            <input
-              v-model="criadoAte"
-              type="date"
-              class="saas-date__input"
-              @change="onDateChange"
-            />
-          </label>
-          <label class="saas-date">
-            <span class="saas-date__label">Próx. cob. de</span>
-            <input
-              v-model="proximaDe"
-              type="date"
-              class="saas-date__input"
-              @change="onDateChange"
-            />
-          </label>
-          <label class="saas-date">
-            <span class="saas-date__label">Próx. cob. até</span>
-            <input
-              v-model="proximaAte"
-              type="date"
-              class="saas-date__input"
-              @change="onDateChange"
-            />
-          </label>
+          <NightDateRangePicker
+            v-model="criadoRange"
+            label="Criação"
+            @change="onDateChange"
+          />
+          <NightDateRangePicker
+            v-model="proximaRange"
+            label="Próx. cobrança"
+            @change="onDateChange"
+          />
 
           <div class="saas-toolbar__actions">
             <button type="button" class="saas-btn saas-btn--ghost" @click="limparFiltros">
@@ -457,7 +448,7 @@ function statusClass(s?: string) {
 
   &__top {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     gap: 12px;
   }
@@ -466,21 +457,23 @@ function statusClass(s?: string) {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
-    gap: 12px;
+    gap: 16px;
   }
 
   &__actions {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-left: auto;
+    margin-left: 0;
+    padding-bottom: 0;
+    height: 44px;
   }
 }
 
 .saas-search {
-  flex: 1 1 320px;
-  min-width: 220px;
-  max-width: 518px;
+  flex: 1 1 auto;
+  min-width: 260px;
+  max-width: none;
   height: 49px;
   display: flex;
   align-items: center;
@@ -528,11 +521,11 @@ function statusClass(s?: string) {
   z-index: 5;
 
   &--status {
-    width: 180px;
+    width: 220px;
   }
 
   &--plano {
-    width: 180px;
+    width: 220px;
   }
 
   &__trigger {
@@ -618,42 +611,6 @@ function statusClass(s?: string) {
       background: #ff00ff;
       color: #ffffff;
       font-weight: 400;
-    }
-  }
-}
-
-.saas-date {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 150px;
-
-  &__label {
-    padding-left: 12px;
-    font-family: 'Source Code Pro', monospace;
-    font-size: 12px;
-    font-weight: 700;
-    color: #f7f7f7;
-    opacity: 0.7;
-    text-transform: uppercase;
-  }
-
-  &__input {
-    height: 44px;
-    padding: 0 14px;
-    border: none;
-    border-radius: 30px;
-    background: rgba(121, 121, 121, 0.3);
-    color: #ffffff;
-    font-family: 'Source Code Pro', monospace;
-    font-size: 13px;
-    outline: none;
-    color-scheme: dark;
-
-    &::-webkit-calendar-picker-indicator {
-      filter: invert(1);
-      opacity: 0.7;
-      cursor: pointer;
     }
   }
 }
@@ -918,9 +875,32 @@ function statusClass(s?: string) {
   width: 100%;
 }
 
+@media (max-width: 1400px) {
+  .saas-toolbar__top {
+    flex-wrap: wrap;
+  }
+
+  .saas-search {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .saas-filter {
+    &--status,
+    &--plano {
+      width: calc(50% - 6px);
+      flex: 1 1 calc(50% - 6px);
+    }
+  }
+}
+
 @media (max-width: 1200px) {
   .saas-toolbar {
     padding: 24px 16px 24px;
+
+    &__top {
+      flex-wrap: wrap;
+    }
   }
 
   .saas-search {
@@ -944,18 +924,13 @@ function statusClass(s?: string) {
     }
   }
 
-  .saas-date {
-    min-width: calc(50% - 6px);
-    flex: 1 1 calc(50% - 6px);
-  }
-
   .saas-toolbar__actions {
-    width: 100%;
+    width: auto;
     margin-left: 0;
-    justify-content: stretch;
+    justify-content: flex-start;
 
     .saas-btn {
-      flex: 1;
+      flex: 0 0 auto;
     }
   }
 
