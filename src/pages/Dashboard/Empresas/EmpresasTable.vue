@@ -161,7 +161,7 @@ function getDocumentId(item: IGetEmpresasDataRes): string {
                     aria-label="Editar empresa"
                     @click="goToEditar(item.id)"
                   >
-                    <img :src="iconEdit" width="18" height="18" alt="" />
+                    <img :src="iconEdit" width="24" height="24" alt="" />
                   </button>
                   <button
                     type="button"
@@ -478,6 +478,12 @@ function getDocumentId(item: IGetEmpresasDataRes): string {
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
+
+  img {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
 
   &:hover {
     opacity: 0.85;

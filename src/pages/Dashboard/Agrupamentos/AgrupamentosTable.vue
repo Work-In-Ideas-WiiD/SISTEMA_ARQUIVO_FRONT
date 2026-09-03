@@ -253,7 +253,7 @@ function getMembrosInfo(item: IAgrupamento): string {
                     aria-label="Editar agrupamento"
                     @click="goToEditar(item.id)"
                   >
-                    <img :src="iconEdit" width="18" height="18" alt="" />
+                    <img :src="iconEdit" width="24" height="24" alt="" />
                   </button>
                   <button
                     type="button"
@@ -338,9 +338,10 @@ function getMembrosInfo(item: IAgrupamento): string {
 }
 
 .agrup-search {
-  flex: 0 0 518px;
-  width: 518px;
+  flex: 1 1 auto;
+  width: auto;
   max-width: 518px;
+  min-width: 0;
   height: 49px;
   display: flex;
   align-items: center;
@@ -469,6 +470,7 @@ function getMembrosInfo(item: IAgrupamento): string {
 
 .agrup-cta {
   flex: 0 0 auto;
+  flex-shrink: 0;
   min-width: 223px;
   height: 46px;
   margin-left: auto;
@@ -703,6 +705,12 @@ function getMembrosInfo(item: IAgrupamento): string {
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
+
+  img {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
 
   &:hover {
     opacity: 0.85;

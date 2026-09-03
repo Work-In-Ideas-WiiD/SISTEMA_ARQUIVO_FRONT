@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
+import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import { getPlano } from '@/services/http/planos'
 
 const router = useRouter()
@@ -30,7 +31,7 @@ onMounted(async () => {
   try {
     const { data } = await getPlano(planoId)
     nome.value = data.nome || ''
-    descricao.value = data.descricao || ''
+    descricao.value = data.descricao || '—'
     valor.value = formatBRL(data.valor_mensal_centavos)
     maxUsuarios.value = String(data.max_usuarios)
     armazenamento.value = formatGB(data.armazenamento_bytes)
@@ -54,57 +55,65 @@ function goBack() {
 </script>
 
 <template>
-  <section class="new_form">
-    <div class="page_title">
-      <button class="back_btn" @click="goBack">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-        </svg>
+  <section class="visualizar-plano">
+    <div class="visualizar-plano__heading">
+      <button
+        type="button"
+        class="visualizar-plano__back"
+        aria-label="Voltar para Planos"
+        @click="goBack"
+      >
+        <img :src="iconChevronLeft" width="24" height="24" alt="" />
       </button>
-      <h2 class="dashboard_title">PLANO</h2>
+      <h2 class="visualizar-plano__title dashboard_title">PLANO</h2>
     </div>
 
-    <div v-if="loading" class="loading_container">
-      <p>Carregando...</p>
+    <div v-if="loading" class="visualizar-plano__loading">
+      <p>Carregando…</p>
     </div>
 
-    <div v-else class="form_wrapper">
-      <form>
-        <div class="input_row">
-          <div class="form_group flex_3">
-            <label>Nome</label>
-            <input v-model="nome" type="text" disabled />
+    <div v-else class="visualizar-plano__panel">
+      <form class="visualizar-plano__form" @submit.prevent>
+        <div class="visualizar-plano__row">
+          <div class="visualizar-plano__field visualizar-plano__field--wide">
+            <span class="visualizar-plano__label night-field-label">NOME</span>
+            <input v-model="nome" type="text" class="visualizar-plano__input" disabled />
           </div>
-          <div class="form_group flex_1">
-            <label>Status</label>
-            <input v-model="status" type="text" disabled />
-          </div>
-        </div>
-
-        <div class="input_row">
-          <div class="form_group flex_1">
-            <label>Descrição</label>
-            <textarea v-model="descricao" rows="3" disabled />
+          <div class="visualizar-plano__field visualizar-plano__field--narrow">
+            <span class="visualizar-plano__label night-field-label">STATUS</span>
+            <input v-model="status" type="text" class="visualizar-plano__input" disabled />
           </div>
         </div>
 
-        <div class="input_row">
-          <div class="form_group flex_1">
-            <label>Valor mensal</label>
-            <input v-model="valor" type="text" disabled />
+        <div class="visualizar-plano__field">
+          <span class="visualizar-plano__label night-field-label">DESCRIÇÃO</span>
+          <textarea
+            v-model="descricao"
+            class="visualizar-plano__textarea"
+            rows="4"
+            disabled
+          />
+        </div>
+
+        <div class="visualizar-plano__row visualizar-plano__row--thirds">
+          <div class="visualizar-plano__field">
+            <span class="visualizar-plano__label night-field-label">VALOR MENSAL</span>
+            <input v-model="valor" type="text" class="visualizar-plano__input" disabled />
           </div>
-          <div class="form_group flex_1">
-            <label>Máx. usuários</label>
-            <input v-model="maxUsuarios" type="text" disabled />
+          <div class="visualizar-plano__field">
+            <span class="visualizar-plano__label night-field-label">MÁX. USUÁRIOS</span>
+            <input v-model="maxUsuarios" type="text" class="visualizar-plano__input" disabled />
           </div>
-          <div class="form_group flex_1">
-            <label>Armazenamento</label>
-            <input v-model="armazenamento" type="text" disabled />
+          <div class="visualizar-plano__field">
+            <span class="visualizar-plano__label night-field-label">ARMAZENAMENTO</span>
+            <input v-model="armazenamento" type="text" class="visualizar-plano__input" disabled />
           </div>
         </div>
 
-        <div class="form_actions">
-          <button type="button" class="edit_btn" @click="goToEditar">EDITAR</button>
+        <div class="visualizar-plano__actions">
+          <button type="button" class="visualizar-plano__submit" @click="goToEditar">
+            EDITAR
+          </button>
         </div>
       </form>
     </div>
@@ -112,123 +121,252 @@ function goBack() {
 </template>
 
 <style lang="scss" scoped>
-.new_form {
+.visualizar-plano {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
 
-  .page_title {
+  &__heading {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 1px;
     margin-bottom: 42px;
+  }
 
-    .back_btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--color-orange-500);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+  &__back {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
     }
   }
 
-  .loading_container {
+  &__title {
+    margin: 0;
+  }
+
+  &__loading {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 200px;
 
     p {
-      color: #666;
-      font-size: 16px;
+      font-family: 'Source Code Pro', monospace;
+      font-size: 14px;
+      color: #f7f7f7;
+      opacity: 0.7;
     }
   }
 
-  .form_wrapper {
-    background-color: rgba(207, 198, 188, 0.1);
-    padding: 45px 50px;
-    max-width: 1050px;
+  &__panel {
+    width: 800px;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 48px 75px 40px;
+    background: rgba(121, 121, 121, 0.1);
+    border-radius: var(--night-radius, 30px);
+  }
 
-    @media (max-width: 900px) {
-      padding: 20px 13px;
+  &__form {
+    width: 650px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+  }
+
+  &__row {
+    display: flex;
+    gap: 20px;
+
+    &--thirds {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+  }
+
+  &__field {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+
+    &--wide {
+      flex: 3;
+      min-width: 0;
     }
 
-    form {
-      display: flex;
+    &--narrow {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+
+  &__label {
+    display: block;
+    flex-shrink: 0;
+    width: 100%;
+    margin: 0;
+    padding-left: 20px;
+    box-sizing: border-box;
+    font-family: var(--night-font, 'Source Code Pro', monospace);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+    letter-spacing: 0;
+    color: var(--night-gray, #f7f7f7);
+    opacity: 0.7;
+    text-transform: uppercase;
+  }
+
+  &__input,
+  &__textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    border-radius: 30px;
+    background: rgba(121, 121, 121, 0.3);
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.4;
+    color: #ffffff;
+    outline: none;
+    -webkit-text-fill-color: #ffffff;
+    opacity: 1;
+    cursor: default;
+
+    &:disabled {
+      opacity: 1;
+      color: #ffffff;
+      -webkit-text-fill-color: #ffffff;
+      background: rgba(121, 121, 121, 0.3);
+    }
+  }
+
+  &__input {
+    height: 49px;
+    padding: 0 20px;
+    line-height: 1;
+  }
+
+  &__textarea {
+    min-height: 120px;
+    padding: 16px 20px;
+    resize: none;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  &__submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 140px;
+    height: 46px;
+    padding: 0 28px;
+    border: none;
+    border-radius: 30px;
+    background: #ff00ff;
+    color: #ffffff;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.92;
+    }
+  }
+
+  @media (max-width: 900px) {
+    &__panel {
+      width: 100%;
+      padding: 32px 24px;
+    }
+
+    &__form {
+      width: 100%;
+    }
+
+    &__row {
       flex-direction: column;
-      gap: 29px;
+      gap: 24px;
 
-      @media (max-width: 900px) {
-        gap: 10px;
+      &--thirds {
+        grid-template-columns: 1fr;
+        gap: 24px;
       }
     }
+  }
 
-    .input_row {
-      display: flex;
-      gap: 37px;
-
-      @media (max-width: 900px) {
-        flex-direction: column;
-        gap: 10px;
-      }
+  @media (max-width: 768px) {
+    &__heading {
+      margin-bottom: 24px;
     }
 
-    .form_group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-
-      &.flex_1 {
-        flex: 1;
-      }
-
-      &.flex_3 {
-        flex: 3;
-      }
-
-      label {
-        font-size: 0.875rem;
-        color: var(--color-blue-700);
-      }
-
-      input,
-      textarea {
-        border: 1px solid var(--color-gray-500);
-        padding: 15px;
-        font-size: 0.938rem;
-        color: var(--color-blue-700);
-        outline: none;
-        background: white;
-        font-family: inherit;
-        resize: vertical;
-
-        &:disabled {
-          background: #f5f5f5;
-          color: var(--color-blue-700);
-        }
-      }
-
-      input {
-        height: 51px;
-        padding: 0 15px;
-      }
+    &__panel {
+      padding: 28px 20px 32px;
     }
 
-    .form_actions {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 10px;
+    &__submit {
+      width: 100%;
+    }
+  }
 
-      .edit_btn {
-        background-color: var(--color-orange-600, #c7633b);
-        color: #fff;
-        border: none;
-        padding: 0 28px;
-        height: 44px;
-        cursor: pointer;
-        font-size: 0.875rem;
-        font-weight: 600;
-      }
+  @media (max-width: 480px) {
+    &__heading {
+      margin-bottom: 16px;
+    }
+
+    &__panel {
+      padding: 24px 16px 28px;
+      border-radius: 20px;
+    }
+
+    &__form {
+      gap: 18px;
+    }
+
+    &__label {
+      font-size: 12px;
+    }
+
+    &__input {
+      height: 44px;
+      font-size: 13px;
+    }
+
+    &__textarea {
+      min-height: 100px;
+      font-size: 13px;
+    }
+
+    &__submit {
+      height: 44px;
+      font-size: 14px;
     }
   }
 }

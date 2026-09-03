@@ -461,6 +461,12 @@ function getContato(item: IGetClientesDataRes): string {
   padding: 0;
   flex-shrink: 0;
 
+  img {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+
   &:hover {
     opacity: 0.85;
   }

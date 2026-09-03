@@ -11,6 +11,8 @@ import iconFuncionarios from '@/assets/imgs/dashboard/icon-menu-funcionarios.svg
 import iconAgrupamentos from '@/assets/imgs/dashboard/icon-menu-agrupamentos.svg'
 import iconEmpresas from '@/assets/imgs/dashboard/icon-menu-empresas.svg'
 import iconAdmins from '@/assets/imgs/dashboard/icon-menu-admins.svg'
+import iconPlanos from '@/assets/imgs/dashboard/icon-menu-planos.svg'
+import iconAssinaturas from '@/assets/imgs/dashboard/icon-menu-assinaturas.svg'
 
 defineProps<{
   title: string
@@ -38,7 +40,9 @@ const figmaIcons: Record<string, { src: string; w: number; h: number }> = {
   funcionarios: { src: iconFuncionarios, w: 28, h: 19 },
   agrupamentos: { src: iconAgrupamentos, w: 22, h: 20 },
   building: { src: iconEmpresas, w: 20, h: 23 },
-  admin: { src: iconAdmins, w: 29, h: 23 }
+  admin: { src: iconAdmins, w: 29, h: 23 },
+  plans: { src: iconPlanos, w: 22, h: 22 },
+  subscription: { src: iconAssinaturas, w: 22, h: 22 }
 }
 </script>
 
@@ -64,12 +68,6 @@ const figmaIcons: Record<string, { src: string; w: number; h: number }> = {
       </svg>
       <svg v-else-if="icon === 'document'" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
         <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-      </svg>
-      <svg v-else-if="icon === 'plans'" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
-      </svg>
-      <svg v-else-if="icon === 'subscription'" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
       </svg>
       <svg v-else-if="icon === 'pen'" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
