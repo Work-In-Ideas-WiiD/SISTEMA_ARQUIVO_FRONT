@@ -11,6 +11,7 @@ import { getAllFuncoes, type IFuncao } from '@/services/http/funcoes'
 import { getAllEmpresas } from '@/services/http/empresas'
 import { isValidOptionalCpf, maskCpf } from '@/utils/formatCpfCnpj'
 import { maskPhone, stripDigits } from '@/utils/formatPhone'
+import NightDatePicker from '@/components/inputs/NightDatePicker/NightDatePicker.vue'
 
 const router = useRouter()
 const toast = useToast()
@@ -294,11 +295,10 @@ function goBack() {
             <label class="novo-funcionario__label night-field-label" for="data_nascimento">
               DATA DE NASCIMENTO
             </label>
-            <input
+            <NightDatePicker
               id="data_nascimento"
               v-model="form.data_nascimento"
-              type="date"
-              class="novo-funcionario__input"
+              placeholder="dd/mm/aaaa"
             />
           </div>
           <div class="novo-funcionario__field">
@@ -802,6 +802,11 @@ function goBack() {
 
     &__input,
     &__select-trigger {
+      height: 44px;
+      font-size: 13px;
+    }
+
+    :deep(.night-date__trigger) {
       height: 44px;
       font-size: 13px;
     }
