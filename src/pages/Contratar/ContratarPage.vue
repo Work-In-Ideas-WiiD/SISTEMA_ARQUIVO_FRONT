@@ -3,10 +3,14 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import Cookies from 'js-cookie'
-import CustomButton from '@/components/CustomButton/CustomButton.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import logoWiidocs from '@/assets/imgs/login/logo-wiidocs-white.png'
+import iconBackCircle from '@/assets/imgs/login/icon-back-circle.svg'
+import iconChevronLeft from '@/assets/imgs/login/icon-chevron-left.svg'
 import { getPlanosPublicos, type IPlanoPublico } from '@/services/http/planos'
 import { getChavePublica, postContratacao } from '@/services/http/conta'
 import { getApiErrorMessage } from '@/utils/apiError'
+import { maskPhone, stripDigits } from '@/utils/formatPhone'
 
 const router = useRouter()
 const toast = useToast()
@@ -72,6 +76,19 @@ function formatBRL(centavos: number) {
 
 function formatGB(bytes: number) {
   return `${(bytes / 1024 ** 3).toLocaleString('pt-BR', { maximumFractionDigits: 2 })} GB`
+}
+
+function maskCardNumber(value: string): string {
+  const digits = stripDigits(value).slice(0, 16)
+  return digits.replace(/(\d{4})(?=\d)/g, '$1 ')
+}
+
+function onTelefoneInput(event: Event) {
+  telefone.value = maskPhone((event.target as HTMLInputElement).value)
+}
+
+function onCardNumberInput(event: Event) {
+  card.value.number = maskCardNumber((event.target as HTMLInputElement).value)
 }
 
 function selecionarPlano(plano: IPlanoPublico) {
@@ -162,262 +179,460 @@ async function pagar() {
 </script>
 
 <template>
-  <main class="public_page">
-    <!-- Sucesso -->
-    <div v-if="sucesso" class="card center">
-      <h1 class="card_title">Assinatura ativada 🎉</h1>
-      <p class="card_subtitle">Seu pagamento foi aprovado. Você já pode acessar o sistema.</p>
-      <div class="form_actions">
-        <CustomButton title="IR PARA O LOGIN" type="button" @click="router.push('/')" />
-      </div>
+  <main class="contratar_page">
+    <p class="contratar_page__watermark" aria-hidden="true">&lt;/DOC</p>
+
+    <div v-if="sucesso" class="contratar_shell">
+      <img class="contratar_logo" :src="logoWiidocs" alt="WiiDocs" />
+      <h1 class="contratar_title">Assinatura ativada</h1>
+      <p class="contratar_subtitle">Seu pagamento foi aprovado. Você já pode acessar o sistema.</p>
+      <button type="button" class="night_btn" @click="router.push('/')">
+        IR PARA O LOGIN
+      </button>
     </div>
 
-    <!-- Pagamento (cartão) -->
-    <div v-else-if="planoSelecionado" class="card">
-      <div class="card_header">
-        <button type="button" class="back_btn" title="Voltar aos planos" @click="voltarParaPlanos">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-          </svg>
-        </button>
-        <h1 class="card_title">Pagamento</h1>
-      </div>
-      <p class="card_subtitle">
+    <div v-else-if="planoSelecionado" class="contratar_shell contratar_shell--pay">
+      <button type="button" class="back_btn" aria-label="Voltar aos planos" @click="voltarParaPlanos">
+        <img class="back_btn__circle" :src="iconBackCircle" alt="" width="66" height="66" />
+        <img class="back_btn__icon" :src="iconChevronLeft" alt="" width="40" height="40" />
+      </button>
+
+      <img class="contratar_logo" :src="logoWiidocs" alt="WiiDocs" />
+      <h1 class="contratar_title">Pagamento</h1>
+      <p class="contratar_subtitle">
         {{ planoSelecionado.nome }} —
-        <strong>{{ formatBRL(planoSelecionado.valor_mensal_centavos) }}/mês</strong>
+        <span>{{ formatBRL(planoSelecionado.valor_mensal_centavos) }}/mês</span>
       </p>
 
-      <form @submit.prevent="pagar">
-        <div class="form_group">
-          <label for="telefone">Telefone (DDD + número) *</label>
+      <form class="pay_form" @submit.prevent="pagar">
+        <label class="night_field">
+          <span class="night_field__label">Telefone</span>
           <input
-            id="telefone"
             v-model="telefone"
             type="tel"
             inputmode="numeric"
             maxlength="15"
-            placeholder="11999998888"
+            placeholder="(11) 99999-8888"
             autocomplete="tel"
+            @input="onTelefoneInput"
           />
-        </div>
-        <div class="form_group">
-          <label for="holder">Nome impresso no cartão</label>
-          <input id="holder" v-model="card.holder" type="text" placeholder="Como está no cartão" autocomplete="cc-name" />
-        </div>
-        <div class="form_group">
-          <label for="number">Número do cartão</label>
-          <input id="number" v-model="card.number" type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" autocomplete="cc-number" />
-        </div>
-        <div class="row">
-          <div class="form_group">
-            <label for="expMonth">Mês (MM)</label>
-            <input id="expMonth" v-model="card.expMonth" type="text" inputmode="numeric" maxlength="2" placeholder="12" />
-          </div>
-          <div class="form_group">
-            <label for="expYear">Ano (AAAA)</label>
-            <input id="expYear" v-model="card.expYear" type="text" inputmode="numeric" maxlength="4" placeholder="2030" />
-          </div>
-          <div class="form_group">
-            <label for="cvv">CVV</label>
-            <input id="cvv" v-model="card.cvv" type="text" inputmode="numeric" maxlength="4" placeholder="123" autocomplete="cc-csc" />
-          </div>
+        </label>
+        <label class="night_field">
+          <span class="night_field__label">Nome no cartão</span>
+          <input
+            v-model="card.holder"
+            type="text"
+            placeholder="Como está no cartão"
+            autocomplete="cc-name"
+          />
+        </label>
+        <label class="night_field">
+          <span class="night_field__label">Número do cartão</span>
+          <input
+            v-model="card.number"
+            type="text"
+            inputmode="numeric"
+            maxlength="19"
+            placeholder="0000 0000 0000 0000"
+            autocomplete="cc-number"
+            @input="onCardNumberInput"
+          />
+        </label>
+        <div class="pay_form__row">
+          <label class="night_field">
+            <span class="night_field__label">Mês</span>
+            <input v-model="card.expMonth" type="text" inputmode="numeric" maxlength="2" placeholder="MM" />
+          </label>
+          <label class="night_field">
+            <span class="night_field__label">Ano</span>
+            <input v-model="card.expYear" type="text" inputmode="numeric" maxlength="4" placeholder="AAAA" />
+          </label>
+          <label class="night_field">
+            <span class="night_field__label">CVV</span>
+            <input
+              v-model="card.cvv"
+              type="text"
+              inputmode="numeric"
+              maxlength="4"
+              placeholder="123"
+              autocomplete="cc-csc"
+            />
+          </label>
         </div>
 
-        <div class="form_actions">
-          <CustomButton
-            :title="`PAGAR ${formatBRL(planoSelecionado.valor_mensal_centavos)}`"
-            type="submit"
-            :loading="processando"
-          />
-        </div>
+        <button type="submit" class="night_btn" :disabled="processando">
+          <LoadingSpinner v-if="processando" />
+          <span v-else>PAGAR {{ formatBRL(planoSelecionado.valor_mensal_centavos) }}</span>
+        </button>
       </form>
 
       <p class="secure_note">
-        🔒 Os dados do cartão são criptografados no seu navegador e não passam pelo nosso servidor.
+        Os dados do cartão são criptografados no seu navegador e não passam pelo nosso servidor.
       </p>
     </div>
 
-    <!-- Lista de planos -->
-    <div v-else class="content">
-      <h1 class="page_title">Escolha seu plano</h1>
+    <div v-else class="contratar_shell">
+      <img class="contratar_logo" :src="logoWiidocs" alt="WiiDocs" />
+      <h1 class="contratar_title">Escolha seu plano</h1>
 
-      <p v-if="fetching" class="loading">Carregando planos...</p>
-      <p v-else-if="planos.length === 0" class="loading">Nenhum plano disponível no momento.</p>
+      <p v-if="fetching" class="contratar_loading">Carregando planos...</p>
+      <p v-else-if="planos.length === 0" class="contratar_loading">Nenhum plano disponível no momento.</p>
 
       <div v-else class="planos_grid">
-        <div v-for="plano in planos" :key="plano.id" class="plano_card">
-          <h2 class="plano_nome">{{ plano.nome }}</h2>
-          <p class="plano_valor">{{ formatBRL(plano.valor_mensal_centavos) }}<span>/mês</span></p>
-          <p v-if="plano.descricao" class="plano_desc">{{ plano.descricao }}</p>
-          <ul class="plano_features">
+        <article v-for="plano in planos" :key="plano.id" class="plano_card">
+          <h2 class="plano_card__nome">{{ plano.nome }}</h2>
+          <p class="plano_card__valor">
+            {{ formatBRL(plano.valor_mensal_centavos) }}<span>/mês</span>
+          </p>
+          <p v-if="plano.descricao" class="plano_card__desc">{{ plano.descricao }}</p>
+          <ul class="plano_card__features">
             <li>Até {{ plano.max_usuarios }} usuários</li>
             <li>{{ formatGB(plano.armazenamento_bytes) }} de armazenamento</li>
           </ul>
-          <CustomButton title="CONTRATAR" type="button" @click="selecionarPlano(plano)" />
-        </div>
+          <button type="button" class="night_btn" @click="selecionarPlano(plano)">
+            CONTRATAR
+          </button>
+        </article>
       </div>
     </div>
   </main>
 </template>
 
 <style lang="scss" scoped>
-.public_page {
-  min-height: 100vh;
+@import '@/styles/login-night-mobile.scss';
+
+.contratar_page {
+  --login-black: #212121;
+  --login-magenta: #ff00ff;
+  --login-gray: #f7f7f7;
+
+  position: fixed;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--color-white-300, #f8f8f8);
-  padding: 40px 24px;
+  overflow: hidden;
+  background: linear-gradient(119deg, var(--login-black) 0%, var(--login-magenta) 90%);
+  font-family: 'Source Code Pro', monospace;
 
-  .page_title {
-    font-size: 1.8rem;
-    color: var(--color-blue-700, #1e3f49);
+  @include login-mobile-gradient;
+  @include login-mobile-shell;
+
+  &__watermark {
+    position: absolute;
+    z-index: 0;
+    top: 80.28vh;
+    right: -1.82vw;
+    bottom: auto;
+    margin: 0;
+    font-size: clamp(90px, 24.07vh, 260px);
+    font-weight: 700;
+    line-height: 0.9;
+    color: var(--login-gray);
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+
+    @include login-mobile-watermark-hidden;
+  }
+}
+
+.contratar_shell {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 820px);
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(24px, 4vh, 48px) 18px;
+  box-sizing: border-box;
+
+  &--pay {
+    width: min(100%, 358px);
+    max-height: 100dvh;
+    padding-bottom: clamp(32px, 5vh, 48px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+.contratar_logo {
+  width: clamp(160px, 18vw, 200px);
+  height: auto;
+  margin-bottom: 24px;
+  object-fit: contain;
+}
+
+.contratar_title {
+  margin: 0 0 8px;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  color: #f7f7f7;
+  text-align: center;
+}
+
+.contratar_subtitle {
+  margin: 0 0 28px;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 14px;
+  font-weight: 400;
+  color: #f7f7f7;
+  text-align: center;
+
+  span {
+    font-weight: 700;
+    color: #f7f7f7;
+  }
+}
+
+.contratar_loading {
+  margin: 24px 0 0;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 14px;
+  color: #f7f7f7;
+  opacity: 0.7;
+  text-align: center;
+}
+
+.planos_grid {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.plano_card {
+  width: 280px;
+  max-width: 100%;
+  padding: 28px 24px;
+  border-radius: 30px;
+  background: rgba(121, 121, 121, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+
+  &__nome {
+    margin: 0 0 10px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: #f7f7f7;
     text-align: center;
+    text-transform: uppercase;
+  }
+
+  &__valor {
+    margin: 0 0 16px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    color: #f7f7f7;
+    text-align: center;
+
+    span {
+      margin-left: 4px;
+      font-size: 14px;
+      font-weight: 400;
+      color: #f7f7f7;
+      opacity: 0.7;
+    }
+  }
+
+  &__desc {
+    margin: 0 0 16px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 13px;
+    font-weight: 400;
+    color: #f7f7f7;
+    opacity: 0.7;
+    text-align: center;
+  }
+
+  &__features {
+    list-style: none;
+    width: 100%;
+    margin: 0 0 24px;
+    padding: 0;
+    flex: 1;
+
+    li {
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(247, 247, 247, 0.15);
+      font-family: 'Source Code Pro', monospace;
+      font-size: 14px;
+      font-weight: 400;
+      color: #f7f7f7;
+      text-align: center;
+    }
+  }
+}
+
+.night_btn {
+  width: auto;
+  min-width: 168px;
+  max-width: 100%;
+  min-height: 49px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 30px;
+  background: #f7f7f7;
+  color: #212121;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: wait;
+  }
+}
+
+.back_btn {
+  position: fixed;
+  z-index: 10;
+  top: clamp(24px, 3.5vh, 48px);
+  left: clamp(16px, 3vw, 48px);
+  width: 66px;
+  height: 66px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+
+  @include login-mobile-back-btn;
+
+  &:hover {
+    opacity: 0.85;
+  }
+
+  &__circle {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  &__icon {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    transform: rotate(90deg);
+    object-fit: contain;
+
+    @include login-mobile-back-btn-icon;
+  }
+}
+
+.pay_form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+
+  &__row {
+    width: 100%;
+    display: flex;
+    gap: 10px;
+  }
+}
+
+.night_field {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  cursor: text;
+
+  &__label {
+    padding-left: 20px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: #f7f7f7;
+    opacity: 0.7;
+    text-transform: uppercase;
+  }
+
+  input {
+    width: 100%;
+    height: 49px;
+    padding: 0 22px;
+    border: none;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.2);
+    outline: none;
+    color: #fff;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 400;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    @include login-input-autofill(#fff);
+  }
+}
+
+.secure_note {
+  margin: 20px 0 0;
+  padding: 0 8px;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #f7f7f7;
+  opacity: 0.85;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .contratar_shell {
+    width: 100%;
+    max-width: 358px;
+    min-height: 100dvh;
+    margin: 0 auto;
+    padding: 90px 18px 40px;
+  }
+
+  .contratar_logo {
+    width: 168px;
     margin-bottom: 32px;
   }
 
-  .loading {
-    text-align: center;
-    color: var(--color-gray-500, #707070);
-  }
-
-  .planos_grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 24px;
-    justify-content: center;
-
-    .plano_card {
-      background: #fff;
-      border-radius: 8px;
-      padding: 32px;
-      width: 300px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-      display: flex;
-      flex-direction: column;
-
-      .plano_nome {
-        font-size: 1.3rem;
-        color: var(--color-blue-700, #1e3f49);
-        margin-bottom: 8px;
-      }
-
-      .plano_valor {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: var(--color-orange-600, #c7633b);
-        margin-bottom: 16px;
-
-        span {
-          font-size: 0.9rem;
-          font-weight: 400;
-          color: var(--color-gray-500, #707070);
-        }
-      }
-
-      .plano_desc {
-        color: var(--color-gray-500, #707070);
-        margin-bottom: 16px;
-      }
-
-      .plano_features {
-        list-style: none;
-        margin: 0 0 24px;
-        padding: 0;
-        flex: 1;
-
-        li {
-          padding: 6px 0;
-          border-bottom: 1px solid #f0f0f0;
-          font-size: 0.95rem;
-        }
-      }
-    }
-  }
-
-  .card {
+  .plano_card {
     width: 100%;
-    max-width: 440px;
-    background: #fff;
-    padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  }
 
-    &.center {
-      text-align: center;
-    }
-
-    .card_header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 8px;
-
-      .back_btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        color: var(--color-orange-500, #c7633b);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0;
-      }
-    }
-
-    .card_title {
-      font-size: 1.6rem;
-      color: var(--color-blue-700, #1e3f49);
-    }
-
-    .card_subtitle {
-      color: var(--color-gray-500, #707070);
-      margin-bottom: 24px;
-    }
-
-    .form_group {
-      margin-bottom: 16px;
-      flex: 1;
-
-      label {
-        display: block;
-        margin-bottom: 6px;
-        font-weight: 500;
-        font-size: 0.875rem;
-      }
-
-      input {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid rgba(207, 198, 188, 0.6);
-        border-radius: 4px;
-        font-size: 14px;
-
-        &:focus {
-          outline: none;
-          border-color: #c7633b;
-        }
-      }
-    }
-
-    .row {
-      display: flex;
-      gap: 12px;
-    }
-
-    .form_actions {
-      display: flex;
-      justify-content: center;
-      margin-top: 4px;
-    }
-
-    .secure_note {
-      margin-top: 18px;
-      font-size: 0.8rem;
-      color: var(--color-gray-500, #707070);
-      text-align: center;
-      line-height: 1.4;
-    }
+  .pay_form__row {
+    flex-direction: column;
   }
 }
 </style>
