@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
+import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import {
   getAssinaturaSaas,
   cancelarAssinaturaSaas,
@@ -128,85 +129,125 @@ async function confirmAction() {
     acting.value = false
   }
 }
+
+function statusClass(s?: string | null) {
+  return s || 'desconhecido'
+}
 </script>
 
 <template>
-  <section class="new_form">
-    <div class="page_title">
-      <button class="back_btn" type="button" @click="goBack">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-        </svg>
+  <section class="view-saas">
+    <div class="view-saas__heading">
+      <button
+        type="button"
+        class="view-saas__back"
+        aria-label="Voltar para Assinaturas SaaS"
+        @click="goBack"
+      >
+        <img :src="iconChevronLeft" width="24" height="24" alt="" />
       </button>
-      <h2 class="dashboard_title">ASSINATURA SaaS</h2>
+      <h2 class="view-saas__title dashboard_title">ASSINATURA SAAS</h2>
     </div>
 
-    <div v-if="loading" class="loading_container">
-      <p>Carregando...</p>
+    <div v-if="loading" class="view-saas__loading">
+      <p>Carregando…</p>
     </div>
 
-    <div v-else-if="item" class="form_wrapper">
-      <form>
-        <div class="input_row">
-          <div class="form_group flex_3">
-            <label>Cliente / Conta</label>
-            <input :value="item.conta?.nome || '—'" type="text" disabled />
+    <div v-else-if="item" class="view-saas__panel">
+      <form class="view-saas__form" @submit.prevent>
+        <div class="view-saas__row">
+          <div class="view-saas__field view-saas__field--wide">
+            <span class="view-saas__label night-field-label">CLIENTE / CONTA</span>
+            <input
+              :value="item.conta?.nome || '—'"
+              type="text"
+              class="view-saas__input"
+              disabled
+            />
           </div>
-          <div class="form_group flex_1">
-            <label>Status</label>
-            <input :value="labelStatusAssinatura(item.status)" type="text" disabled />
+          <div class="view-saas__field view-saas__field--narrow">
+            <span class="view-saas__label night-field-label">STATUS</span>
+            <div class="view-saas__status-wrap">
+              <span
+                class="view-saas__status"
+                :class="`view-saas__status--${statusClass(item.status)}`"
+              >
+                {{ labelStatusAssinatura(item.status) }}
+              </span>
+            </div>
           </div>
         </div>
 
-        <div class="input_row">
-          <div class="form_group flex_1">
-            <label>Plano</label>
-            <input :value="item.plano?.nome || '—'" type="text" disabled />
+        <div class="view-saas__row view-saas__row--thirds">
+          <div class="view-saas__field">
+            <span class="view-saas__label night-field-label">PLANO</span>
+            <input :value="item.plano?.nome || '—'" type="text" class="view-saas__input" disabled />
           </div>
-          <div class="form_group flex_1">
-            <label>Valor mensal</label>
-            <input :value="formatBRL(item.plano?.valor_mensal_centavos)" type="text" disabled />
+          <div class="view-saas__field">
+            <span class="view-saas__label night-field-label">VALOR MENSAL</span>
+            <input
+              :value="formatBRL(item.plano?.valor_mensal_centavos)"
+              type="text"
+              class="view-saas__input"
+              disabled
+            />
           </div>
-          <div class="form_group flex_1">
-            <label>Limites</label>
+          <div class="view-saas__field">
+            <span class="view-saas__label night-field-label">LIMITES</span>
             <input
               :value="`${item.plano?.max_usuarios ?? '—'} usuários · ${formatGB(item.plano?.armazenamento_bytes)}`"
               type="text"
+              class="view-saas__input"
               disabled
             />
           </div>
         </div>
 
-        <div class="input_row">
-          <div class="form_group flex_1">
-            <label>Criação</label>
-            <input :value="formatDate(item.created_at)" type="text" disabled />
+        <div class="view-saas__row view-saas__row--thirds">
+          <div class="view-saas__field">
+            <span class="view-saas__label night-field-label">CRIAÇÃO</span>
+            <input :value="formatDate(item.created_at)" type="text" class="view-saas__input" disabled />
           </div>
-          <div class="form_group flex_1">
-            <label>Início</label>
-            <input :value="formatDate(item.inicio_em)" type="text" disabled />
+          <div class="view-saas__field">
+            <span class="view-saas__label night-field-label">INÍCIO</span>
+            <input :value="formatDate(item.inicio_em)" type="text" class="view-saas__input" disabled />
           </div>
-          <div class="form_group flex_1">
-            <label>Próxima cobrança</label>
-            <input :value="formatDate(item.proxima_cobranca_em)" type="text" disabled />
-          </div>
-        </div>
-
-        <div class="input_row">
-          <div class="form_group flex_1">
-            <label>Subscription ID (gateway)</label>
-            <input :value="item.gateway_subscription_id || '—'" type="text" disabled />
-          </div>
-          <div class="form_group flex_1">
-            <label>Customer ID (gateway)</label>
-            <input :value="item.gateway_customer_id || '—'" type="text" disabled />
+          <div class="view-saas__field">
+            <span class="view-saas__label night-field-label">PRÓXIMA COBRANÇA</span>
+            <input
+              :value="formatDate(item.proxima_cobranca_em)"
+              type="text"
+              class="view-saas__input"
+              disabled
+            />
           </div>
         </div>
 
-        <div v-if="item.conta?.usuarios?.length" class="block">
-          <h3 class="block_title">Usuários da conta</h3>
-          <div class="table_mini_wrap">
-            <table class="table_mini">
+        <div class="view-saas__row">
+          <div class="view-saas__field">
+            <span class="view-saas__label night-field-label">SUBSCRIPTION ID (GATEWAY)</span>
+            <input
+              :value="item.gateway_subscription_id || '—'"
+              type="text"
+              class="view-saas__input"
+              disabled
+            />
+          </div>
+          <div class="view-saas__field">
+            <span class="view-saas__label night-field-label">CUSTOMER ID (GATEWAY)</span>
+            <input
+              :value="item.gateway_customer_id || '—'"
+              type="text"
+              class="view-saas__input"
+              disabled
+            />
+          </div>
+        </div>
+
+        <div v-if="item.conta?.usuarios?.length" class="view-saas__block">
+          <h3 class="view-saas__block-title">Usuários da conta</h3>
+          <div class="view-saas__table-wrap">
+            <table class="view-saas__table">
               <thead>
                 <tr>
                   <th>Nome</th>
@@ -216,20 +257,20 @@ async function confirmAction() {
               </thead>
               <tbody>
                 <tr v-for="u in item.conta.usuarios" :key="u.id">
-                  <td>{{ u.nome }}</td>
-                  <td>{{ u.email }}</td>
-                  <td>{{ u.cnpj || u.cpf || '—' }}</td>
+                  <td :title="u.nome">{{ u.nome }}</td>
+                  <td :title="u.email">{{ u.email }}</td>
+                  <td :title="u.cnpj || u.cpf || '—'">{{ u.cnpj || u.cpf || '—' }}</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        <div class="block">
-          <h3 class="block_title">Pagamentos / faturas</h3>
-          <div v-if="!pagamentos.length" class="empty">Nenhum pagamento registrado.</div>
-          <div v-else class="table_mini_wrap">
-            <table class="table_mini">
+        <div class="view-saas__block">
+          <h3 class="view-saas__block-title">Pagamentos / faturas</h3>
+          <div v-if="!pagamentos.length" class="view-saas__empty">Nenhum pagamento registrado.</div>
+          <div v-else class="view-saas__table-wrap">
+            <table class="view-saas__table">
               <thead>
                 <tr>
                   <th>Status</th>
@@ -252,11 +293,11 @@ async function confirmAction() {
           </div>
         </div>
 
-        <div class="block">
-          <h3 class="block_title">Histórico de status</h3>
-          <div v-if="!historico.length" class="empty">Sem histórico.</div>
-          <div v-else class="table_mini_wrap">
-            <table class="table_mini">
+        <div class="view-saas__block">
+          <h3 class="view-saas__block-title">Histórico de status</h3>
+          <div v-if="!historico.length" class="view-saas__empty">Sem histórico.</div>
+          <div v-else class="view-saas__table-wrap">
+            <table class="view-saas__table">
               <thead>
                 <tr>
                   <th>De</th>
@@ -277,10 +318,10 @@ async function confirmAction() {
           </div>
         </div>
 
-        <div class="form_actions">
+        <div class="view-saas__actions">
           <button
             type="button"
-            class="action_btn"
+            class="view-saas__btn view-saas__btn--ghost"
             :disabled="acting || item.status === 'suspensa'"
             @click="openConfirm('suspender')"
           >
@@ -288,7 +329,7 @@ async function confirmAction() {
           </button>
           <button
             type="button"
-            class="action_btn"
+            class="view-saas__btn view-saas__btn--primary"
             :disabled="acting || item.status === 'ativa'"
             @click="openConfirm('reativar')"
           >
@@ -296,7 +337,7 @@ async function confirmAction() {
           </button>
           <button
             type="button"
-            class="action_btn danger"
+            class="view-saas__btn view-saas__btn--danger"
             :disabled="acting || item.status === 'cancelada'"
             @click="openConfirm('cancelar')"
           >
@@ -306,22 +347,27 @@ async function confirmAction() {
       </form>
     </div>
 
-    <div v-if="confirmOpen" class="confirm_overlay" @click.self="closeConfirm">
-      <div class="confirm_modal" role="dialog" aria-modal="true">
+    <div v-if="confirmOpen" class="view-saas__overlay" @click.self="closeConfirm">
+      <div class="view-saas__modal" role="dialog" aria-modal="true">
         <h3>{{ confirmCopy.title }}</h3>
         <p>{{ confirmCopy.body }}</p>
-        <div class="confirm_actions">
-          <button type="button" class="btn_ghost" :disabled="acting" @click="closeConfirm">
-            Voltar
+        <div class="view-saas__modal-actions">
+          <button
+            type="button"
+            class="view-saas__btn view-saas__btn--ghost"
+            :disabled="acting"
+            @click="closeConfirm"
+          >
+            VOLTAR
           </button>
           <button
             type="button"
-            class="action_btn"
-            :class="{ danger: confirmCopy.danger }"
+            class="view-saas__btn"
+            :class="confirmCopy.danger ? 'view-saas__btn--danger' : 'view-saas__btn--primary'"
             :disabled="acting"
             @click="confirmAction"
           >
-            {{ acting ? 'Aguarde...' : confirmCopy.confirmLabel }}
+            {{ acting ? 'AGUARDE…' : confirmCopy.confirmLabel }}
           </button>
         </div>
       </div>
@@ -330,162 +376,324 @@ async function confirmAction() {
 </template>
 
 <style lang="scss" scoped>
-.new_form {
+.view-saas {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
 
-  .page_title {
+  &__heading {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 1px;
     margin-bottom: 42px;
+  }
 
-    .back_btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--color-orange-500);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+  &__back {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
     }
   }
 
-  .loading_container {
+  &__title {
+    margin: 0;
+  }
+
+  &__loading {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 200px;
 
     p {
-      color: #666;
-      font-size: 16px;
+      font-family: 'Source Code Pro', monospace;
+      font-size: 14px;
+      color: #f7f7f7;
+      opacity: 0.7;
     }
   }
 
-  .form_wrapper {
-    background-color: rgba(207, 198, 188, 0.1);
-    padding: 45px 50px;
-    max-width: 1050px;
+  &__panel {
+    width: 1000px;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 48px 75px 40px;
+    background: rgba(121, 121, 121, 0.1);
+    border-radius: var(--night-radius, 30px);
+  }
 
-    @media (max-width: 900px) {
-      padding: 20px 13px;
+  &__form {
+    width: 850px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  &__row {
+    display: flex;
+    gap: 20px;
+
+    &--thirds {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+  }
+
+  &__field {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+
+    &--wide {
+      flex: 3;
     }
 
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 29px;
+    &--narrow {
+      flex: 1;
+    }
+  }
+
+  &__label {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding-left: 20px;
+    box-sizing: border-box;
+    font-family: var(--night-font, 'Source Code Pro', monospace);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+    color: var(--night-gray, #f7f7f7);
+    opacity: 0.7;
+    text-transform: uppercase;
+  }
+
+  &__input {
+    width: 100%;
+    height: 49px;
+    box-sizing: border-box;
+    padding: 0 20px;
+    border: none;
+    border-radius: 30px;
+    background: rgba(121, 121, 121, 0.3);
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1;
+    color: #ffffff;
+    outline: none;
+    -webkit-text-fill-color: #ffffff;
+    opacity: 1;
+    cursor: default;
+
+    &:disabled {
+      opacity: 1;
+      color: #ffffff;
+      -webkit-text-fill-color: #ffffff;
+      background: rgba(121, 121, 121, 0.3);
+    }
+  }
+
+  &__status-wrap {
+    width: 100%;
+    min-height: 49px;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    box-sizing: border-box;
+  }
+
+  &__status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+
+    &--ativa {
+      background: rgba(76, 175, 80, 0.25);
+      color: #8ee99a;
     }
 
-    .input_row {
-      display: flex;
-      gap: 37px;
+    &--pendente,
+    &--pendente_acao {
+      background: rgba(255, 193, 7, 0.25);
+      color: #ffd666;
+    }
 
-      @media (max-width: 900px) {
-        flex-direction: column;
-        gap: 10px;
+    &--inadimplente {
+      background: rgba(220, 53, 69, 0.25);
+      color: #ff8a96;
+    }
+
+    &--suspensa {
+      background: rgba(121, 121, 121, 0.4);
+      color: rgba(247, 247, 247, 0.8);
+    }
+
+    &--cancelada,
+    &--expirada,
+    &--desconhecido {
+      background: rgba(121, 121, 121, 0.35);
+      color: rgba(247, 247, 247, 0.65);
+    }
+  }
+
+  &__block {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__block-title {
+    margin: 0;
+    padding-left: 8px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: #f7f7f7;
+  }
+
+  &__empty {
+    padding: 12px 8px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 13px;
+    color: rgba(247, 247, 247, 0.65);
+  }
+
+  &__table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 20px;
+    background: rgba(121, 121, 121, 0.18);
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+
+    th,
+    td {
+      padding: 14px 16px;
+      text-align: left;
+      font-family: 'Source Code Pro', monospace;
+      color: #f7f7f7;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    th {
+      font-size: 13px;
+      font-weight: 700;
+      opacity: 0.7;
+      text-transform: uppercase;
+      background: rgba(33, 33, 33, 0.35);
+    }
+
+    td {
+      font-size: 13px;
+      font-weight: 300;
+      border-top: 1px solid rgba(121, 121, 121, 0.25);
+    }
+
+    tbody tr:nth-child(odd) td {
+      background: rgba(33, 33, 33, 0.28);
+    }
+
+    small {
+      font-size: 11px;
+      opacity: 0.8;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 140px;
+    height: 46px;
+    padding: 0 22px;
+    border-radius: 30px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    &--ghost {
+      border: 1px solid rgba(247, 247, 247, 0.7);
+      background: transparent;
+      color: #ffffff;
+
+      &:hover:not(:disabled) {
+        opacity: 0.85;
       }
     }
 
-    .form_group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+    &--primary {
+      border: none;
+      background: #ff00ff;
+      color: #ffffff;
 
-      &.flex_1 {
-        flex: 1;
-      }
-
-      &.flex_3 {
-        flex: 3;
-      }
-
-      label {
-        font-size: 0.875rem;
-        color: var(--color-blue-700);
-      }
-
-      input {
-        border: 1px solid var(--color-gray-500);
-        height: 51px;
-        padding: 0 15px;
-        font-size: 0.938rem;
-        color: var(--color-blue-700);
-        outline: none;
-        background: #f5f5f5;
-        font-family: inherit;
+      &:hover:not(:disabled) {
+        opacity: 0.92;
       }
     }
 
-    .block {
-      .block_title {
-        margin: 0 0 12px;
-        color: var(--color-blue-700);
-        font-size: 1rem;
-      }
+    &--danger {
+      border: none;
+      background: rgba(220, 53, 69, 0.85);
+      color: #ffffff;
 
-      .empty {
-        color: #777;
-        font-size: 0.9rem;
-      }
-    }
-
-    .table_mini_wrap {
-      overflow-x: auto;
-      background: #fff;
-    }
-
-    .table_mini {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.875rem;
-
-      th,
-      td {
-        text-align: left;
-        padding: 10px 12px;
-        border-bottom: 1px solid #eee;
-        color: var(--color-blue-700);
-      }
-
-      th {
-        background: rgba(207, 198, 188, 0.25);
-      }
-    }
-
-    .form_actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-
-      .action_btn {
-        background-color: var(--color-orange-600, #c7633b);
-        color: #fff;
-        border: none;
-        padding: 0 20px;
-        height: 44px;
-        cursor: pointer;
-        font-size: 0.875rem;
-        font-weight: 600;
-
-        &:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-
-        &.danger {
-          background-color: #dc3545;
-        }
+      &:hover:not(:disabled) {
+        opacity: 0.92;
       }
     }
   }
 
-  .confirm_overlay {
+  &__overlay {
     position: fixed;
     inset: 0;
-    background: rgba(30, 63, 73, 0.45);
+    background: rgba(0, 0, 0, 0.55);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -493,66 +701,92 @@ async function confirmAction() {
     padding: 20px;
   }
 
-  .confirm_modal {
+  &__modal {
     width: 100%;
     max-width: 440px;
-    background: #fff;
     padding: 28px 24px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    background: rgba(33, 33, 33, 0.98);
+    border: 1px solid rgba(121, 121, 121, 0.45);
+    border-radius: 24px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
 
     h3 {
       margin: 0 0 10px;
-      color: var(--color-blue-700, #1e3f49);
-      font-size: 1.15rem;
+      font-family: 'Source Code Pro', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: #f7f7f7;
     }
 
     p {
       margin: 0 0 24px;
-      color: #555;
-      font-size: 0.95rem;
+      font-family: 'Source Code Pro', monospace;
+      font-size: 14px;
+      font-weight: 300;
       line-height: 1.45;
+      color: rgba(247, 247, 247, 0.75);
+    }
+  }
+
+  &__modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 900px) {
+    &__panel {
+      width: 100%;
+      padding: 32px 24px;
     }
 
-    .confirm_actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      flex-wrap: wrap;
+    &__form {
+      width: 100%;
     }
 
-    .btn_ghost {
-      background: transparent;
-      border: 1px solid var(--color-gray-500, #999);
-      color: var(--color-blue-700, #1e3f49);
-      height: 44px;
-      padding: 0 18px;
-      cursor: pointer;
-      font-size: 0.875rem;
-      font-weight: 600;
+    &__row {
+      flex-direction: column;
+      gap: 24px;
 
-      &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
+      &--thirds {
+        grid-template-columns: 1fr;
+        gap: 24px;
       }
     }
 
-    .action_btn {
-      background-color: var(--color-orange-600, #c7633b);
-      color: #fff;
-      border: none;
-      padding: 0 20px;
-      height: 44px;
-      cursor: pointer;
-      font-size: 0.875rem;
-      font-weight: 600;
+    &__actions {
+      justify-content: stretch;
 
-      &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
+      .view-saas__btn {
+        flex: 1;
+        min-width: 0;
       }
+    }
+  }
 
-      &.danger {
-        background-color: #dc3545;
+  @media (max-width: 768px) {
+    &__heading {
+      margin-bottom: 24px;
+    }
+
+    &__panel {
+      padding: 28px 20px 32px;
+    }
+
+    &__actions {
+      flex-direction: column-reverse;
+
+      .view-saas__btn {
+        width: 100%;
+      }
+    }
+
+    &__modal-actions {
+      flex-direction: column-reverse;
+
+      .view-saas__btn {
+        width: 100%;
       }
     }
   }
