@@ -121,16 +121,16 @@ function goBack() {
       <button
         type="button"
         class="perfil__back"
-        aria-label="Voltar para Home"
+        aria-label="Voltar"
         @click="goBack"
       >
-        <img :src="iconChevronLeft" width="24" height="24" alt="" />
+        <img :src="iconChevronLeft" width="30" height="30" alt="" />
       </button>
       <h2 class="perfil__title dashboard_title">PERFIL</h2>
     </div>
 
-    <div class="perfil__panel">
-      <form class="perfil__form" @submit.prevent="handleSubmit">
+    <form class="perfil__form" @submit.prevent="handleSubmit">
+      <div class="perfil__panel">
         <div class="perfil__field">
           <label class="perfil__label night-field-label" for="nome">{{ nomeLabel }}</label>
           <input
@@ -208,16 +208,21 @@ function goBack() {
           />
         </div>
 
-        <div class="perfil__actions">
-          <button type="button" class="perfil__cancel" @click="goBack">
-            CANCELAR
-          </button>
+        <!-- Desktop: botão dentro do card -->
+        <div class="perfil__actions perfil__actions--desktop">
           <button type="submit" class="perfil__submit" :disabled="fetching">
-            {{ fetching ? 'Salvando…' : 'SALVAR' }}
+            {{ fetching ? 'Salvando…' : 'SALVAR MUDANÇAS' }}
           </button>
         </div>
-      </form>
-    </div>
+      </div>
+
+      <!-- Mobile: botão fora / abaixo do card -->
+      <div class="perfil__actions perfil__actions--mobile">
+        <button type="submit" class="perfil__submit" :disabled="fetching">
+          {{ fetching ? 'Salvando…' : 'SALVAR MUDANÇAS' }}
+        </button>
+      </div>
+    </form>
   </main>
 </template>
 
@@ -247,6 +252,12 @@ function goBack() {
     cursor: pointer;
     opacity: 0.7;
 
+    img {
+      width: 24px;
+      height: 24px;
+      display: block;
+    }
+
     &:hover {
       opacity: 1;
     }
@@ -256,18 +267,22 @@ function goBack() {
     margin: 0;
   }
 
-  &__panel {
+  &__form {
     width: 800px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  &__panel {
+    width: 100%;
     max-width: 100%;
     box-sizing: border-box;
     padding: 48px 75px 40px;
     background: rgba(121, 121, 121, 0.1);
     border-radius: var(--night-radius, 30px);
-  }
-
-  &__form {
-    width: 650px;
-    max-width: 100%;
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -276,6 +291,7 @@ function goBack() {
 
   &__field {
     width: 100%;
+    max-width: 650px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -344,9 +360,12 @@ function goBack() {
     justify-content: center;
     gap: 12px;
     margin-top: 8px;
+
+    &--mobile {
+      display: none;
+    }
   }
 
-  &__cancel,
   &__submit {
     display: inline-flex;
     align-items: center;
@@ -354,7 +373,10 @@ function goBack() {
     min-width: 140px;
     height: 46px;
     padding: 0 28px;
+    border: none;
     border-radius: 30px;
+    background: #ff00ff;
+    color: #f7f7f7;
     font-family: 'Source Code Pro', monospace;
     font-size: 16px;
     font-weight: 700;
@@ -363,22 +385,6 @@ function goBack() {
     text-transform: uppercase;
     white-space: nowrap;
     cursor: pointer;
-  }
-
-  &__cancel {
-    border: 1px solid rgba(247, 247, 247, 0.7);
-    background: transparent;
-    color: #ffffff;
-
-    &:hover {
-      opacity: 0.85;
-    }
-  }
-
-  &__submit {
-    border: none;
-    background: #ff00ff;
-    color: #ffffff;
 
     &:hover:not(:disabled) {
       opacity: 0.92;
@@ -391,32 +397,72 @@ function goBack() {
   }
 
   @media (max-width: 900px) {
-    &__panel {
-      width: 100%;
-      padding: 32px 24px;
-    }
-
     &__form {
       width: 100%;
     }
+
+    &__panel {
+      padding: 32px 24px;
+    }
+
+    &__field {
+      max-width: 100%;
+    }
   }
 
+  /* Mobile Figma: setinha circular + SALVAR fora do card */
   @media (max-width: 768px) {
     &__heading {
       margin-bottom: 24px;
+      gap: 12px;
+    }
+
+    &__back {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      opacity: 1;
+
+      img {
+        width: 30px;
+        height: 30px;
+        opacity: 1;
+      }
+
+      &:hover {
+        opacity: 0.9;
+      }
     }
 
     &__panel {
-      padding: 28px 20px 32px;
-    }
-
-    &__actions {
-      flex-direction: column-reverse;
-    }
-
-    &__cancel,
-    &__submit {
       width: 100%;
+      max-width: 358px;
+      margin: 0 auto;
+      padding: 28px 20px 32px;
+      border-radius: 30px;
+      background: rgba(121, 121, 121, 0.1);
+    }
+
+    &__actions--desktop {
+      display: none;
+    }
+
+    &__actions--mobile {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      margin-top: 26px;
+    }
+
+    &__submit {
+      width: 213px;
+      min-width: 213px;
+      height: 49px;
+      padding: 0 16px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #f7f7f7;
     }
   }
 
@@ -427,11 +473,6 @@ function goBack() {
 
     &__panel {
       padding: 24px 16px 28px;
-      border-radius: 20px;
-    }
-
-    &__form {
-      gap: 18px;
     }
 
     &__label {
@@ -441,12 +482,6 @@ function goBack() {
     &__input {
       height: 44px;
       font-size: 13px;
-    }
-
-    &__cancel,
-    &__submit {
-      height: 44px;
-      font-size: 14px;
     }
   }
 }

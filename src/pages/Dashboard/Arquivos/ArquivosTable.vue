@@ -34,6 +34,9 @@ const search = ref('')
 const viewMode = ref<ViewMode>('list')
 const selectedId = ref<string | null>(null)
 const openMenuId = ref<string | null>(null)
+const isMobile = ref(
+  typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches
+)
 const searchPlaceholder = ref('Pesquisar por ID, nome, e-mail e número de documento…')
 
 const selectedArquivo = computed(() =>
@@ -42,6 +45,7 @@ const selectedArquivo = computed(() =>
 
 let searchPlaceholderMql: MediaQueryList | null = null
 let searchPlaceholderTabletMql: MediaQueryList | null = null
+let mobileMql: MediaQueryList | null = null
 
 function updateSearchPlaceholder() {
   if (window.matchMedia('(max-width: 768px)').matches) {
@@ -55,12 +59,19 @@ function updateSearchPlaceholder() {
   searchPlaceholder.value = 'Pesquisar por ID, nome, e-mail e número de documento…'
 }
 
+function updateIsMobile() {
+  isMobile.value = window.matchMedia('(max-width: 768px)').matches
+}
+
 onMounted(() => {
   searchPlaceholderMql = window.matchMedia('(max-width: 1200px)')
   searchPlaceholderTabletMql = window.matchMedia('(max-width: 768px)')
+  mobileMql = window.matchMedia('(max-width: 768px)')
   updateSearchPlaceholder()
+  updateIsMobile()
   searchPlaceholderMql.addEventListener('change', updateSearchPlaceholder)
   searchPlaceholderTabletMql.addEventListener('change', updateSearchPlaceholder)
+  mobileMql.addEventListener('change', updateIsMobile)
   document.addEventListener('click', closeTileMenu)
   getData(page.value, search.value)
 })
@@ -68,6 +79,7 @@ onMounted(() => {
 onUnmounted(() => {
   searchPlaceholderMql?.removeEventListener('change', updateSearchPlaceholder)
   searchPlaceholderTabletMql?.removeEventListener('change', updateSearchPlaceholder)
+  mobileMql?.removeEventListener('change', updateIsMobile)
   document.removeEventListener('click', closeTileMenu)
 })
 
@@ -217,8 +229,8 @@ watch(viewMode, () => {
 </script>
 
 <template>
-  <section class="arquivos-page">
-    <div class="arquivos-page__heading">
+  <section class="arquivos-page" :class="{ 'arquivos-page--mobile': isMobile }">
+    <div v-if="!isMobile" class="arquivos-page__heading">
       <div class="arquivos-page__heading-left">
         <button
           type="button"
@@ -293,8 +305,64 @@ watch(viewMode, () => {
         </div>
       </form>
 
-      <div v-if="viewMode === 'list'" class="arquivos-scroll">
-        <table class="arquivos-grid">
+      <!-- Mobile Figma: busca → botão à direita → grade/lista full width -->
+      <div v-if="isMobile" class="arquivos-mobile-body">
+        <div class="arquivos-mobile-body__toolbar">
+          <button
+            type="button"
+            class="arquivos-page__view-btn arquivos-page__view-btn--mobile"
+            :aria-label="viewMode === 'list' ? 'Alternar para grade' : 'Alternar para lista'"
+            @click="toggleViewMode"
+          >
+            <img
+              :src="viewMode === 'list' ? iconGrid : iconList"
+              :width="viewMode === 'list' ? 22 : 18"
+              :height="viewMode === 'list' ? 14 : 12"
+              alt=""
+            />
+          </button>
+        </div>
+
+        <ul v-if="viewMode === 'list'" class="arquivos-mobile-list">
+          <li v-for="item in arquivos" :key="item.id">
+            <button
+              type="button"
+              class="arquivos-mobile-list__row"
+              @click="openFile(item.url)"
+            >
+                <img
+                  class="arquivos-mobile-list__icon"
+                  :src="iconFolder"
+                  width="30"
+                  height="30"
+                  alt=""
+                />
+              <span class="arquivos-mobile-list__name" :title="item.descricao">
+                {{ item.descricao }}
+              </span>
+            </button>
+          </li>
+        </ul>
+
+        <div v-else class="arquivos-grade__tiles arquivos-grade__tiles--mobile">
+          <button
+            v-for="item in arquivos"
+            :key="item.id"
+            type="button"
+            class="arquivos-tile"
+            :aria-label="item.descricao"
+            @click="openFile(item.url)"
+          >
+            <span class="arquivos-tile__box">
+              <img class="arquivos-tile__icon" :src="iconFolder" width="40" height="40" alt="" />
+            </span>
+            <span class="arquivos-tile__name" :title="item.descricao">{{ item.descricao }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div v-if="viewMode === 'list' && !isMobile" class="arquivos-scroll">
+        <table class="arquivos-grid arquivos-grid--desktop">
           <thead>
             <tr>
               <th>Arquivo</th>
@@ -337,7 +405,7 @@ watch(viewMode, () => {
         </table>
       </div>
 
-      <div v-if="viewMode === 'grid'" class="arquivos-grade__tiles">
+      <div v-if="viewMode === 'grid' && !isMobile" class="arquivos-grade__tiles">
         <div
           v-for="item in arquivos"
           :key="item.id"
@@ -391,7 +459,7 @@ watch(viewMode, () => {
         </div>
       </div>
 
-      <aside v-if="viewMode === 'grid' && selectedArquivo" class="arquivos-grade__sidebar">
+      <aside v-if="viewMode === 'grid' && selectedArquivo && !isMobile" class="arquivos-grade__sidebar">
         <h3 class="arquivos-grade__sidebar-title">informações</h3>
 
         <div class="arquivos-grade__info">
@@ -916,6 +984,7 @@ watch(viewMode, () => {
     flex-shrink: 0;
     width: 40px;
     height: 40px;
+    opacity: 0.7;
     pointer-events: none;
   }
 
@@ -1354,138 +1423,216 @@ watch(viewMode, () => {
 }
 
 @media (max-width: 768px) {
+  /* Padding vem do ArquivosPage (18px) — não duplicar */
+  .arquivos-page--mobile {
+    padding-left: 0;
+    padding-right: 0;
+    box-sizing: border-box;
+  }
+
+  /* Figma: lista e grade iguais — sem card, fundo #212121 */
+  .arquivos-panel,
+  .arquivos-panel--grid,
   .arquivos-panel--grid-selected {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
+    background: transparent !important;
+    border-radius: 0 !important;
+    display: block !important;
+    grid-template-columns: none !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+  }
 
-    .arquivos-toolbar {
-      grid-column: 1;
-      grid-row: 1;
-      padding: 20px 16px 14px !important;
+  .arquivos-toolbar,
+  .arquivos-panel--grid .arquivos-toolbar,
+  .arquivos-panel--grid:not(.arquivos-panel--grid-selected) .arquivos-toolbar,
+  .arquivos-panel--grid-selected .arquivos-toolbar {
+    padding: 0 0 10px !important;
+    margin: 0 !important;
+    flex-wrap: nowrap !important;
+    align-items: center;
+    gap: 0 !important;
+  }
+
+  /* Figma Rectangle 1: 358×49, r30, #797979 30% — mesma busca nos 2 modos */
+  .arquivos-search,
+  .arquivos-panel--grid .arquivos-search,
+  .arquivos-panel--grid-selected .arquivos-search {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    height: 49px !important;
+    padding: 0 18px !important;
+    background: rgba(121, 121, 121, 0.3) !important;
+    border-radius: 30px !important;
+    gap: 14px !important;
+    box-sizing: border-box;
+
+    input {
+      font-family: 'Source Code Pro', monospace !important;
+      font-size: 14px !important;
+      font-weight: 300 !important;
+      line-height: 1 !important;
+      color: #f7f7f7 !important;
+
+      &::placeholder {
+        color: #f7f7f7 !important;
+        opacity: 1 !important;
+      }
     }
-
-    .arquivos-grade__tiles {
-      grid-column: 1;
-      grid-row: 2;
-      padding: 0 16px 16px;
-    }
-
-    .arquivos-grade__sidebar {
-      grid-column: 1;
-      grid-row: 3;
-      width: 100%;
-      margin: 0 0 16px;
-      padding: 20px 16px 22px;
-    }
-
-    .arquivos-empty {
-      grid-column: 1;
-      grid-row: 2;
-    }
   }
 
-  .arquivos-page__heading {
-    margin-bottom: 20px;
-  }
-
-  .arquivos-page__view-btn {
-    width: 44px;
-    height: 44px;
-    margin-top: 0;
-  }
-
-  .arquivos-toolbar {
-    padding: 20px 16px 16px !important;
-  }
-
-  .arquivos-search {
-    flex: 1 1 100%;
-    width: 100%;
-  }
-
-  .arquivos-toolbar__actions {
-    flex: 1 1 100%;
-    width: 100%;
-    margin-left: 0;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-  }
-
+  .arquivos-toolbar__actions,
   .arquivos-panel--grid .arquivos-toolbar__actions,
   .arquivos-panel--grid-selected .arquivos-toolbar__actions {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 10px;
+    display: none !important;
   }
 
-  .arquivos-grade__tiles {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 12px;
+  .arquivos-grade__sidebar,
+  .arquivos-paginator {
+    display: none !important;
+  }
+
+  .arquivos-mobile-body {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 0;
+  }
+
+  .arquivos-mobile-body__toolbar {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-bottom: 14px;
+  }
+
+  /* Figma Botão galeria/lista: 50×50 */
+  .arquivos-page__view-btn--mobile {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    margin-top: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  /* Figma lista: pasta 30×30 70%, texto 16px / 400 / #FFF */
+  .arquivos-mobile-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+
+    &__row {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      text-align: left;
+      min-height: 30px;
+    }
+
+    &__icon {
+      flex-shrink: 0;
+      width: 30px;
+      height: 30px;
+      opacity: 0.7;
+    }
+
+    &__name {
+      min-width: 0;
+      font-family: 'Source Code Pro', monospace;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1;
+      color: #ffffff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  /* Figma grade: 3× tile 110×94 r15 #797979 30%, pasta 40×40 70% */
+  .arquivos-grade__tiles--mobile {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px 14px;
+    width: 100%;
+    padding: 0;
+    margin: 0;
   }
 
   .arquivos-tile {
     width: 100%;
     max-width: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
 
     &__box {
       width: 100%;
       height: auto;
       aspect-ratio: 110 / 94;
+      border-radius: 15px;
+      background: rgba(121, 121, 121, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      outline: none;
+    }
+
+    &__icon {
+      width: 40px;
+      height: 40px;
+      opacity: 0.7;
+      pointer-events: none;
+      flex-shrink: 0;
     }
 
     &__name {
       width: 100%;
+      max-width: 100%;
+      min-height: 18px;
+      font-family: 'Source Code Pro', monospace;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 18px;
+      color: #ffffff;
+      text-align: left;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
-  }
 
-  .arquivos-tile__menu {
-    top: 28px;
-    right: 0;
-    left: auto;
-  }
-
-  .arquivos-grade__sidebar {
-    padding: 20px 16px 24px;
+    &__options-btn,
+    &__menu {
+      display: none;
+    }
   }
 }
 
 @media (max-width: 480px) {
-  .arquivos-page__heading {
-    margin-bottom: 16px;
-  }
-
-  .arquivos-toolbar__actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .arquivos-upload,
-  .arquivos-cta,
-  .arquivos-cta--folder {
-    width: 100%;
-    min-width: 0;
-    justify-content: center;
-  }
-
-  .arquivos-upload span {
-    font-size: 11px;
-  }
-
-  .arquivos-grade__tiles {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-  }
-
-  .arquivos-panel--grid-selected .arquivos-grade__sidebar {
-    margin: 0 0 12px;
-  }
-
-  .arquivos-panel--grid .arquivos-toolbar,
-  .arquivos-panel--grid .arquivos-grade__tiles {
-    padding-left: 12px;
-    padding-right: 12px;
+  .arquivos-grade__tiles--mobile {
+    gap: 14px 12px;
   }
 }
 </style>

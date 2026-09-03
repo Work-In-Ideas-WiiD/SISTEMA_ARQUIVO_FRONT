@@ -124,7 +124,8 @@ export const useAuthStore = defineStore('auth', () => {
       if (loginData.requires_payment) {
         router.push('/contratar')
       } else {
-        router.push('/dashboard/home')
+        // Cliente: pastas ficam em Arquivos (visual do Figma)
+        router.push('/dashboard/arquivos')
       }
     } catch (err) {
       console.error(err)

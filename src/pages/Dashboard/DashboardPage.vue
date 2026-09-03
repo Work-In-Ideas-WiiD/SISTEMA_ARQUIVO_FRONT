@@ -1,15 +1,22 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import Sidebar from '@/components/sidebar/Sidebar.vue'
 import MobileHeader from '@/components/mobileHeader/MobileHeader.vue'
+import MobileBottomNav from '@/components/mobileBottomNav/MobileBottomNav.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
 
 const isReady = ref(false)
+
+/** Hamburger só pra admin/empresa (módulos extras). Bottom nav aparece pra todos. */
+const showMobileHeader = computed(() => {
+  const role = authStore.userRole
+  return role === 'administrador' || role === 'empresa'
+})
 
 onMounted(async () => {
   // Tenta restaurar a sessão do usuário
@@ -25,14 +32,15 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main v-if="isReady" class="main dashboard-night">
+  <main v-if="isReady" class="main dashboard-night main--with-bottom-nav">
     <div class="aside_container">
       <Sidebar />
     </div>
     <div class="outlat_container">
-      <MobileHeader />
+      <MobileHeader v-if="showMobileHeader" />
       <RouterView />
     </div>
+    <MobileBottomNav />
   </main>
   <div v-else class="dashboard-loading dashboard-night">
     <LoadingSpinner theme="night" size="lg" />
@@ -97,9 +105,16 @@ onMounted(async () => {
   }
 
   @media (max-width: 900px) {
+    /* Figma mobile: fundo #212121 (evita corte cinza abaixo do conteúdo) */
+    background-color: #212121;
+
     .outlat_container {
       min-height: 100vh;
       width: 100%;
+      background-color: #212121;
+      /* Espaço pro menu flutuante 74px + margem */
+      padding-bottom: 106px;
+      box-sizing: border-box;
     }
 
     .aside_container {
