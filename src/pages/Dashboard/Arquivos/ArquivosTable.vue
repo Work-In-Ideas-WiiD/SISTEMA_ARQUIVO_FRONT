@@ -641,26 +641,40 @@ watch(viewMode, () => {
 
   &--grid-selected {
     grid-template-columns: minmax(0, 1fr) 320px;
-    column-gap: 24px;
-    grid-template-rows: auto auto;
+    column-gap: 0;
+    grid-template-rows: auto 1fr auto;
     grid-template-areas:
       'toolbar sidebar'
-      'tiles sidebar';
-    align-items: start;
+      'tiles sidebar'
+      'paginator sidebar';
+    align-items: stretch;
 
     .arquivos-toolbar {
       grid-area: toolbar;
-      padding: 30px 0 16px 38px;
+      padding: 30px 24px 16px 38px;
       flex-wrap: wrap;
       row-gap: 12px;
       min-width: 0;
     }
 
+    .arquivos-search {
+      flex: 1 1 180px;
+      width: auto;
+      max-width: none;
+      min-width: 0;
+    }
+
+    .arquivos-toolbar__actions {
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+
     .arquivos-grade__tiles {
       grid-area: tiles;
-      padding: 0 0 32px 38px;
+      padding: 0 24px 16px 38px;
       min-width: 0;
       margin-top: 0;
+      align-self: start;
     }
 
     .arquivos-grade__sidebar {
@@ -670,14 +684,19 @@ watch(viewMode, () => {
       width: 100%;
       min-width: 0;
       max-width: none;
-      min-height: auto;
       height: auto;
+      min-height: 0;
       margin: 0;
       box-sizing: border-box;
+      border-radius: 0;
       border-top-right-radius: var(--night-radius, 30px);
       border-bottom-right-radius: var(--night-radius, 30px);
-      border-top-left-radius: 29px;
-      border-bottom-left-radius: 29px;
+    }
+
+    .arquivos-paginator {
+      grid-area: paginator;
+      padding: 0 24px 24px 38px;
+      box-sizing: border-box;
     }
 
     .arquivos-empty {
@@ -835,7 +854,7 @@ watch(viewMode, () => {
     flex: unset;
     width: 100%;
     min-width: 0;
-    min-height: auto;
+    min-height: 0;
     padding: 28px 24px 32px;
     border-radius: 29px;
     background: rgba(121, 121, 121, 0.3);
@@ -1261,20 +1280,42 @@ watch(viewMode, () => {
 
   .arquivos-panel--grid-selected {
     grid-template-columns: minmax(0, 1fr) 260px;
-    column-gap: 16px;
+    column-gap: 0;
+    grid-template-rows: auto 1fr auto;
     grid-template-areas:
       'toolbar sidebar'
-      'tiles sidebar';
+      'tiles sidebar'
+      'paginator sidebar';
+    align-items: stretch;
 
     .arquivos-toolbar {
       grid-area: toolbar;
-      padding: 20px 0 12px 16px;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+      padding: 20px 16px 12px 16px;
+    }
+
+    .arquivos-search {
+      flex: none;
+      width: 100%;
+      max-width: none;
+      min-width: 0;
+    }
+
+    .arquivos-toolbar__actions {
+      flex: none;
+      width: 100%;
+      margin-left: 0;
+      justify-content: flex-start;
+      gap: 10px;
     }
 
     .arquivos-grade__tiles {
       grid-area: tiles;
-      padding: 0 0 20px 16px;
+      padding: 0 16px 12px 16px;
       margin-top: 0;
+      align-self: start;
     }
 
     .arquivos-grade__sidebar {
@@ -1284,14 +1325,22 @@ watch(viewMode, () => {
       width: 100%;
       min-width: 0;
       max-width: none;
+      height: auto;
+      min-height: 0;
       margin: 0;
       padding: 20px 16px 24px;
+      border-radius: 0;
       border-top-right-radius: var(--night-radius, 30px);
       border-bottom-right-radius: var(--night-radius, 30px);
     }
 
+    .arquivos-paginator {
+      grid-area: paginator;
+      padding: 0 16px 16px 16px;
+    }
+
     .arquivos-upload {
-      flex: 0 0 auto;
+      flex: 1 1 auto;
       width: auto;
       max-width: none;
       min-width: 0;
