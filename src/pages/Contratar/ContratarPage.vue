@@ -11,9 +11,11 @@ import { getPlanosPublicos, type IPlanoPublico } from '@/services/http/planos'
 import { getChavePublica, postContratacao } from '@/services/http/conta'
 import { getApiErrorMessage } from '@/utils/apiError'
 import { maskPhone, stripDigits } from '@/utils/formatPhone'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 const toast = useToast()
+const authStore = useAuthStore()
 
 const planos = ref<IPlanoPublico[]>([])
 const fetching = ref(true)
@@ -102,6 +104,10 @@ function limparCartao() {
 function voltarParaPlanos() {
   planoSelecionado.value = null
   limparCartao()
+}
+
+function voltarParaLogin() {
+  authStore.signOut()
 }
 
 function telefoneValido(raw: string): boolean {
@@ -272,6 +278,11 @@ async function pagar() {
     </div>
 
     <div v-else class="contratar_shell">
+      <button type="button" class="back_btn" aria-label="Voltar ao login" @click="voltarParaLogin">
+        <img class="back_btn__circle" :src="iconBackCircle" alt="" width="66" height="66" />
+        <img class="back_btn__icon" :src="iconChevronLeft" alt="" width="40" height="40" />
+      </button>
+
       <img class="contratar_logo" :src="logoWiidocs" alt="WiiDocs" />
       <h1 class="contratar_title">Escolha seu plano</h1>
 
