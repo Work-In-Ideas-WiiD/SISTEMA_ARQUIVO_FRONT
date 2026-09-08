@@ -372,7 +372,7 @@ function goBack() {
               ref="fileInputRef"
               type="file"
               hidden
-              accept=".jpeg,.jpg,.png,.mp4,.mov,.wmv,.mkv,.webm"
+              accept=".jpeg,.jpg,.png,.pdf,.doc,.docx,.mp4,.mov,.wmv,.mkv,.webm"
               @change="onFileChange"
             />
           </label>
