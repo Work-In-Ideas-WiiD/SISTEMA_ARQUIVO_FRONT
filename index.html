@@ -60,7 +60,7 @@
     <div id="app"></div>
     <script>
       (function () {
-        if (!location.pathname.startsWith('/dashboard')) return
+        if (!location.pathname.includes('/dashboard')) return
         document.documentElement.classList.add('boot-dashboard')
         var app = document.getElementById('app')
         app.innerHTML =
