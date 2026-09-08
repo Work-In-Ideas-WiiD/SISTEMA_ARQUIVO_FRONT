@@ -1,4 +1,4 @@
-import type { AxiosResponse, AxiosError } from 'axios'
+import type { AxiosResponse } from 'axios'
 import { api } from '../api'
 
 export interface IGetClientesRes {
@@ -48,7 +48,7 @@ export interface IPostClienteModel {
 export async function getClientes(
   page: number = 1,
   like: string = ''
-): Promise<AxiosResponse<IGetClientesRes, AxiosError>> {
+): Promise<AxiosResponse<IGetClientesRes>> {
   const res = await api.get('/cliente', {
     params: {
       like: like,
@@ -58,22 +58,22 @@ export async function getClientes(
   return res
 }
 
-export async function getCliente(id: string): Promise<AxiosResponse<any, AxiosError>> {
+export async function getCliente(id: string): Promise<AxiosResponse<any>> {
   const res = await api.get(`/cliente/${id}`)
   return res
 }
 
-export async function postCliente(data: IPostClienteModel): Promise<AxiosResponse<any, AxiosError>> {
+export async function postCliente(data: IPostClienteModel): Promise<AxiosResponse<any>> {
   const res = await api.post('/cliente', { ...data, type: 'cliente' })
   return res
 }
 
-export async function patchCliente(data: IPostClienteModel, id: string): Promise<AxiosResponse<any, AxiosError>> {
+export async function patchCliente(data: IPostClienteModel, id: string): Promise<AxiosResponse<any>> {
   const res = await api.patch(`/cliente/${id}`, data)
   return res
 }
 
-export async function deleteCliente(id: string): Promise<AxiosResponse<any, AxiosError>> {
+export async function deleteCliente(id: string): Promise<AxiosResponse<any>> {
   const res = await api.delete(`/cliente/${id}`)
   return res
 }

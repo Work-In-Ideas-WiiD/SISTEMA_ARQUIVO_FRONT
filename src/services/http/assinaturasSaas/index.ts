@@ -1,4 +1,4 @@
-import type { AxiosResponse, AxiosError } from 'axios'
+import type { AxiosResponse } from 'axios'
 import { api } from '../api'
 
 export type TAssinaturaSaasStatus =
@@ -96,7 +96,7 @@ export interface IAssinaturasSaasFilters {
 export async function getAssinaturasSaas(
   page: number = 1,
   filters: IAssinaturasSaasFilters = {}
-): Promise<AxiosResponse<IGetAssinaturasSaasRes, AxiosError>> {
+): Promise<AxiosResponse<IGetAssinaturasSaasRes>> {
   const params: Record<string, string | number> = { page }
 
   Object.entries(filters).forEach(([key, value]) => {
@@ -110,25 +110,25 @@ export async function getAssinaturasSaas(
 
 export async function getAssinaturaSaas(
   id: string
-): Promise<AxiosResponse<IAssinaturaSaas, AxiosError>> {
+): Promise<AxiosResponse<IAssinaturaSaas>> {
   return api.get(`/saas/assinaturas/${id}`)
 }
 
 export async function cancelarAssinaturaSaas(
   id: string
-): Promise<AxiosResponse<IAssinaturaSaas, AxiosError>> {
+): Promise<AxiosResponse<IAssinaturaSaas>> {
   return api.post(`/saas/assinaturas/${id}/cancelar`)
 }
 
 export async function suspenderAssinaturaSaas(
   id: string
-): Promise<AxiosResponse<IAssinaturaSaas, AxiosError>> {
+): Promise<AxiosResponse<IAssinaturaSaas>> {
   return api.post(`/saas/assinaturas/${id}/suspender`)
 }
 
 export async function reativarAssinaturaSaas(
   id: string
-): Promise<AxiosResponse<IAssinaturaSaas, AxiosError>> {
+): Promise<AxiosResponse<IAssinaturaSaas>> {
   return api.post(`/saas/assinaturas/${id}/reativar`)
 }
 

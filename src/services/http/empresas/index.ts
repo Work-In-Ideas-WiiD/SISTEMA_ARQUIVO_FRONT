@@ -1,4 +1,4 @@
-import type { AxiosResponse, AxiosError } from 'axios'
+import type { AxiosResponse } from 'axios'
 import { api } from '../api'
 
 export interface IGetEmpresasRes {
@@ -52,7 +52,7 @@ export interface IPostEmpresaModel {
 export async function getEmpresas(
   page: number = 1,
   like: string = ''
-): Promise<AxiosResponse<IGetEmpresasRes, AxiosError>> {
+): Promise<AxiosResponse<IGetEmpresasRes>> {
   const res = await api.get('/user', {
     params: {
       type: 'empresa',
@@ -63,27 +63,27 @@ export async function getEmpresas(
   return res
 }
 
-export async function getEmpresa(id: string): Promise<AxiosResponse<IGetEmpresasDataRes, AxiosError>> {
+export async function getEmpresa(id: string): Promise<AxiosResponse<IGetEmpresasDataRes>> {
   const res = await api.get(`/user/${id}`)
   return res
 }
 
-export async function postEmpresa(data: IPostEmpresaModel): Promise<AxiosResponse<any, AxiosError>> {
+export async function postEmpresa(data: IPostEmpresaModel): Promise<AxiosResponse<any>> {
   const res = await api.post('/user', { ...data, type: 'empresa' })
   return res
 }
 
-export async function patchEmpresa(data: IPostEmpresaModel, id: string): Promise<AxiosResponse<any, AxiosError>> {
+export async function patchEmpresa(data: IPostEmpresaModel, id: string): Promise<AxiosResponse<any>> {
   const res = await api.patch(`/user/${id}`, data)
   return res
 }
 
-export async function deleteEmpresa(id: string): Promise<AxiosResponse<any, AxiosError>> {
+export async function deleteEmpresa(id: string): Promise<AxiosResponse<any>> {
   const res = await api.delete(`/user/${id}`)
   return res
 }
 
-export async function getAllEmpresas(): Promise<AxiosResponse<{ data: { id: string; nome: string }[] }, AxiosError>> {
+export async function getAllEmpresas(): Promise<AxiosResponse<{ data: { id: string; nome: string }[] }>> {
   const res = await api.get('/empresas', {
     params: { limit: 100 }
   })

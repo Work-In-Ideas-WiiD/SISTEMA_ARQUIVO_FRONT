@@ -1,4 +1,4 @@
-import type { AxiosResponse, AxiosError } from 'axios'
+import type { AxiosResponse } from 'axios'
 import { api } from '../api'
 import type { ISetor } from '../setores'
 import type { IFuncao } from '../funcoes'
@@ -47,7 +47,7 @@ export async function getFuncionarios(
   empresa_id?: string,
   setor_id?: string,
   funcao_id?: string
-): Promise<AxiosResponse<IGetFuncionariosRes, AxiosError>> {
+): Promise<AxiosResponse<IGetFuncionariosRes>> {
   const res = await api.get('/funcionario', {
     params: {
       ...(like ? { like } : {}),
@@ -62,29 +62,29 @@ export async function getFuncionarios(
 
 export async function getAllFuncionarios(
   empresa_id?: string
-): Promise<AxiosResponse<IFuncionario[], AxiosError>> {
+): Promise<AxiosResponse<IFuncionario[]>> {
   const res = await api.get('/funcionarios/all', {
     params: empresa_id ? { empresa_id } : {}
   })
   return res
 }
 
-export async function getFuncionario(id: string): Promise<AxiosResponse<IFuncionario, AxiosError>> {
+export async function getFuncionario(id: string): Promise<AxiosResponse<IFuncionario>> {
   const res = await api.get(`/funcionario/${id}`)
   return res
 }
 
-export async function postFuncionario(data: IPostFuncionarioModel): Promise<AxiosResponse<IFuncionario, AxiosError>> {
+export async function postFuncionario(data: IPostFuncionarioModel): Promise<AxiosResponse<IFuncionario>> {
   const res = await api.post('/funcionario', data)
   return res
 }
 
-export async function patchFuncionario(data: Partial<IPostFuncionarioModel>, id: string): Promise<AxiosResponse<IFuncionario, AxiosError>> {
+export async function patchFuncionario(data: Partial<IPostFuncionarioModel>, id: string): Promise<AxiosResponse<IFuncionario>> {
   const res = await api.patch(`/funcionario/${id}`, data)
   return res
 }
 
-export async function deleteFuncionario(id: string): Promise<AxiosResponse<any, AxiosError>> {
+export async function deleteFuncionario(id: string): Promise<AxiosResponse<any>> {
   const res = await api.delete(`/funcionario/${id}`)
   return res
 }

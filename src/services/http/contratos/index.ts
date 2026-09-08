@@ -1,4 +1,4 @@
-import type { AxiosResponse, AxiosError } from 'axios'
+import type { AxiosResponse } from 'axios'
 import { api } from '../api'
 
 export interface IGetContratosRes {
@@ -45,7 +45,7 @@ export interface IGetContratosDataRes {
 export async function getContratos(
   page: number = 1,
   like: string = ''
-): Promise<AxiosResponse<IGetContratosRes, AxiosError>> {
+): Promise<AxiosResponse<IGetContratosRes>> {
   const res = await api.get('/contrato', {
     params: {
       like: like,
@@ -58,7 +58,7 @@ export async function getContratos(
 export async function postContrato(
   formData: FormData,
   onUploadProgress?: (percent: number) => void
-): Promise<AxiosResponse<any, AxiosError>> {
+): Promise<AxiosResponse<any>> {
   const res = await api.post('/contrato', formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
@@ -71,7 +71,7 @@ export async function postContrato(
   return res
 }
 
-export async function postSendToClicksign(contractId: string): Promise<AxiosResponse<any, AxiosError>> {
+export async function postSendToClicksign(contractId: string): Promise<AxiosResponse<any>> {
   const res = await api.post(`/contrato/${contractId}/send`)
   return res
 }
