@@ -4,8 +4,29 @@ import type { RouteRecordRaw } from 'vue-router'
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
+    name: 'landing',
+    component: () => import('@/pages/Landing/LandingPage.vue')
+  },
+  {
+    path: '/login',
     name: 'login',
     component: () => import('@/pages/Login/LoginPage.vue')
+  },
+  {
+    path: '/sobre',
+    name: 'sobre',
+    component: () => import('@/pages/Institucionais/SobrePage.vue'),
+    alias: '/sobre-nos'
+  },
+  {
+    path: '/politica-de-privacidade',
+    name: 'politica-privacidade',
+    component: () => import('@/pages/Institucionais/PoliticaPrivacidadePage.vue')
+  },
+  {
+    path: '/termos-de-uso',
+    name: 'termos-uso',
+    component: () => import('@/pages/Institucionais/TermosUsoPage.vue')
   },
   {
     path: '/cliente',
@@ -323,7 +344,16 @@ const routes: RouteRecordRaw[] = [
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
+  scrollBehavior(to, _from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    }
+    if (to.hash) {
+      return { el: to.hash, behavior: 'smooth' }
+    }
+    return { top: 0 }
+  }
 })
 
 // Navigation guard para autenticação

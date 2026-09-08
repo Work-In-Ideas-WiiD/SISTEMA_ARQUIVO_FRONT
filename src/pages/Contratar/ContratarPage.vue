@@ -12,6 +12,7 @@ import { getChavePublica, postContratacao } from '@/services/http/conta'
 import { getApiErrorMessage } from '@/utils/apiError'
 import { maskPhone, stripDigits } from '@/utils/formatPhone'
 import { useAuthStore } from '@/stores/auth'
+import { getSelectedPlan } from '@/utils/tracking'
 
 const router = useRouter()
 const toast = useToast()
@@ -64,6 +65,16 @@ onMounted(async () => {
   try {
     const { data } = await getPlanosPublicos()
     planos.value = data
+
+    // Pré-seleciona o plano se veio da Landing Page
+    const prePlano = getSelectedPlan()
+    const queryId = (router.currentRoute.value.query.plano as string) || prePlano?.id
+    if (queryId && Array.isArray(data)) {
+      const match = data.find((p) => p.id === queryId)
+      if (match) {
+        selecionarPlano(match)
+      }
+    }
   } catch (error) {
     console.error(error)
     toast.error('Erro ao carregar os planos.')

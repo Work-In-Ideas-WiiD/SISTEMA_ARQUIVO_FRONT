@@ -1,16 +1,26 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import logoWiidocs from '@/assets/imgs/login/logo-wiidocs-white.png'
 import iconPerson from '@/assets/imgs/login/icon-person.svg'
 import iconLock from '@/assets/imgs/login/icon-lock.svg'
+import iconBackCircle from '@/assets/imgs/login/icon-back-circle.svg'
+import iconChevronLeft from '@/assets/imgs/login/icon-chevron-left.svg'
+import { setPageSeo } from '@/utils/seo'
 
 const authStore = useAuthStore()
 
 const email = ref('')
 const password = ref('')
+
+onMounted(() => {
+  setPageSeo({
+    title: 'Login — WiiDocs | Acesso à Plataforma',
+    description: 'Acesse sua conta no WiiDocs para gerenciar contratos, documentos e clientes na nuvem.'
+  })
+})
 
 async function handleLogin() {
   await authStore.signIn(email.value, password.value)
@@ -20,6 +30,11 @@ async function handleLogin() {
 <template>
   <main class="login_page">
     <p class="login_page__watermark" aria-hidden="true">&lt;/DOC</p>
+
+    <RouterLink class="back_btn" to="/" aria-label="Voltar para a página inicial">
+      <img class="back_btn__circle" :src="iconBackCircle" alt="" width="66" height="66" />
+      <img class="back_btn__icon" :src="iconChevronLeft" alt="" width="40" height="40" />
+    </RouterLink>
 
     <form class="login_form" @submit.prevent="handleLogin">
       <img class="login_form__logo" :src="logoWiidocs" alt="WiiDocs" />
@@ -125,6 +140,47 @@ async function handleLogin() {
     bottom: -5vh;
     right: -2vw;
     font-size: clamp(76px, 19.5vh, 180px);
+  }
+}
+
+.back_btn {
+  position: fixed;
+  z-index: 10;
+  top: clamp(24px, 3.5vh, 48px);
+  left: clamp(16px, 3vw, 48px);
+  width: 66px;
+  height: 66px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+
+  @include login-mobile-back-btn;
+
+  &:hover {
+    opacity: 0.85;
+  }
+
+  &__circle {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  &__icon {
+    position: relative;
+    z-index: 1;
+    width: 40px;
+    height: 40px;
+    transform: rotate(90deg);
+    object-fit: contain;
+    display: block;
+
+    @include login-mobile-back-btn-icon;
   }
 }
 

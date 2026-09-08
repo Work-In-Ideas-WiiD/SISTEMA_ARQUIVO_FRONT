@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
@@ -10,6 +10,8 @@ import iconBuilding from '@/assets/imgs/login/icon-building.svg'
 import iconLock from '@/assets/imgs/login/icon-lock.svg'
 import iconBackCircle from '@/assets/imgs/login/icon-back-circle.svg'
 import iconChevronLeft from '@/assets/imgs/login/icon-chevron-left.svg'
+import { trackEvent } from '@/utils/tracking'
+import { setPageSeo } from '@/utils/seo'
 import {
   maskCpf,
   maskCnpj,
@@ -19,6 +21,14 @@ import {
 
 const toast = useToast()
 const auth = useAuthStore()
+
+onMounted(() => {
+  trackEvent('cadastro_iniciado')
+  setPageSeo({
+    title: 'Cadastro — WiiDocs | Crie sua Conta',
+    description: 'Crie sua conta no WiiDocs e comece a gerenciar seus documentos e contratos na nuvem.'
+  })
+})
 
 const form = ref({
   nome: '',
@@ -195,7 +205,7 @@ async function handleSubmit() {
         </button>
       </div>
 
-      <RouterLink class="login_form__first_access" to="/">
+      <RouterLink class="login_form__first_access" to="/login">
         Já tem conta? <span>Entrar.</span>
       </RouterLink>
     </form>

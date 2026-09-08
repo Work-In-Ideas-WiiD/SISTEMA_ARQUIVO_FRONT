@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+Allow: /sobre
+Allow: /sobre-nos
+Allow: /politica-de-privacidade
+Allow: /termos-de-uso
+Allow: /login
+Allow: /cadastro
+
+# Bloquear rotas autenticadas, administrativas e endpoints de API
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /recuperar/
+Disallow: /primeiroacesso
+Disallow: /assinar/
+Disallow: /contratar
+
+# Sitemap XML
+Sitemap: https://wiidocs.com.br/sitemap.xml
