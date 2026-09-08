@@ -38,6 +38,7 @@ jobs:
         run: npm run build:action
         env:
           GITHUB_ACTIONS: true
+          BASE_PATH: '/'
 
       - name: SPA Fallback e desativação do Jekyll
         run: |
