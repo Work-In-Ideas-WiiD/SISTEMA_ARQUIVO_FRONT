@@ -1,4 +1,4 @@
-import type { AxiosResponse, AxiosError } from 'axios'
+import type { AxiosResponse } from 'axios'
 import { api } from '../api'
 
 export interface IPlano {
@@ -47,7 +47,7 @@ export async function getPlanos(
   page: number = 1,
   like: string = '',
   ativo?: boolean
-): Promise<AxiosResponse<IGetPlanosRes, AxiosError>> {
+): Promise<AxiosResponse<IGetPlanosRes>> {
   const res = await api.get('/plano', {
     params: {
       ...(like ? { like } : {}),
@@ -59,17 +59,17 @@ export async function getPlanos(
 }
 
 // Público: planos ativos para contratação
-export async function getPlanosPublicos(): Promise<AxiosResponse<IPlanoPublico[], AxiosError>> {
+export async function getPlanosPublicos(): Promise<AxiosResponse<IPlanoPublico[]>> {
   const res = await api.get('/planos/publicos')
   return res
 }
 
-export async function getPlano(id: string): Promise<AxiosResponse<IPlano, AxiosError>> {
+export async function getPlano(id: string): Promise<AxiosResponse<IPlano>> {
   const res = await api.get(`/plano/${id}`)
   return res
 }
 
-export async function postPlano(data: IPostPlanoModel): Promise<AxiosResponse<IPlano, AxiosError>> {
+export async function postPlano(data: IPostPlanoModel): Promise<AxiosResponse<IPlano>> {
   const res = await api.post('/plano', data)
   return res
 }
@@ -77,7 +77,7 @@ export async function postPlano(data: IPostPlanoModel): Promise<AxiosResponse<IP
 export async function patchPlano(
   data: Partial<IPostPlanoModel>,
   id: string
-): Promise<AxiosResponse<IPlano, AxiosError>> {
+): Promise<AxiosResponse<IPlano>> {
   const res = await api.patch(`/plano/${id}`, data)
   return res
 }
@@ -85,12 +85,12 @@ export async function patchPlano(
 export async function patchPlanoStatus(
   id: string,
   ativo: boolean
-): Promise<AxiosResponse<IPlano, AxiosError>> {
+): Promise<AxiosResponse<IPlano>> {
   const res = await api.patch(`/plano/${id}/status`, { ativo })
   return res
 }
 
-export async function deletePlano(id: string): Promise<AxiosResponse<any, AxiosError>> {
+export async function deletePlano(id: string): Promise<AxiosResponse<any>> {
   const res = await api.delete(`/plano/${id}`)
   return res
 }

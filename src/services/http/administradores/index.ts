@@ -1,4 +1,4 @@
-import type { AxiosResponse, AxiosError } from 'axios'
+import type { AxiosResponse } from 'axios'
 import { api } from '../api'
 
 export interface IGetAdministradoresRes {
@@ -42,7 +42,7 @@ export interface IPostAdministradorRes {
 export async function getAdministradores(
   page: number = 1,
   like: string = ''
-): Promise<AxiosResponse<IGetAdministradoresRes, AxiosError>> {
+): Promise<AxiosResponse<IGetAdministradoresRes>> {
   const res = await api.get('/user', {
     params: {
       type: 'administrador',
@@ -55,14 +55,14 @@ export async function getAdministradores(
 
 export async function getAdministrador(
   id: string
-): Promise<AxiosResponse<IGetAdministradoresDataRes, AxiosError>> {
+): Promise<AxiosResponse<IGetAdministradoresDataRes>> {
   const res = await api.get(`/user/${id}`)
   return res
 }
 
 export async function postAdministrador(
   model: IPostAdministradorModel
-): Promise<AxiosResponse<IPostAdministradorRes, AxiosError>> {
+): Promise<AxiosResponse<IPostAdministradorRes>> {
   const res = await api.post('/user', { ...model, type: 'administrador' })
   return res
 }
@@ -70,7 +70,7 @@ export async function postAdministrador(
 export async function patchAdministrador(
   model: IPostAdministradorModel,
   id: string
-): Promise<AxiosResponse<IPostAdministradorRes, AxiosError>> {
+): Promise<AxiosResponse<IPostAdministradorRes>> {
   const res = await api.patch(`/user/${id}`, model)
   return res
 }
@@ -78,7 +78,7 @@ export async function patchAdministrador(
 export async function postAddEmpresaToArquivo(
   empresaIds: string[],
   arquivoId: string
-): Promise<AxiosResponse<any, AxiosError>> {
+): Promise<AxiosResponse<any>> {
   const res = await api.post('/add/empresa/arquivo', {
     empresas: empresaIds,
     arquivo_id: arquivoId
@@ -89,7 +89,7 @@ export async function postAddEmpresaToArquivo(
 export async function postAddEmpresaToContrato(
   empresaId: string,
   contratoId: string
-): Promise<AxiosResponse<any, AxiosError>> {
+): Promise<AxiosResponse<any>> {
   const res = await api.post('/add/empresa/contrato', {
     empresa_id: empresaId,
     contrato_id: contratoId

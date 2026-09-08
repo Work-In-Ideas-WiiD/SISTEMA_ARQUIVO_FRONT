@@ -1,4 +1,4 @@
-import type { AxiosResponse, AxiosError } from 'axios'
+import type { AxiosResponse } from 'axios'
 import { api } from '../api'
 
 export interface IPatchUserModel {
@@ -12,7 +12,7 @@ export interface IPatchUserModel {
 export async function patchUser(
   model: IPatchUserModel,
   id: string
-): Promise<AxiosResponse<unknown, AxiosError>> {
+): Promise<AxiosResponse<unknown>> {
   const res = await api.patch(`/user/${id}`, model)
   return res
 }

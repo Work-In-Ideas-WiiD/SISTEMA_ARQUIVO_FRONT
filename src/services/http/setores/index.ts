@@ -1,4 +1,4 @@
-import type { AxiosResponse, AxiosError } from 'axios'
+import type { AxiosResponse } from 'axios'
 import { api } from '../api'
 
 export interface ISetor {
@@ -30,7 +30,7 @@ export async function getSetores(
   page: number = 1,
   like: string = '',
   empresa_id?: string
-): Promise<AxiosResponse<IGetSetoresRes, AxiosError>> {
+): Promise<AxiosResponse<IGetSetoresRes>> {
   const res = await api.get('/setor', {
     params: {
       ...(like ? { like } : {}),
@@ -43,29 +43,29 @@ export async function getSetores(
 
 export async function getAllSetores(
   empresa_id?: string
-): Promise<AxiosResponse<ISetor[], AxiosError>> {
+): Promise<AxiosResponse<ISetor[]>> {
   const res = await api.get('/setores/all', {
     params: empresa_id ? { empresa_id } : {}
   })
   return res
 }
 
-export async function getSetor(id: string): Promise<AxiosResponse<ISetor, AxiosError>> {
+export async function getSetor(id: string): Promise<AxiosResponse<ISetor>> {
   const res = await api.get(`/setor/${id}`)
   return res
 }
 
-export async function postSetor(data: IPostSetorModel): Promise<AxiosResponse<ISetor, AxiosError>> {
+export async function postSetor(data: IPostSetorModel): Promise<AxiosResponse<ISetor>> {
   const res = await api.post('/setor', data)
   return res
 }
 
-export async function patchSetor(data: Partial<IPostSetorModel>, id: string): Promise<AxiosResponse<ISetor, AxiosError>> {
+export async function patchSetor(data: Partial<IPostSetorModel>, id: string): Promise<AxiosResponse<ISetor>> {
   const res = await api.patch(`/setor/${id}`, data)
   return res
 }
 
-export async function deleteSetor(id: string): Promise<AxiosResponse<any, AxiosError>> {
+export async function deleteSetor(id: string): Promise<AxiosResponse<any>> {
   const res = await api.delete(`/setor/${id}`)
   return res
 }

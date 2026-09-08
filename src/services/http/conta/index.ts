@@ -1,4 +1,4 @@
-import type { AxiosResponse, AxiosError } from 'axios'
+import type { AxiosResponse } from 'axios'
 import { api } from '../api'
 
 // Cadastro público (SaaS): cria a conta + o usuário administrador da conta.
@@ -41,13 +41,13 @@ export interface IChavePublicaRes {
 
 export async function postRegistro(
   data: IRegistroModel
-): Promise<AxiosResponse<IRegistroRes, AxiosError>> {
+): Promise<AxiosResponse<IRegistroRes>> {
   const res = await api.post('/registro', data)
   return res
 }
 
 // Chave pública do PagBank para o SDK criptografar o cartão no navegador.
-export async function getChavePublica(): Promise<AxiosResponse<IChavePublicaRes, AxiosError>> {
+export async function getChavePublica(): Promise<AxiosResponse<IChavePublicaRes>> {
   const res = await api.get('/pagseguro/chave-publica')
   return res
 }
@@ -59,7 +59,7 @@ export async function postContratacao(
   encrypted: string,
   security_code: string,
   telefone?: string
-): Promise<AxiosResponse<IContratacaoRes, AxiosError>> {
+): Promise<AxiosResponse<IContratacaoRes>> {
   const res = await api.post('/contratacao', {
     plano_id,
     encrypted,

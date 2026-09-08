@@ -1,4 +1,4 @@
-import type { AxiosResponse, AxiosError } from 'axios'
+import type { AxiosResponse } from 'axios'
 import { api } from '../api'
 
 export interface IArquivoVinculo {
@@ -44,7 +44,7 @@ export interface IGetArquivosDataRes {
 export async function getArquivos(
   page: number = 1,
   like: string = ''
-): Promise<AxiosResponse<IGetArquivosRes, AxiosError>> {
+): Promise<AxiosResponse<IGetArquivosRes>> {
   const res = await api.get('/arquivo', {
     params: {
       like: like,
@@ -57,7 +57,7 @@ export async function getArquivos(
 export async function postArquivo(
   formData: FormData,
   onUploadProgress?: (percent: number) => void
-): Promise<AxiosResponse<IGetArquivosDataRes, AxiosError>> {
+): Promise<AxiosResponse<IGetArquivosDataRes>> {
   const res = await api.post('/arquivo', formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
@@ -70,7 +70,7 @@ export async function postArquivo(
   return res
 }
 
-export async function deleteArquivo(id: string): Promise<AxiosResponse<any, AxiosError>> {
+export async function deleteArquivo(id: string): Promise<AxiosResponse<any>> {
   const res = await api.delete(`/arquivo/${id}`)
   return res
 }

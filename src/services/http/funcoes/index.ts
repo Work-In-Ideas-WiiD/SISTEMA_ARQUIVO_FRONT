@@ -1,4 +1,4 @@
-import type { AxiosResponse, AxiosError } from 'axios'
+import type { AxiosResponse } from 'axios'
 import { api } from '../api'
 
 export interface IFuncao {
@@ -30,7 +30,7 @@ export async function getFuncoes(
   page: number = 1,
   like: string = '',
   empresa_id?: string
-): Promise<AxiosResponse<IGetFuncoesRes, AxiosError>> {
+): Promise<AxiosResponse<IGetFuncoesRes>> {
   const res = await api.get('/funcao', {
     params: {
       ...(like ? { like } : {}),
@@ -43,29 +43,29 @@ export async function getFuncoes(
 
 export async function getAllFuncoes(
   empresa_id?: string
-): Promise<AxiosResponse<IFuncao[], AxiosError>> {
+): Promise<AxiosResponse<IFuncao[]>> {
   const res = await api.get('/funcoes/all', {
     params: empresa_id ? { empresa_id } : {}
   })
   return res
 }
 
-export async function getFuncao(id: string): Promise<AxiosResponse<IFuncao, AxiosError>> {
+export async function getFuncao(id: string): Promise<AxiosResponse<IFuncao>> {
   const res = await api.get(`/funcao/${id}`)
   return res
 }
 
-export async function postFuncao(data: IPostFuncaoModel): Promise<AxiosResponse<IFuncao, AxiosError>> {
+export async function postFuncao(data: IPostFuncaoModel): Promise<AxiosResponse<IFuncao>> {
   const res = await api.post('/funcao', data)
   return res
 }
 
-export async function patchFuncao(data: Partial<IPostFuncaoModel>, id: string): Promise<AxiosResponse<IFuncao, AxiosError>> {
+export async function patchFuncao(data: Partial<IPostFuncaoModel>, id: string): Promise<AxiosResponse<IFuncao>> {
   const res = await api.patch(`/funcao/${id}`, data)
   return res
 }
 
-export async function deleteFuncao(id: string): Promise<AxiosResponse<any, AxiosError>> {
+export async function deleteFuncao(id: string): Promise<AxiosResponse<any>> {
   const res = await api.delete(`/funcao/${id}`)
   return res
 }

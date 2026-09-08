@@ -1,4 +1,4 @@
-import type { AxiosResponse, AxiosError } from 'axios'
+import type { AxiosResponse } from 'axios'
 import { api } from '../api'
 
 export interface IGetAssinaturasRes {
@@ -34,7 +34,7 @@ export interface IGetAssinaturasData {
 export async function getAssinaturas(
   page: number = 1,
   like: string = ''
-): Promise<AxiosResponse<IGetAssinaturasRes, AxiosError>> {
+): Promise<AxiosResponse<IGetAssinaturasRes>> {
   const res = await api.get('/assinatura', {
     params: {
       like: like,
@@ -44,7 +44,7 @@ export async function getAssinaturas(
   return res
 }
 
-export async function getAssinatura(id: string): Promise<AxiosResponse<any, AxiosError>> {
+export async function getAssinatura(id: string): Promise<AxiosResponse<any>> {
   const res = await api.get(`/assinatura/${id}`)
   return res
 }
