@@ -55,10 +55,6 @@ const displayedPlanos = computed(() => {
   return apiPlanos.value.length > 0 ? apiPlanos.value : fallbackPlanos
 })
 
-function formatBRL(centavos: number): string {
-  return (centavos / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-}
-
 function formatGB(bytes: number): string {
   const gb = bytes / 1024 ** 3
   return `${gb.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} GB`
