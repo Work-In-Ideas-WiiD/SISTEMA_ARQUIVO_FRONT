@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import logoWiidocs from '@/assets/imgs/login/logo-wiidocs-white.png'
-import { trackEvent } from '@/utils/tracking'
+import { trackLoginClick, trackCtaClick } from '@/utils/tracking'
 
 const route = useRoute()
 const router = useRouter()
@@ -41,14 +41,14 @@ function handleNavClick(hash: string) {
   }
 }
 
-function onLoginClick() {
+function onLoginClick(local: string = 'header') {
   closeMobileMenu()
-  trackEvent('clique_login', { local: 'header' })
+  trackLoginClick(local)
 }
 
-function onStartClick() {
+function onStartClick(local: string = 'header') {
   closeMobileMenu()
-  trackEvent('clique_comecar_agora', { local: 'header' })
+  trackCtaClick('comecar_agora', local)
 }
 </script>
 
@@ -78,10 +78,10 @@ function onStartClick() {
       </nav>
 
       <div class="landing_header__actions">
-        <RouterLink to="/login" class="header_btn header_btn--outline" @click="onLoginClick">
+        <RouterLink to="/login" class="header_btn header_btn--outline" @click="onLoginClick('header')">
           LOGIN
         </RouterLink>
-        <RouterLink to="/cadastro" class="header_btn header_btn--primary" @click="onStartClick">
+        <RouterLink to="/cadastro" class="header_btn header_btn--primary" @click="onStartClick('header')">
           COMEÇAR AGORA
         </RouterLink>
       </div>
@@ -123,10 +123,10 @@ function onStartClick() {
           </RouterLink>
 
           <div class="mobile_drawer__actions">
-            <RouterLink to="/login" class="mobile_btn mobile_btn--outline" @click="onLoginClick">
+            <RouterLink to="/login" class="mobile_btn mobile_btn--outline" @click="onLoginClick('mobile_menu')">
               LOGIN
             </RouterLink>
-            <RouterLink to="/cadastro" class="mobile_btn mobile_btn--primary" @click="onStartClick">
+            <RouterLink to="/cadastro" class="mobile_btn mobile_btn--primary" @click="onStartClick('mobile_menu')">
               COMEÇAR AGORA
             </RouterLink>
           </div>

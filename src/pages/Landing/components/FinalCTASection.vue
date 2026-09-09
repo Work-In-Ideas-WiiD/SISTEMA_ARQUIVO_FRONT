@@ -1,9 +1,17 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
-import { trackEvent } from '@/utils/tracking'
+import { trackCtaClick, trackContactClick } from '@/utils/tracking'
 
 function onStartClick() {
-  trackEvent('clique_comecar_agora', { local: 'final_cta' })
+  trackCtaClick('comecar_agora', 'final_cta')
+}
+
+function onWhatsAppClick() {
+  trackContactClick('whatsapp', 'final_cta', '5562983398612')
+}
+
+function onEmailClick() {
+  trackContactClick('email', 'final_cta', 'contato@wi-id.com')
 }
 </script>
 
@@ -36,6 +44,7 @@ function onStartClick() {
           target="_blank"
           rel="noopener noreferrer"
           class="cta_btn cta_btn--secondary"
+          @click="onWhatsAppClick"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
@@ -45,7 +54,7 @@ function onStartClick() {
       </div>
 
       <p class="cta_direct_contact">
-        Ou envie uma mensagem para <a href="mailto:contato@wi-id.com">contato@wi-id.com</a>
+        Ou envie uma mensagem para <a href="mailto:contato@wi-id.com" @click="onEmailClick">contato@wi-id.com</a>
       </p>
     </div>
   </section>

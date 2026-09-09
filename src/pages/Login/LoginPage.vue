@@ -9,6 +9,7 @@ import iconLock from '@/assets/imgs/login/icon-lock.svg'
 import iconBackCircle from '@/assets/imgs/login/icon-back-circle.svg'
 import iconChevronLeft from '@/assets/imgs/login/icon-chevron-left.svg'
 import { setPageSeo } from '@/utils/seo'
+import { trackCtaClick } from '@/utils/tracking'
 
 const authStore = useAuthStore()
 
@@ -80,7 +81,11 @@ async function handleLogin() {
           <span v-else>ENTRAR</span>
         </button>
 
-        <RouterLink class="login_btn login_btn--outline" to="/cadastro">
+        <RouterLink
+          class="login_btn login_btn--outline"
+          to="/cadastro"
+          @click="trackCtaClick('criar_conta', 'login_page')"
+        >
           CADASTRAR
         </RouterLink>
       </div>

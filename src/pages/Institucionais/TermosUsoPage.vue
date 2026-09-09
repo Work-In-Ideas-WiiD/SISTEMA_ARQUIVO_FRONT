@@ -4,6 +4,7 @@ import { RouterLink } from 'vue-router'
 import LandingHeader from '@/pages/Landing/components/LandingHeader.vue'
 import LandingFooter from '@/pages/Landing/components/LandingFooter.vue'
 import { setPageSeo } from '@/utils/seo'
+import { trackContactClick } from '@/utils/tracking'
 
 onMounted(() => {
   setPageSeo({
@@ -132,9 +133,9 @@ onMounted(() => {
               Para suporte, esclarecimento de dúvidas sobre estes termos ou solicitações corporativas, utilize nossos canais oficiais:
             </p>
             <div class="contact_box">
-              <p><strong>E-mail:</strong> <a href="mailto:contato@wi-id.com">contato@wi-id.com</a></p>
-              <p><strong>E-mail de desenvolvimento:</strong> <a href="mailto:desenvolvimento@wi-id.com">desenvolvimento@wi-id.com</a></p>
-              <p><strong>WhatsApp:</strong> <a href="https://wa.me/5562983398612" target="_blank" rel="noopener noreferrer">(62) 98339-8612</a></p>
+              <p><strong>E-mail:</strong> <a href="mailto:contato@wi-id.com" @click="trackContactClick('email', 'termos_uso', 'contato@wi-id.com')">contato@wi-id.com</a></p>
+              <p><strong>E-mail de desenvolvimento:</strong> <a href="mailto:desenvolvimento@wi-id.com" @click="trackContactClick('email', 'termos_uso', 'desenvolvimento@wi-id.com')">desenvolvimento@wi-id.com</a></p>
+              <p><strong>WhatsApp:</strong> <a href="https://wa.me/5562983398612" target="_blank" rel="noopener noreferrer" @click="trackContactClick('whatsapp', 'termos_uso', '5562983398612')">(62) 98339-8612</a></p>
               <p><strong>Empresa Responsável:</strong> Work In Ideas (WiiD)</p>
             </div>
           </section>

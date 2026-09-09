@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import logoWiidocs from '@/assets/imgs/login/logo-wiidocs-white.png'
+import { trackLoginClick, trackCtaClick, trackContactClick } from '@/utils/tracking'
 
 const route = useRoute()
 const router = useRouter()
@@ -55,8 +56,8 @@ function handleAnchor(hash: string) {
             <li><RouterLink to="/sobre" class="footer_link">Sobre Nós</RouterLink></li>
             <li><RouterLink to="/politica-de-privacidade" class="footer_link">Política de Privacidade</RouterLink></li>
             <li><RouterLink to="/termos-de-uso" class="footer_link">Termos de Uso</RouterLink></li>
-            <li><RouterLink to="/login" class="footer_link">Acessar Conta (Login)</RouterLink></li>
-            <li><RouterLink to="/cadastro" class="footer_link">Criar Nova Conta</RouterLink></li>
+            <li><RouterLink to="/login" class="footer_link" @click="trackLoginClick('footer')">Acessar Conta (Login)</RouterLink></li>
+            <li><RouterLink to="/cadastro" class="footer_link" @click="trackCtaClick('criar_conta', 'footer')">Criar Nova Conta</RouterLink></li>
             <li><RouterLink to="/cliente" class="footer_link">Portal do Cliente</RouterLink></li>
           </ul>
         </div>
@@ -66,7 +67,11 @@ function handleAnchor(hash: string) {
           <span class="footer_col_title">Contato & Suporte</span>
           <ul class="footer_links footer_contacts">
             <li>
-              <a href="mailto:contato@wi-id.com" class="footer_contact_item">
+              <a
+                href="mailto:contato@wi-id.com"
+                class="footer_contact_item"
+                @click="trackContactClick('email', 'footer', 'contato@wi-id.com')"
+              >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff00ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                   <polyline points="22,6 12,13 2,6"></polyline>
@@ -75,7 +80,11 @@ function handleAnchor(hash: string) {
               </a>
             </li>
             <li>
-              <a href="mailto:desenvolvimento@wi-id.com" class="footer_contact_item">
+              <a
+                href="mailto:desenvolvimento@wi-id.com"
+                class="footer_contact_item"
+                @click="trackContactClick('email', 'footer', 'desenvolvimento@wi-id.com')"
+              >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff00ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <polyline points="16 18 22 12 16 6"></polyline>
                   <polyline points="8 6 2 12 8 18"></polyline>
@@ -84,7 +93,13 @@ function handleAnchor(hash: string) {
               </a>
             </li>
             <li>
-              <a href="https://wa.me/5562983398612" target="_blank" rel="noopener noreferrer" class="footer_contact_item footer_contact_item--whatsapp">
+              <a
+                href="https://wa.me/5562983398612"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="footer_contact_item footer_contact_item--whatsapp"
+                @click="trackContactClick('whatsapp', 'footer', '5562983398612')"
+              >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
                 </svg>

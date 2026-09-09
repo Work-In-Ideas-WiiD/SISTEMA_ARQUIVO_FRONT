@@ -11,6 +11,7 @@ function toggleFaq(index: number) {
   } else {
     activeIndex.value = index
     trackEvent('faq_aberto', { pergunta: faqs[index].question })
+    trackEvent('select_content', { content_type: 'faq_accordion', item_id: faqs[index].question })
   }
 }
 </script>

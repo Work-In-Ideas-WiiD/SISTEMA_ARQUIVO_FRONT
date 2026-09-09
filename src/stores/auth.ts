@@ -7,6 +7,7 @@ import { api, setAuthToken } from '@/services/http/api'
 import type { IUserProps, TUserTypes } from '@/types/auth'
 import type { IPostContratoRes } from '@/types/contratos'
 import { postRegistro, type IRegistroModel } from '@/services/http/conta'
+import { trackSignUp, trackLogin } from '@/utils/tracking'
 
 const defaultUser: IUserProps = {
   id: '',
@@ -88,6 +89,7 @@ export const useAuthStore = defineStore('auth', () => {
       })
       
       handleFetching(false)
+      trackLogin('email')
       // Assinatura pendente/vencida -> modo pagamento (não entra no sistema).
       if (loginData.requires_payment) {
         router.push('/contratar')
@@ -121,6 +123,7 @@ export const useAuthStore = defineStore('auth', () => {
       })
       
       handleFetching(false)
+      trackLogin('portal_cliente')
       if (loginData.requires_payment) {
         router.push('/contratar')
       } else {
@@ -153,6 +156,7 @@ export const useAuthStore = defineStore('auth', () => {
       }
 
       handleFetching(false)
+      trackSignUp('email')
       // Conta recém-criada não tem assinatura ativa -> vai para a contratação.
       router.push('/contratar')
     } catch (err: any) {

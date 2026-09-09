@@ -2,7 +2,13 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getPlanosPublicos, type IPlanoPublico } from '@/services/http/planos'
-import { saveSelectedPlan, trackEvent, getStoredUtmParams } from '@/utils/tracking'
+import {
+  saveSelectedPlan,
+  trackPlanSelection,
+  trackBeginCheckout,
+  trackContactClick,
+  getStoredUtmParams
+} from '@/utils/tracking'
 
 const router = useRouter()
 
@@ -95,22 +101,16 @@ function getFeaturesForPlan(plano: IPlanoPublico): string[] {
 }
 
 function handleSelectPlan(plano: IPlanoPublico) {
-  trackEvent('selecionar_plano', {
-    plano_id: plano.id,
-    plano_nome: plano.nome,
-    periodicidade: billingCycle.value
-  })
-  trackEvent('contratar_plano', {
-    plano_nome: plano.nome,
-    periodicidade: billingCycle.value
-  })
-
-  saveSelectedPlan({
+  const selectedPlanData = {
     id: plano.id,
     nome: plano.nome,
     valor_mensal_centavos: getCalculatedPrice(plano.valor_mensal_centavos),
     periodicidade: billingCycle.value
-  })
+  }
+
+  trackPlanSelection(selectedPlanData)
+  trackBeginCheckout(selectedPlanData)
+  saveSelectedPlan(selectedPlanData)
 
   const utms = getStoredUtmParams()
   router.push({
@@ -121,6 +121,14 @@ function handleSelectPlan(plano: IPlanoPublico) {
       ...utms
     }
   })
+}
+
+function onEmailContactClick() {
+  trackContactClick('email', 'pricing_guarantee', 'contato@wi-id.com')
+}
+
+function onWhatsAppContactClick() {
+  trackContactClick('whatsapp', 'pricing_guarantee', '5562983398612')
 }
 </script>
 
@@ -222,9 +230,9 @@ function handleSelectPlan(plano: IPlanoPublico) {
         </svg>
         <span>
           Precisa de um plano sob medida para alta volumetria?
-          <a href="mailto:contato@wi-id.com" class="guarantee_link">Fale com nossos consultores (contato@wi-id.com)</a>
+          <a href="mailto:contato@wi-id.com" class="guarantee_link" @click="onEmailContactClick">Fale com nossos consultores (contato@wi-id.com)</a>
           ou pelo
-          <a href="https://wa.me/5562983398612" target="_blank" rel="noopener noreferrer" class="guarantee_link">WhatsApp (62) 98339-8612</a>.
+          <a href="https://wa.me/5562983398612" target="_blank" rel="noopener noreferrer" class="guarantee_link" @click="onWhatsAppContactClick">WhatsApp (62) 98339-8612</a>.
         </span>
       </div>
     </div>

@@ -10,7 +10,7 @@ import iconBuilding from '@/assets/imgs/login/icon-building.svg'
 import iconLock from '@/assets/imgs/login/icon-lock.svg'
 import iconBackCircle from '@/assets/imgs/login/icon-back-circle.svg'
 import iconChevronLeft from '@/assets/imgs/login/icon-chevron-left.svg'
-import { trackEvent } from '@/utils/tracking'
+import { trackEvent, trackLoginClick } from '@/utils/tracking'
 import { setPageSeo } from '@/utils/seo'
 import {
   maskCpf,
@@ -205,7 +205,7 @@ async function handleSubmit() {
         </button>
       </div>
 
-      <RouterLink class="login_form__first_access" to="/login">
+      <RouterLink class="login_form__first_access" to="/login" @click="trackLoginClick('cadastro_page')">
         Já tem conta? <span>Entrar.</span>
       </RouterLink>
     </form>

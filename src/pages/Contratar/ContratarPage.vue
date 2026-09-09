@@ -12,7 +12,7 @@ import { getChavePublica, postContratacao } from '@/services/http/conta'
 import { getApiErrorMessage } from '@/utils/apiError'
 import { maskPhone, stripDigits } from '@/utils/formatPhone'
 import { useAuthStore } from '@/stores/auth'
-import { getSelectedPlan } from '@/utils/tracking'
+import { getSelectedPlan, trackBeginCheckout, trackPurchase } from '@/utils/tracking'
 
 const router = useRouter()
 const toast = useToast()
@@ -106,6 +106,12 @@ function onCardNumberInput(event: Event) {
 
 function selecionarPlano(plano: IPlanoPublico) {
   planoSelecionado.value = plano
+  trackBeginCheckout({
+    id: plano.id,
+    nome: plano.nome,
+    valor_mensal_centavos: plano.valor_mensal_centavos,
+    periodicidade: 'mensal'
+  })
 }
 
 function limparCartao() {
@@ -179,8 +185,26 @@ async function pagar() {
     if (data.status === 'ativa') {
       sucesso.value = true
       toast.success(data.message || 'Pagamento aprovado! Assinatura ativada.')
+      trackPurchase({
+        transactionId: data.pagamento?.id || data.assinatura?.id,
+        plano: {
+          id: planoSelecionado.value.id,
+          nome: planoSelecionado.value.nome,
+          valor_mensal_centavos: planoSelecionado.value.valor_mensal_centavos,
+          periodicidade: 'mensal'
+        }
+      })
     } else if (data.status === 'pendente') {
       toast.info(data.message || 'Assinatura criada. Aguardando confirmação do pagamento.')
+      trackPurchase({
+        transactionId: data.pagamento?.id || data.assinatura?.id,
+        plano: {
+          id: planoSelecionado.value.id,
+          nome: planoSelecionado.value.nome,
+          valor_mensal_centavos: planoSelecionado.value.valor_mensal_centavos,
+          periodicidade: 'mensal'
+        }
+      })
     } else {
       toast.error(data.message || 'Pagamento não autorizado. Tente outro cartão.')
     }

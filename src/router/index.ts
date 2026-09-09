@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
+import { trackPageView } from '@/utils/tracking'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -368,6 +369,13 @@ router.beforeEach((to, _from, next) => {
   } else {
     next()
   }
+})
+
+// Rastreamento de visualizações de página virtuais no GA4 em transições do SPA
+router.afterEach((to) => {
+  setTimeout(() => {
+    trackPageView(to.fullPath, typeof document !== 'undefined' ? document.title : undefined)
+  }, 100)
 })
 
 export default router

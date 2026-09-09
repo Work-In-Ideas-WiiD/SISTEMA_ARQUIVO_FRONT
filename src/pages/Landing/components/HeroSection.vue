@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
-import { trackEvent } from '@/utils/tracking'
+import { trackCtaClick, trackEvent } from '@/utils/tracking'
 
 function onStartClick() {
-  trackEvent('clique_comecar_agora', { local: 'hero' })
+  trackCtaClick('comecar_agora', 'hero')
 }
 
 function scrollToPricing() {
+  trackCtaClick('ver_planos', 'hero')
   trackEvent('selecionar_plano', { local: 'hero_secundario' })
   const el = document.querySelector('#planos')
   if (el) {
