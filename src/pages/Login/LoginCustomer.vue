@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
@@ -7,8 +7,16 @@ import logoWiidocs from '@/assets/imgs/login/logo-wiidocs-white.png'
 import iconBuilding from '@/assets/imgs/login/icon-building.svg'
 import iconPerson from '@/assets/imgs/login/icon-person.svg'
 import iconLock from '@/assets/imgs/login/icon-lock.svg'
+import { setPageSeo } from '@/utils/seo'
 
 const authStore = useAuthStore()
+
+onMounted(() => {
+  setPageSeo({
+    title: 'Portal do Cliente — WiiDocs | Acesso a Documentos',
+    description: 'Área exclusiva para clientes acessarem seus arquivos, contratos e documentos compartilhados na plataforma WiiDocs.'
+  })
+})
 
 const companyId = ref('')
 const email = ref('')
@@ -21,15 +29,16 @@ async function handleLogin() {
 
 <template>
   <main class="login_page">
+    <h1 class="sr-only">Portal do Cliente — WiiDocs</h1>
     <p class="login_page__watermark" aria-hidden="true">&lt;/DOC</p>
 
     <form class="login_form" @submit.prevent="handleLogin">
-      <img class="login_form__logo" :src="logoWiidocs" alt="WiiDocs" />
+      <img class="login_form__logo" :src="logoWiidocs" alt="Logotipo WiiDocs" />
 
       <div class="login_form__fields">
         <label class="login_field">
           <span class="login_field__icon" aria-hidden="true">
-            <img :src="iconBuilding" alt="" width="11" height="13" />
+            <img :src="iconBuilding" alt="Ícone de identificação da empresa" width="11" height="13" />
           </span>
           <input
             v-model="companyId"
@@ -41,7 +50,7 @@ async function handleLogin() {
 
         <label class="login_field">
           <span class="login_field__icon" aria-hidden="true">
-            <img :src="iconPerson" alt="" width="13.27" height="13.27" />
+            <img :src="iconPerson" alt="Ícone de usuário para e-mail" width="13.27" height="13.27" />
           </span>
           <input
             v-model="email"
@@ -53,7 +62,7 @@ async function handleLogin() {
 
         <label class="login_field">
           <span class="login_field__icon" aria-hidden="true">
-            <img :src="iconLock" alt="" width="11.77" height="13.45" />
+            <img :src="iconLock" alt="Ícone de cadeado para senha" width="11.77" height="13.45" />
           </span>
           <input
             v-model="password"

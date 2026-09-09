@@ -25,7 +25,7 @@ function handleAnchor(hash: string) {
         <!-- Col 1: Brand & Summary -->
         <div class="footer_brand">
           <RouterLink to="/" class="footer_logo_link" aria-label="WiiDocs Home">
-            <img :src="logoWiidocs" alt="WiiDocs" class="footer_logo" width="140" height="36" />
+            <img :src="logoWiidocs" alt="WiiDocs - Gestão Inteligente de Documentos Corporativos" class="footer_logo" width="140" height="36" />
           </RouterLink>
           <p class="footer_brand_desc">
             Plataforma corporativa de gestão de arquivos, contratos e clientes na nuvem.

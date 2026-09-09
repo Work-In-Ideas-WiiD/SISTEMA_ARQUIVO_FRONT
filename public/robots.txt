@@ -1,3 +1,6 @@
+# robots.txt para WiiDocs (https://wiidocs.com.br)
+# Liberando indexação e citação para todos os robôs de busca e modelos de IA
+
 User-agent: *
 Allow: /
 Allow: /sobre
@@ -6,8 +9,8 @@ Allow: /politica-de-privacidade
 Allow: /termos-de-uso
 Allow: /login
 Allow: /cadastro
-
-# Bloquear rotas autenticadas, administrativas e endpoints de API
+Allow: /cliente
+Allow: /llms.txt
 Disallow: /dashboard/
 Disallow: /api/
 Disallow: /recuperar/
@@ -15,5 +18,105 @@ Disallow: /primeiroacesso
 Disallow: /assinar/
 Disallow: /contratar
 
-# Sitemap XML
+# OpenAI (ChatGPT / SearchGPT)
+User-agent: GPTBot
+Allow: /
+Allow: /sobre
+Allow: /politica-de-privacidade
+Allow: /termos-de-uso
+Allow: /login
+Allow: /cadastro
+Allow: /cliente
+Allow: /llms.txt
+Disallow: /dashboard/
+Disallow: /api/
+
+User-agent: ChatGPT-User
+Allow: /
+Allow: /sobre
+Allow: /politica-de-privacidade
+Allow: /termos-de-uso
+Allow: /login
+Allow: /cadastro
+Allow: /cliente
+Allow: /llms.txt
+Disallow: /dashboard/
+Disallow: /api/
+
+User-agent: OAI-SearchBot
+Allow: /
+Allow: /sobre
+Allow: /politica-de-privacidade
+Allow: /termos-de-uso
+Allow: /login
+Allow: /cadastro
+Allow: /cliente
+Allow: /llms.txt
+Disallow: /dashboard/
+Disallow: /api/
+
+# Perplexity AI
+User-agent: PerplexityBot
+Allow: /
+Allow: /sobre
+Allow: /politica-de-privacidade
+Allow: /termos-de-uso
+Allow: /login
+Allow: /cadastro
+Allow: /cliente
+Allow: /llms.txt
+Disallow: /dashboard/
+Disallow: /api/
+
+# Anthropic Claude
+User-agent: Claude-SearchBot
+Allow: /
+Allow: /sobre
+Allow: /politica-de-privacidade
+Allow: /termos-de-uso
+Allow: /login
+Allow: /cadastro
+Allow: /cliente
+Allow: /llms.txt
+Disallow: /dashboard/
+Disallow: /api/
+
+User-agent: ClaudeBot
+Allow: /
+Allow: /sobre
+Allow: /politica-de-privacidade
+Allow: /termos-de-uso
+Allow: /login
+Allow: /cadastro
+Allow: /cliente
+Allow: /llms.txt
+Disallow: /dashboard/
+Disallow: /api/
+
+# Google AI & Search
+User-agent: Googlebot
+Allow: /
+Allow: /sobre
+Allow: /politica-de-privacidade
+Allow: /termos-de-uso
+Allow: /login
+Allow: /cadastro
+Allow: /cliente
+Allow: /llms.txt
+Disallow: /dashboard/
+Disallow: /api/
+
+User-agent: Google-Extended
+Allow: /
+Allow: /sobre
+Allow: /politica-de-privacidade
+Allow: /termos-de-uso
+Allow: /login
+Allow: /cadastro
+Allow: /cliente
+Allow: /llms.txt
+Disallow: /dashboard/
+Disallow: /api/
+
+# Linha do Sitemap
 Sitemap: https://wiidocs.com.br/sitemap.xml

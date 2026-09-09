@@ -30,20 +30,21 @@ async function handleLogin() {
 
 <template>
   <main class="login_page">
+    <h1 class="sr-only">Login — Acesso à Plataforma WiiDocs</h1>
     <p class="login_page__watermark" aria-hidden="true">&lt;/DOC</p>
 
     <RouterLink class="back_btn" to="/" aria-label="Voltar para a página inicial">
-      <img class="back_btn__circle" :src="iconBackCircle" alt="" width="66" height="66" />
-      <img class="back_btn__icon" :src="iconChevronLeft" alt="" width="40" height="40" />
+      <img class="back_btn__circle" :src="iconBackCircle" alt="Círculo do botão voltar" width="66" height="66" />
+      <img class="back_btn__icon" :src="iconChevronLeft" alt="Ícone de seta para voltar" width="40" height="40" />
     </RouterLink>
 
     <form class="login_form" @submit.prevent="handleLogin">
-      <img class="login_form__logo" :src="logoWiidocs" alt="WiiDocs" />
+      <img class="login_form__logo" :src="logoWiidocs" alt="Logotipo WiiDocs" />
 
       <div class="login_form__fields">
         <label class="login_field">
           <span class="login_field__icon" aria-hidden="true">
-            <img :src="iconPerson" alt="" width="13.27" height="13.27" />
+            <img :src="iconPerson" alt="Ícone de usuário para e-mail" width="13.27" height="13.27" />
           </span>
           <input
             v-model="email"
@@ -55,7 +56,7 @@ async function handleLogin() {
 
         <label class="login_field">
           <span class="login_field__icon" aria-hidden="true">
-            <img :src="iconLock" alt="" width="11.77" height="13.45" />
+            <img :src="iconLock" alt="Ícone de cadeado para senha" width="11.77" height="13.45" />
           </span>
           <input
             v-model="password"

@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc && vite build",
-    "build:action": "vite build",
+    "build": "vue-tsc && vite build && node scripts/prerender.mjs",
+    "build:action": "vite build && node scripts/prerender.mjs",
+    "prerender": "node scripts/prerender.mjs",
     "preview": "vite preview",
     "type-check": "vue-tsc --noEmit"
   },

@@ -224,7 +224,7 @@ async function pagar() {
     <p class="contratar_page__watermark" aria-hidden="true">&lt;/DOC</p>
 
     <div v-if="sucesso" class="contratar_shell">
-      <img class="contratar_logo" :src="logoWiidocs" alt="WiiDocs" />
+      <img class="contratar_logo" :src="logoWiidocs" alt="Logotipo WiiDocs" />
       <h1 class="contratar_title">Assinatura ativada</h1>
       <p class="contratar_subtitle">Seu pagamento foi aprovado. Você já pode acessar o sistema.</p>
       <button type="button" class="night_btn" @click="router.push('/')">
@@ -234,11 +234,11 @@ async function pagar() {
 
     <div v-else-if="planoSelecionado" class="contratar_shell contratar_shell--pay">
       <button type="button" class="back_btn" aria-label="Voltar aos planos" @click="voltarParaPlanos">
-        <img class="back_btn__circle" :src="iconBackCircle" alt="" width="66" height="66" />
-        <img class="back_btn__icon" :src="iconChevronLeft" alt="" width="40" height="40" />
+        <img class="back_btn__circle" :src="iconBackCircle" alt="Círculo do botão voltar" width="66" height="66" />
+        <img class="back_btn__icon" :src="iconChevronLeft" alt="Ícone de seta para voltar" width="40" height="40" />
       </button>
 
-      <img class="contratar_logo" :src="logoWiidocs" alt="WiiDocs" />
+      <img class="contratar_logo" :src="logoWiidocs" alt="Logotipo WiiDocs" />
       <h1 class="contratar_title">Pagamento</h1>
       <p class="contratar_subtitle">
         {{ planoSelecionado.nome }} —
@@ -314,11 +314,11 @@ async function pagar() {
 
     <div v-else class="contratar_shell">
       <button type="button" class="back_btn" aria-label="Voltar ao login" @click="voltarParaLogin">
-        <img class="back_btn__circle" :src="iconBackCircle" alt="" width="66" height="66" />
-        <img class="back_btn__icon" :src="iconChevronLeft" alt="" width="40" height="40" />
+        <img class="back_btn__circle" :src="iconBackCircle" alt="Círculo do botão voltar" width="66" height="66" />
+        <img class="back_btn__icon" :src="iconChevronLeft" alt="Ícone de seta para voltar" width="40" height="40" />
       </button>
 
-      <img class="contratar_logo" :src="logoWiidocs" alt="WiiDocs" />
+      <img class="contratar_logo" :src="logoWiidocs" alt="Logotipo WiiDocs" />
       <h1 class="contratar_title">Escolha seu plano</h1>
 
       <p v-if="fetching" class="contratar_loading">Carregando planos...</p>

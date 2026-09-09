@@ -31,9 +31,9 @@ async function handleSubmit() {
   <main class="first_access_page">
     <p class="first_access_page__watermark" aria-hidden="true">&lt;/DOC</p>
 
-    <RouterLink class="back_btn" to="/" aria-label="Voltar">
-      <img class="back_btn__circle" :src="iconBackCircle" alt="" width="66" height="66" />
-      <img class="back_btn__icon" :src="iconChevronLeft" alt="" width="40" height="40" />
+    <RouterLink class="back_btn" to="/" aria-label="Voltar para a página inicial">
+      <img class="back_btn__circle" :src="iconBackCircle" alt="Círculo do botão voltar" width="66" height="66" />
+      <img class="back_btn__icon" :src="iconChevronLeft" alt="Ícone de seta para voltar" width="40" height="40" />
     </RouterLink>
 
     <form class="first_access_form" @submit.prevent="handleSubmit">
@@ -49,7 +49,7 @@ async function handleSubmit() {
 
       <label class="first_access_field">
         <span class="first_access_field__icon" aria-hidden="true">
-          <img :src="iconPerson" alt="" width="13.27" height="13.27" />
+          <img :src="iconPerson" alt="Ícone de usuário para e-mail" width="13.27" height="13.27" />
         </span>
         <input
           v-model="email"

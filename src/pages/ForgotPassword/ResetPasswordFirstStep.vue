@@ -32,9 +32,9 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <RouterLink class="back_btn" :to="loginPath" aria-label="Voltar">
-    <img class="back_btn__circle" :src="iconBackCircle" alt="" width="66" height="66" />
-    <img class="back_btn__icon" :src="iconChevronLeft" alt="" width="40" height="40" />
+  <RouterLink class="back_btn" :to="loginPath" aria-label="Voltar para a página de login">
+    <img class="back_btn__circle" :src="iconBackCircle" alt="Círculo do botão voltar" width="66" height="66" />
+    <img class="back_btn__icon" :src="iconChevronLeft" alt="Ícone de seta para voltar" width="40" height="40" />
   </RouterLink>
 
   <form class="recover_form" @submit.prevent="handleSubmit">
@@ -50,7 +50,7 @@ async function handleSubmit() {
 
     <label class="recover_field">
       <span class="recover_field__icon" aria-hidden="true">
-        <img :src="iconPerson" alt="" width="13.27" height="13.27" />
+        <img :src="iconPerson" alt="Ícone de usuário para e-mail" width="13.27" height="13.27" />
       </span>
       <input
         v-model="email"

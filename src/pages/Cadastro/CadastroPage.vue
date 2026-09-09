@@ -91,20 +91,21 @@ async function handleSubmit() {
 
 <template>
   <main class="login_page">
+    <h1 class="sr-only">Cadastro de Empresa — WiiDocs</h1>
     <p class="login_page__watermark" aria-hidden="true">&lt;/DOC</p>
 
-    <RouterLink class="back_btn" to="/" aria-label="Voltar">
-      <img class="back_btn__circle" :src="iconBackCircle" alt="" width="66" height="66" />
-      <img class="back_btn__icon" :src="iconChevronLeft" alt="" width="40" height="40" />
+    <RouterLink class="back_btn" to="/" aria-label="Voltar para a página inicial">
+      <img class="back_btn__circle" :src="iconBackCircle" alt="Círculo do botão voltar" width="66" height="66" />
+      <img class="back_btn__icon" :src="iconChevronLeft" alt="Ícone de seta para voltar" width="40" height="40" />
     </RouterLink>
 
     <form class="login_form" @submit.prevent="handleSubmit">
-      <img class="login_form__logo" :src="logoWiidocs" alt="WiiDocs" />
+      <img class="login_form__logo" :src="logoWiidocs" alt="Logotipo WiiDocs" />
 
       <div class="login_form__fields">
         <label class="login_field">
           <span class="login_field__icon" aria-hidden="true">
-            <img :src="iconPerson" alt="" width="13.27" height="13.27" />
+            <img :src="iconPerson" alt="Ícone de usuário para nome completo" width="13.27" height="13.27" />
           </span>
           <input
             v-model="form.nome"
@@ -117,7 +118,7 @@ async function handleSubmit() {
 
         <label class="login_field">
           <span class="login_field__icon" aria-hidden="true">
-            <img :src="iconBuilding" alt="" width="11" height="13" />
+            <img :src="iconBuilding" alt="Ícone de identificação da empresa" width="11" height="13" />
           </span>
           <input
             v-model="form.nome_empresa"
@@ -130,7 +131,7 @@ async function handleSubmit() {
 
         <label class="login_field">
           <span class="login_field__icon" aria-hidden="true">
-            <img :src="iconPerson" alt="" width="13.27" height="13.27" />
+            <img :src="iconPerson" alt="Ícone de identificação para e-mail" width="13.27" height="13.27" />
           </span>
           <input
             v-model="form.email"
@@ -143,7 +144,7 @@ async function handleSubmit() {
 
         <label class="login_field">
           <span class="login_field__icon" aria-hidden="true">
-            <img :src="iconPerson" alt="" width="13.27" height="13.27" />
+            <img :src="iconPerson" alt="Ícone de identificação para CPF" width="13.27" height="13.27" />
           </span>
           <input
             :value="form.cpf"
@@ -158,7 +159,7 @@ async function handleSubmit() {
 
         <label class="login_field">
           <span class="login_field__icon" aria-hidden="true">
-            <img :src="iconBuilding" alt="" width="11" height="13" />
+            <img :src="iconBuilding" alt="Ícone de identificação para CNPJ" width="11" height="13" />
           </span>
           <input
             :value="form.cnpj"
@@ -173,7 +174,7 @@ async function handleSubmit() {
 
         <label class="login_field">
           <span class="login_field__icon" aria-hidden="true">
-            <img :src="iconLock" alt="" width="11.77" height="13.45" />
+            <img :src="iconLock" alt="Ícone de cadeado para senha" width="11.77" height="13.45" />
           </span>
           <input
             v-model="form.password"
@@ -186,7 +187,7 @@ async function handleSubmit() {
 
         <label class="login_field">
           <span class="login_field__icon" aria-hidden="true">
-            <img :src="iconLock" alt="" width="11.77" height="13.45" />
+            <img :src="iconLock" alt="Ícone de cadeado para confirmação de senha" width="11.77" height="13.45" />
           </span>
           <input
             v-model="form.password_confirmation"

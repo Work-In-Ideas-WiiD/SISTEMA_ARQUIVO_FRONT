@@ -131,7 +131,7 @@ function shouldShowItem(item: IMenuItem): boolean {
 
 <template>
   <aside class="sidebar">
-    <img class="logo" :src="logoWiidocs" alt="WiiDocs" />
+    <img class="logo" :src="logoWiidocs" alt="Logotipo WiiDocs - Sistema de Gestão Eletrônica de Documentos" />
     <nav class="sidebar__nav">
       <template v-for="item in menuItems" :key="item.path">
         <SidebarItem

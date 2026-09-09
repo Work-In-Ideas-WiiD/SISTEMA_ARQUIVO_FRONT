@@ -56,7 +56,7 @@ function onStartClick(local: string = 'header') {
   <header class="landing_header" :class="{ 'landing_header--scrolled': isScrolled }">
     <div class="landing_header__container">
       <RouterLink to="/" class="landing_header__logo_link" aria-label="WiiDocs Home">
-        <img :src="logoWiidocs" alt="WiiDocs" class="landing_header__logo" width="130" height="34" />
+        <img :src="logoWiidocs" alt="WiiDocs - Gestão Eletrônica de Documentos" class="landing_header__logo" width="130" height="34" />
       </RouterLink>
 
       <nav class="landing_header__nav" aria-label="Navegação principal">
