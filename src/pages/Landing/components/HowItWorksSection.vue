@@ -3,17 +3,22 @@ const steps = [
   {
     number: '01',
     title: 'Crie sua conta',
-    description: 'Preencha o formulário rápido de cadastro em menos de 2 minutos. Sem burocracia ou dados desnecessários.'
+    description: 'Cadastre sua empresa e comece seu teste gratuito de 8 dias.'
   },
   {
     number: '02',
-    title: 'Configure sua empresa',
-    description: 'Cadastre os setores da organização, cadastre funções e convide seus colaboradores com seus respectivos acessos.'
+    title: 'Estruture sua organização',
+    description: 'Cadastre setores, funções, funcionários, clientes e grupos de acordo com a realidade da sua empresa.'
   },
   {
     number: '03',
-    title: 'Comece a operar',
-    description: 'Faça upload de contratos e documentos, envie para clientes com segurança e acompanhe tudo pelo painel central.'
+    title: 'Envie seus arquivos',
+    description: 'Organize os documentos em pastas e defina quem poderá acessá-los.'
+  },
+  {
+    number: '04',
+    title: 'Compartilhe e acompanhe',
+    description: 'Disponibilize arquivos aos usuários e clientes autorizados e acompanhe os acessos e confirmações de leitura.'
   }
 ]
 </script>
@@ -24,10 +29,10 @@ const steps = [
       <div class="section_header">
         <span class="section_badge">PASSO A PASSO</span>
         <h2 id="how-it-works-title" class="section_title">
-          Como funciona o WiiDocs na prática?
+          Como funciona o AkiDocs na prática?
         </h2>
         <p class="section_subtitle">
-          Uma implantação ágil e sem complicações para que sua equipe comece a produzir desde o primeiro dia.
+          Uma implantação ágil e sem complicações para que sua equipe comece a operar pelo navegador desde o primeiro dia.
         </p>
       </div>
 
@@ -98,12 +103,17 @@ const steps = [
 
 .steps_grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
 
-  @media (max-width: 900px) {
+  @media (max-width: 1100px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+  }
+
+  @media (max-width: 640px) {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 32px;
   }
 }
 

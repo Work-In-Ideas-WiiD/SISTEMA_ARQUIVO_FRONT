@@ -25,7 +25,7 @@ function toggleFaq(index: number) {
           Perguntas Frequentes
         </h2>
         <p class="section_subtitle">
-          Reunimos aqui as principais respostas sobre como o WiiDocs funciona e como ele pode apoiar a sua empresa.
+          Reunimos aqui as respostas sobre o funcionamento, limites, infraestrutura, segurança e condições operacionais do AkiDocs.
         </p>
       </div>
 

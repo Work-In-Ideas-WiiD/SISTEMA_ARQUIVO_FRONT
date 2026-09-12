@@ -15,8 +15,8 @@ export interface ISelectedPlan {
 
 export const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-6DQ5G4E85Q'
 
-const STORAGE_KEY = 'wiidocs_utm_params'
-const PLANO_STORAGE_KEY = 'wiidocs_selected_plan'
+const STORAGE_KEY = 'akidocs_utm_params'
+const PLANO_STORAGE_KEY = 'akidocs_selected_plan'
 
 let isFirstNavigation = true
 

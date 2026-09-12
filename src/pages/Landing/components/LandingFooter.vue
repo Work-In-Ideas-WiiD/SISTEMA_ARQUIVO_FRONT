@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { RouterLink, useRoute, useRouter } from 'vue-router'
-import logoWiidocs from '@/assets/imgs/login/logo-wiidocs-white.png'
-import { trackLoginClick, trackCtaClick, trackContactClick } from '@/utils/tracking'
+import { useRoute, useRouter } from 'vue-router'
+import logoAkidocs from '@/assets/imgs/login/logo-akidocs-white.png'
+import { trackContactClick } from '@/utils/tracking'
 
 const route = useRoute()
 const router = useRouter()
@@ -22,18 +22,23 @@ function handleAnchor(hash: string) {
   <footer class="landing_footer" role="contentinfo">
     <div class="footer_container">
       <div class="footer_grid">
-        <!-- Col 1: Brand & Summary -->
+        <!-- Col 1: Brand & Institutional Info -->
         <div class="footer_brand">
-          <RouterLink to="/" class="footer_logo_link" aria-label="WiiDocs Home">
-            <img :src="logoWiidocs" alt="WiiDocs - Gestão Inteligente de Documentos Corporativos" class="footer_logo" width="140" height="36" />
+          <RouterLink to="/" class="footer_logo_link" aria-label="AkiDocs Home">
+            <img :src="logoAkidocs" alt="AkiDocs — Todos os seus documentos, Aki!" class="footer_logo" width="140" height="36" />
           </RouterLink>
           <p class="footer_brand_desc">
-            Plataforma corporativa de gestão de arquivos, contratos e clientes na nuvem.
-            Segurança, velocidade e conformidade legal para a sua empresa.
+            Todos os seus documentos, Aki! Plataforma SaaS B2B de gestão e compartilhamento seguro de arquivos para empresas.
           </p>
+          <div class="footer_company_data">
+            <strong>Work in Ideas</strong>
+            <span>CNPJ: 17.808.481/0001-69</span>
+            <span>Av. T-1, 2266 — Setor Bueno</span>
+            <span>Goiânia — GO, CEP 74215-025</span>
+          </div>
           <div class="footer_badges">
-            <span class="cert_badge">LGPD COMPLIANT</span>
-            <span class="cert_badge">SSL 256-BIT</span>
+            <span class="cert_badge">INFRAESTRUTURA NO BRASIL</span>
+            <span class="cert_badge">CONFORME LGPD</span>
           </div>
         </div>
 
@@ -44,27 +49,50 @@ function handleAnchor(hash: string) {
             <li><button type="button" class="footer_link_btn" @click="handleAnchor('#beneficios')">Benefícios</button></li>
             <li><button type="button" class="footer_link_btn" @click="handleAnchor('#funcionalidades')">Funcionalidades</button></li>
             <li><button type="button" class="footer_link_btn" @click="handleAnchor('#como-funciona')">Como Funciona</button></li>
+            <li><button type="button" class="footer_link_btn" @click="handleAnchor('#diferenciais')">Diferenciais</button></li>
+            <li><button type="button" class="footer_link_btn" @click="handleAnchor('#seguranca')">Segurança & LGPD</button></li>
+            <li><button type="button" class="footer_link_btn" @click="handleAnchor('#continuidade')">Continuidade & SLA</button></li>
             <li><button type="button" class="footer_link_btn" @click="handleAnchor('#planos')">Planos & Preços</button></li>
             <li><button type="button" class="footer_link_btn" @click="handleAnchor('#faq')">Perguntas Frequentes</button></li>
           </ul>
         </div>
 
-        <!-- Col 3: Institutional Links -->
+        <!-- Col 3: Jurídico & Governança -->
         <div class="footer_col">
-          <span class="footer_col_title">Institucional</span>
+          <span class="footer_col_title">Jurídico & Governança</span>
           <ul class="footer_links">
-            <li><RouterLink to="/sobre" class="footer_link">Sobre Nós</RouterLink></li>
-            <li><RouterLink to="/politica-de-privacidade" class="footer_link">Política de Privacidade</RouterLink></li>
             <li><RouterLink to="/termos-de-uso" class="footer_link">Termos de Uso</RouterLink></li>
-            <li><RouterLink to="/login" class="footer_link" @click="trackLoginClick('footer')">Acessar Conta (Login)</RouterLink></li>
-            <li><RouterLink to="/cadastro" class="footer_link" @click="trackCtaClick('criar_conta', 'footer')">Criar Nova Conta</RouterLink></li>
+            <li><RouterLink to="/politica-de-privacidade" class="footer_link">Política de Privacidade</RouterLink></li>
+            <li><RouterLink to="/dpa" class="footer_link">Acordo de Tratamento de Dados (DPA)</RouterLink></li>
+            <li><RouterLink to="/sla" class="footer_link">Acordo de Nível de Serviço (SLA)</RouterLink></li>
+            <li><RouterLink to="/politica-de-cancelamento" class="footer_link">Política de Cancelamento</RouterLink></li>
+            <li><RouterLink to="/sobre" class="footer_link">Sobre a Work in Ideas</RouterLink></li>
             <li><RouterLink to="/cliente" class="footer_link">Portal do Cliente</RouterLink></li>
           </ul>
         </div>
 
-        <!-- Col 4: Contato & Suporte -->
+        <!-- Col 4: DPO & Suporte Oficial -->
         <div class="footer_col">
-          <span class="footer_col_title">Contato & Suporte</span>
+          <span class="footer_col_title">Privacidade & Suporte</span>
+          
+          <div class="footer_dpo_snippet">
+            <span class="footer_dpo_tag">ENCARREGADO DE DADOS (DPO)</span>
+            <strong class="footer_dpo_name">Charles Egidio</strong>
+            <a href="mailto:charles@wi-id.com" class="footer_dpo_link">charles@wi-id.com</a>
+          </div>
+
+          <div class="footer_support_snippet">
+            <span class="footer_dpo_tag">SUPORTE TÉCNICO OFICIAL</span>
+            <a href="https://suporte.akidocs.com.br" target="_blank" rel="noopener noreferrer" class="footer_support_link">
+              <span>suporte.akidocs.com.br</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+            </a>
+          </div>
+
           <ul class="footer_links footer_contacts">
             <li>
               <a
@@ -72,24 +100,11 @@ function handleAnchor(hash: string) {
                 class="footer_contact_item"
                 @click="trackContactClick('email', 'footer', 'contato@wi-id.com')"
               >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff00ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff00ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                   <polyline points="22,6 12,13 2,6"></polyline>
                 </svg>
                 <span>contato@wi-id.com</span>
-              </a>
-            </li>
-            <li>
-              <a
-                href="mailto:desenvolvimento@wi-id.com"
-                class="footer_contact_item"
-                @click="trackContactClick('email', 'footer', 'desenvolvimento@wi-id.com')"
-              >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff00ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <polyline points="16 18 22 12 16 6"></polyline>
-                  <polyline points="8 6 2 12 8 18"></polyline>
-                </svg>
-                <span>desenvolvimento@wi-id.com</span>
               </a>
             </li>
             <li>
@@ -100,7 +115,7 @@ function handleAnchor(hash: string) {
                 class="footer_contact_item footer_contact_item--whatsapp"
                 @click="trackContactClick('whatsapp', 'footer', '5562983398612')"
               >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
                 </svg>
                 <span>(62) 98339-8612</span>
@@ -112,12 +127,16 @@ function handleAnchor(hash: string) {
 
       <div class="footer_bottom">
         <p class="copyright_text">
-          &copy; {{ new Date().getFullYear() }} WiiDocs. Todos os direitos reservados. Desenvolvido por Work In Ideas (WiiD).
+          &copy; {{ new Date().getFullYear() }} AkiDocs. Todos os direitos reservados. Desenvolvido por Work in Ideas (CNPJ 17.808.481/0001-69).
         </p>
         <div class="footer_legal_links">
+          <RouterLink to="/termos-de-uso">Termos de Uso</RouterLink>
+          <span class="sep">•</span>
           <RouterLink to="/politica-de-privacidade">Privacidade</RouterLink>
           <span class="sep">•</span>
-          <RouterLink to="/termos-de-uso">Termos de Uso</RouterLink>
+          <RouterLink to="/dpa">DPA</RouterLink>
+          <span class="sep">•</span>
+          <RouterLink to="/sla">SLA</RouterLink>
           <span class="sep">•</span>
           <a href="/sitemap.xml" target="_blank" rel="noopener">Sitemap</a>
         </div>
@@ -200,6 +219,64 @@ function handleAnchor(hash: string) {
   border: 1px solid rgba(255, 0, 255, 0.25);
   padding: 3px 8px;
   border-radius: 6px;
+}
+
+.footer_company_data {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: rgba(247, 247, 247, 0.6);
+
+  strong {
+    color: #f7f7f7;
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+}
+
+.footer_dpo_snippet,
+.footer_support_snippet {
+  background: rgba(121, 121, 121, 0.12);
+  border: 1px solid rgba(247, 247, 247, 0.08);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+
+.footer_dpo_tag {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  color: #ff00ff;
+  letter-spacing: 0.5px;
+}
+
+.footer_dpo_name {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #f7f7f7;
+}
+
+.footer_dpo_link,
+.footer_support_link {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 12px;
+  color: rgba(247, 247, 247, 0.75);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #ff00ff;
+  }
 }
 
 .footer_col {

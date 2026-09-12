@@ -1,44 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://wiidocs.com.br/</loc>
-    <lastmod>2026-09-09</lastmod>
+    <loc>https://akidocs.com.br/</loc>
+    <lastmod>2026-09-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://wiidocs.com.br/sobre</loc>
-    <lastmod>2026-09-09</lastmod>
+    <loc>https://akidocs.com.br/sobre</loc>
+    <lastmod>2026-09-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://wiidocs.com.br/cadastro</loc>
-    <lastmod>2026-09-09</lastmod>
+    <loc>https://akidocs.com.br/cadastro</loc>
+    <lastmod>2026-09-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://wiidocs.com.br/login</loc>
-    <lastmod>2026-09-09</lastmod>
+    <loc>https://akidocs.com.br/login</loc>
+    <lastmod>2026-09-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://wiidocs.com.br/cliente</loc>
-    <lastmod>2026-09-09</lastmod>
+    <loc>https://akidocs.com.br/cliente</loc>
+    <lastmod>2026-09-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://wiidocs.com.br/politica-de-privacidade</loc>
-    <lastmod>2026-09-09</lastmod>
+    <loc>https://akidocs.com.br/politica-de-privacidade</loc>
+    <lastmod>2026-09-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://wiidocs.com.br/termos-de-uso</loc>
-    <lastmod>2026-09-09</lastmod>
+    <loc>https://akidocs.com.br/termos-de-uso</loc>
+    <lastmod>2026-09-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://akidocs.com.br/dpa</loc>
+    <lastmod>2026-09-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://akidocs.com.br/sla</loc>
+    <lastmod>2026-09-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://akidocs.com.br/politica-de-cancelamento</loc>
+    <lastmod>2026-09-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>

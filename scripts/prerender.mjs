@@ -16,73 +16,100 @@ const routes = [
     path: '/',
     outputPath: 'index.html',
     componentPath: '/src/pages/Landing/LandingPage.vue',
-    title: 'WiiDocs — Gestão Inteligente de Documentos, Contratos e Clientes na Nuvem',
+    title: 'AkiDocs — Gestão Segura de Documentos e Arquivos na Nuvem',
     description:
-      'Plataforma web corporativa para gestão segura de arquivos, minutas e contratos na nuvem. Organize empresas, setores, equipes e acelere assinaturas digitais com conformidade LGPD.',
-    canonical: 'https://wiidocs.com.br/'
+      'Plataforma web corporativa para gestão segura e centralizada de arquivos e documentos na nuvem. Organize clientes, setores e equipes com armazenamento estruturado, controle de acesso e conformidade com a LGPD.',
+    canonical: 'https://akidocs.com.br/'
   },
   {
     path: '/sobre',
     outputPath: 'sobre/index.html',
     componentPath: '/src/pages/Institucionais/SobrePage.vue',
-    title: 'Sobre Nós — WiiDocs | Plataforma de Gestão Documental Corporativa',
+    title: 'Sobre Nós — AkiDocs | Gestão Segura de Documentos Corporativos na Nuvem',
     description:
-      'Conheça a história, a missão e os pilares do WiiDocs, uma solução corporativa desenvolvida pela Work In Ideas para simplificar a gestão de arquivos, contratos e clientes.',
-    canonical: 'https://wiidocs.com.br/sobre'
+      'Conheça o AkiDocs, desenvolvido pela Work in Ideas (12+ anos de mercado, Goiânia-GO). Plataforma web para armazenamento, organização e compartilhamento seguro de arquivos para empresas.',
+    canonical: 'https://akidocs.com.br/sobre'
   },
   {
     path: '/sobre-nos',
     outputPath: 'sobre-nos/index.html',
     componentPath: '/src/pages/Institucionais/SobrePage.vue',
-    title: 'Sobre Nós — WiiDocs | Plataforma de Gestão Documental Corporativa',
+    title: 'Sobre Nós — AkiDocs | Gestão Segura de Documentos Corporativos na Nuvem',
     description:
-      'Conheça a história, a missão e os pilares do WiiDocs, uma solução corporativa desenvolvida pela Work In Ideas para simplificar a gestão de arquivos, contratos e clientes.',
-    canonical: 'https://wiidocs.com.br/sobre'
+      'Conheça o AkiDocs, desenvolvido pela Work in Ideas (12+ anos de mercado, Goiânia-GO). Plataforma web para armazenamento, organização e compartilhamento seguro de arquivos para empresas.',
+    canonical: 'https://akidocs.com.br/sobre'
   },
   {
     path: '/politica-de-privacidade',
     outputPath: 'politica-de-privacidade/index.html',
     componentPath: '/src/pages/Institucionais/PoliticaPrivacidadePage.vue',
-    title: 'Política de Privacidade — WiiDocs | Proteção de Dados e LGPD',
+    title: 'Política de Privacidade — AkiDocs | Proteção de Dados e LGPD',
     description:
-      'Conheça a Política de Privacidade do WiiDocs. Entenda como tratamos, armazenamos e protegemos seus dados pessoais em total conformidade com a LGPD.',
-    canonical: 'https://wiidocs.com.br/politica-de-privacidade'
+      'Conheça a Política de Privacidade do AkiDocs. Entenda como tratamos dados pessoais em conformidade com a LGPD (Lei nº 13.709/2018), papéis de Controladora e Operadora.',
+    canonical: 'https://akidocs.com.br/politica-de-privacidade'
   },
   {
     path: '/termos-de-uso',
     outputPath: 'termos-de-uso/index.html',
     componentPath: '/src/pages/Institucionais/TermosUsoPage.vue',
-    title: 'Termos de Uso — WiiDocs | Condições de Prestação de Serviços SaaS',
+    title: 'Termos de Uso — AkiDocs | Condições de Prestação de Serviços SaaS',
     description:
-      'Leia os Termos de Uso do WiiDocs. Conheça as condições de contratação, licença de software, responsabilidades e direitos ao utilizar nossa plataforma.',
-    canonical: 'https://wiidocs.com.br/termos-de-uso'
+      'Leia os Termos de Uso do AkiDocs. Conheça as condições de contratação B2B, licença de software em nuvem, responsabilidades e direitos das partes.',
+    canonical: 'https://akidocs.com.br/termos-de-uso'
+  },
+  {
+    path: '/dpa',
+    outputPath: 'dpa/index.html',
+    componentPath: '/src/pages/Institucionais/DpaPage.vue',
+    title: 'DPA — Acordo de Tratamento de Dados Pessoais | AkiDocs',
+    description:
+      'Acordo de Tratamento de Dados Pessoais (DPA) da plataforma AkiDocs em estrita conformidade com a LGPD. Regula as obrigações da Operadora e da Controladora.',
+    canonical: 'https://akidocs.com.br/dpa'
+  },
+  {
+    path: '/sla',
+    outputPath: 'sla/index.html',
+    componentPath: '/src/pages/Institucionais/SlaPage.vue',
+    title: 'SLA — Acordo de Nível de Serviço | AkiDocs',
+    description:
+      'Conheça o SLA do AkiDocs: disponibilidade mensal de 99,5%, RPO de 24 horas, RTO de 8 horas, retenção de backups por 30 dias e classificação de incidentes.',
+    canonical: 'https://akidocs.com.br/sla'
+  },
+  {
+    path: '/politica-de-cancelamento',
+    outputPath: 'politica-de-cancelamento/index.html',
+    componentPath: '/src/pages/Institucionais/PoliticaCancelamentoPage.vue',
+    title: 'Política de Cancelamento de Planos Anuais | AkiDocs',
+    description:
+      'Regras e condições transparentes para cancelamento de planos anuais no AkiDocs: vigência de 12 meses, multa compensatória de 20% do saldo residual e 90 dias de acesso para exportação.',
+    canonical: 'https://akidocs.com.br/politica-de-cancelamento'
   },
   {
     path: '/login',
     outputPath: 'login/index.html',
     componentPath: '/src/pages/Login/LoginPage.vue',
-    title: 'Login — WiiDocs | Acesso à Plataforma',
+    title: 'Login — AkiDocs | Acesso à Plataforma',
     description:
-      'Acesse sua conta no WiiDocs para gerenciar contratos, documentos e clientes na nuvem com total segurança.',
-    canonical: 'https://wiidocs.com.br/login'
+      'Acesse sua conta no AkiDocs para gerenciar arquivos, clientes e equipes na nuvem com total segurança.',
+    canonical: 'https://akidocs.com.br/login'
   },
   {
     path: '/cadastro',
     outputPath: 'cadastro/index.html',
     componentPath: '/src/pages/Cadastro/CadastroPage.vue',
-    title: 'Cadastro — WiiDocs | Crie sua Conta Corporativa',
+    title: 'Cadastro — AkiDocs | Crie sua Conta Corporativa',
     description:
-      'Crie sua conta no WiiDocs e comece a gerenciar seus documentos corporativos, clientes e contratos na nuvem.',
-    canonical: 'https://wiidocs.com.br/cadastro'
+      'Crie sua conta no AkiDocs e teste grátis por 8 dias. Organize arquivos, setores e clientes em uma plataforma corporativa segura.',
+    canonical: 'https://akidocs.com.br/cadastro'
   },
   {
     path: '/cliente',
     outputPath: 'cliente/index.html',
     componentPath: '/src/pages/Login/LoginCustomer.vue',
-    title: 'Portal do Cliente — WiiDocs | Acesso a Documentos',
+    title: 'Portal do Cliente — AkiDocs | Acesso a Documentos',
     description:
-      'Área exclusiva para clientes acessarem seus arquivos, contratos e documentos compartilhados na plataforma WiiDocs.',
-    canonical: 'https://wiidocs.com.br/cliente'
+      'Área exclusiva para clientes acessarem seus arquivos e documentos compartilhados na plataforma AkiDocs.',
+    canonical: 'https://akidocs.com.br/cliente'
   }
 ]
 

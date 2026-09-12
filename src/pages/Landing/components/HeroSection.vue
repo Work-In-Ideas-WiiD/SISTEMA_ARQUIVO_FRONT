@@ -33,17 +33,20 @@ function scrollToPricing() {
         </div>
 
         <h1 id="hero-title" class="hero_title">
-          Gestão Inteligente de Documentos, Contratos e Clientes na Nuvem
+          Todos os seus documentos, Aki!
         </h1>
 
+        <p class="hero_subtitle">
+          Compartilhe os arquivos da sua empresa com funcionários e clientes, sem limite de acessos para clientes, de modo seguro, organizado e com confirmação de leitura.
+        </p>
+
         <p class="hero_description">
-          Centralize seus arquivos, acelere assinaturas eletrônicas e organize empresas,
-          setores e clientes em um único ecossistema seguro, escalável e 100% em conformidade com a LGPD.
+          Centralize documentos por empresa, setor, função e usuário, controle quem pode acessar cada arquivo e acompanhe os acessos em um único ambiente.
         </p>
 
         <div class="hero_actions">
           <RouterLink to="/cadastro" class="hero_btn hero_btn--primary" @click="onStartClick">
-            <span>COMEÇAR AGORA</span>
+            <span>TESTAR GRÁTIS POR 8 DIAS</span>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <line x1="5" y1="12" x2="19" y2="12"></line>
               <polyline points="12 5 19 12 12 19"></polyline>
@@ -58,22 +61,30 @@ function scrollToPricing() {
         <div class="hero_trust">
           <div class="trust_item">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff00ff" stroke-width="2" aria-hidden="true">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 14 14"/>
             </svg>
-            <span>Criptografia de Ponta a Ponta</span>
+            <span>8 dias grátis</span>
           </div>
           <div class="trust_item">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff00ff" stroke-width="2" aria-hidden="true">
               <polyline points="20 6 9 17 4 12"/>
             </svg>
-            <span>Sem Taxa de Instalação</span>
+            <span>Sem instalação</span>
           </div>
           <div class="trust_item">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff00ff" stroke-width="2" aria-hidden="true">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12 6 12 12 14 14"/>
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
             </svg>
-            <span>Pronto em 2 Minutos</span>
+            <span>Dados hospedados no Brasil</span>
+          </div>
+          <div class="trust_item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff00ff" stroke-width="2" aria-hidden="true">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            </svg>
+            <span>Acessos ilimitados para clientes</span>
           </div>
         </div>
       </div>
@@ -93,10 +104,10 @@ function scrollToPricing() {
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
-              <span>app.wiidocs.com.br/dashboard</span>
+              <span>app.akidocs.com.br/dashboard</span>
             </div>
             <div class="mockup_user">
-              <span class="mockup_avatar">AL</span>
+              <span class="mockup_avatar">AD</span>
             </div>
           </div>
 
@@ -105,13 +116,6 @@ function scrollToPricing() {
             <!-- Mockup Sidebar -->
             <div class="mockup_sidebar">
               <div class="mockup_nav_item mockup_nav_item--active">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                </svg>
-                <span>Contratos</span>
-              </div>
-              <div class="mockup_nav_item">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                 </svg>
@@ -132,6 +136,13 @@ function scrollToPricing() {
                 </svg>
                 <span>Setores</span>
               </div>
+              <div class="mockup_nav_item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Usuários</span>
+              </div>
             </div>
 
             <!-- Mockup Main -->
@@ -139,7 +150,7 @@ function scrollToPricing() {
               <!-- KPI Cards -->
               <div class="mockup_kpis">
                 <div class="kpi_card">
-                  <span class="kpi_label">Contratos Ativos</span>
+                  <span class="kpi_label">Arquivos Armazenados</span>
                   <span class="kpi_val">1.420</span>
                 </div>
                 <div class="kpi_card">
@@ -150,7 +161,7 @@ function scrollToPricing() {
                   <span class="kpi_sub">24.8 GB de 100 GB</span>
                 </div>
                 <div class="kpi_card">
-                  <span class="kpi_label">Assinaturas</span>
+                  <span class="kpi_label">Leituras Confirmadas</span>
                   <span class="kpi_val kpi_val--accent">98.4%</span>
                 </div>
               </div>
@@ -160,31 +171,31 @@ function scrollToPricing() {
                 <div class="table_row table_row--header">
                   <span>Documento</span>
                   <span>Setor</span>
-                  <span>Status</span>
+                  <span>Confirmação</span>
                 </div>
                 <div class="table_row">
                   <div class="doc_cell">
                     <span class="doc_icon">PDF</span>
-                    <span>Contrato_Prestacao_2026.pdf</span>
+                    <span>Manual_Integracao_Colaborador.pdf</span>
                   </div>
-                  <span class="text_muted">Jurídico</span>
-                  <span class="badge badge--success">Assinado</span>
+                  <span class="text_muted">RH</span>
+                  <span class="badge badge--success">Confirmado</span>
                 </div>
                 <div class="table_row">
                   <div class="doc_cell">
                     <span class="doc_icon">PDF</span>
-                    <span>Auditoria_Fiscal_Q1.pdf</span>
+                    <span>Balancete_Gerencial_Q1.pdf</span>
                   </div>
                   <span class="text_muted">Financeiro</span>
-                  <span class="badge badge--warning">Em Análise</span>
+                  <span class="badge badge--success">Confirmado</span>
                 </div>
                 <div class="table_row">
                   <div class="doc_cell">
                     <span class="doc_icon">PDF</span>
-                    <span>Termo_Confidencialidade.pdf</span>
+                    <span>Relatorio_Atividades_Cliente.pdf</span>
                   </div>
-                  <span class="text_muted">Diretoria</span>
-                  <span class="badge badge--success">Assinado</span>
+                  <span class="text_muted">Atendimento</span>
+                  <span class="badge badge--info">Disponível</span>
                 </div>
               </div>
             </div>
@@ -195,16 +206,16 @@ function scrollToPricing() {
         <div class="floating_badge floating_badge--left">
           <span class="badge_icon">🔒</span>
           <div>
-            <strong>Criptografia 256-bit</strong>
-            <small>Arquivos protegidos</small>
+            <strong>Arquivos Criptografados</strong>
+            <small>Segurança na infraestrutura</small>
           </div>
         </div>
 
         <div class="floating_badge floating_badge--right">
-          <span class="badge_icon">⚡</span>
+          <span class="badge_icon">👥</span>
           <div>
-            <strong>Indexação Imediata</strong>
-            <small>Busca em &lt; 50ms</small>
+            <strong>Acessos Ilimitados</strong>
+            <small>Para seus clientes</small>
           </div>
         </div>
       </div>
@@ -318,7 +329,7 @@ function scrollToPricing() {
 }
 
 .hero_title {
-  margin: 0 0 20px;
+  margin: 0 0 16px;
   font-family: 'Source Code Pro', monospace;
   font-size: clamp(32px, 3.4vw, 50px);
   font-weight: 800;
@@ -327,13 +338,23 @@ function scrollToPricing() {
   letter-spacing: -0.5px;
 }
 
+.hero_subtitle {
+  margin: 0 0 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(17px, 1.3vw, 20px);
+  font-weight: 600;
+  line-height: 1.5;
+  color: #ffffff;
+  max-width: 580px;
+}
+
 .hero_description {
   margin: 0 0 36px;
   font-family: 'Inter', sans-serif;
-  font-size: clamp(16px, 1.2vw, 18px);
+  font-size: clamp(15px, 1.1vw, 16px);
   font-weight: 400;
   line-height: 1.6;
-  color: rgba(247, 247, 247, 0.78);
+  color: rgba(247, 247, 247, 0.72);
   max-width: 540px;
 }
 
@@ -657,6 +678,12 @@ function scrollToPricing() {
     background: rgba(255, 189, 46, 0.15);
     color: #ffbd2e;
     border: 1px solid rgba(255, 189, 46, 0.3);
+  }
+
+  &--info {
+    background: rgba(0, 180, 255, 0.15);
+    color: #00b4ff;
+    border: 1px solid rgba(0, 180, 255, 0.3);
   }
 }
 

@@ -1,39 +1,48 @@
-# WiiDocs
+# AkiDocs
 
-> Gestão Eletrônica de Documentos (GED) para pequenos e médias empresas. Um produto Work in Ideas.
+> Gestão e Compartilhamento de Documentos para Empresas. Desenvolvido pela Work in Ideas.
 
-O **WiiDocs** é uma plataforma corporativa em nuvem desenvolvida pela **Work In Ideas (WiiD)** para transformar a governança e custódia de documentos empresariais. A solução centraliza arquivos, contratos, minutas, assinaturas eletrônicas e a comunicação com clientes em um ecossistema digital rápido, moderno, seguro e 100% em conformidade com a LGPD (Lei nº 13.709/2018).
+O **AkiDocs** é uma plataforma SaaS B2B desenvolvida pela **Work in Ideas** para centralizar, organizar e compartilhar documentos corporativos na nuvem. A solução permite estruturar arquivos por empresa, setor, função, cliente e usuário, com controle de acesso granular, confirmação de leitura e acessos ilimitados para clientes.
 
-## Informações do Negócio
-- **Nome do Produto:** WiiDocs
-- **Empresa Proprietária:** Work In Ideas (WiiD)
-- **O que faz:** Gestão Eletrônica de Documentos para pequenos e médias empresas.
-- **Cidade / Estado:** Goiânia - GO, Brasil
+## Informações Institucionais
+- **Nome do Produto:** AkiDocs
+- **Slogan:** Todos os seus documentos, Aki!
+- **Empresa Proprietária:** Work in Ideas (CNPJ: 17.808.481/0001-69)
+- **Experiência de Mercado:** Mais de 12 anos em desenvolvimento de software sob demanda
+- **Sede:** Av. T-1, 2266 — Setor Bueno, Goiânia - GO, CEP 74215-025, Brasil
 - **Telefone / WhatsApp:** (62) 98339-8612
 - **E-mails de Contato:** contato@wi-id.com | desenvolvimento@wi-id.com
-- **Endereço Comercial:** Interative Coworking - R. 137, 556 - 1º Andar - St. Marista, Goiânia - GO, 74170-120, Edifício Alvorada
-- **Horário de Atendimento:** Segunda a Sexta-feira, das 08:00 às 18:00
-- **Instagram:** @workinideas (https://www.instagram.com/workinideas)
-- **Domínio Principal:** https://wiidocs.com.br
+- **Encarregado de Proteção de Dados (DPO):** Charles Egidio (charles@wi-id.com)
+- **Plataforma Oficial de Suporte Técnico:** https://suporte.akidocs.com.br
+- **Domínio Principal:** https://akidocs.com.br
 
-## O Que a Plataforma Faz
-- **Centralização e Armazenamento de Arquivos:** Elimina perdas e desorganização, permitindo uploads seguros, classificação por empresas, setores e categorias.
-- **Gestão de Contratos e Minutas:** Acompanhamento completo do ciclo de vida contratual, modelos de minutas e controle de vigência.
-- **Fluxo de Assinaturas Digitais e Eletrônicas:** Envio e assinatura ágil de contratos com validade legal e notificações automatizadas.
-- **Portal de Autoatendimento do Cliente:** Espaço seguro e restrito onde clientes finais podem visualizar e baixar seus próprios documentos e contratos sem intermediários.
-- **Controle de Acesso Hierárquico:** Níveis de permissão personalizados para diretores, administradores, gestores setoriais e funcionários.
-- **Segurança LGPD e Criptografia:** Criptografia de ponta a ponta, backups contínuos em nuvem e trilhas de auditoria para integridade documental.
+## O Que a Plataforma Faz (Funcionalidades Reais)
+- **Armazenamento em Nuvem:** Repositório centralizado de arquivos corporativos com limite de até 150 MB por arquivo e 1 TB de banda.
+- **Estrutura Organizacional:** Mapeamento da empresa por setores, funções, colaboradores, clientes, funcionários de clientes e grupos de acesso.
+- **Permissões Granulares:** Controle estrito de quem pode visualizar, enviar ou gerenciar arquivos em cada nível da estrutura.
+- **Portal do Cliente:** Ambiente isolado e seguro para que clientes acessem exclusivamente os documentos disponibilizados para eles, com acessos ilimitados sem custo de licenças adicionais.
+- **Confirmação de Leitura:** Rastreabilidade e registro de data/hora de quando documentos disponibilizados foram acessados.
+- **Auditoria e Relatórios:** Acompanhamento de registros operacionais e relatórios consolidados de uso.
+
+## Segurança, Privacidade e LGPD
+- **Infraestrutura no Brasil:** Datacenters principais configurados no Brasil, em São Paulo.
+- **Provedores Utilizados:** DigitalOcean (processamento e armazenamento), Amazon Web Services (AWS - infraestrutura e armazenamento), Cloudflare (borda, proteção e mitigação) e PagSeguro (processamento de pagamentos).
+- **Criptografia na Infraestrutura:** Arquivos mantidos criptografados na infraestrutura do serviço.
+- **Segregação Lógica:** Ambientes de empresas-clientes logicamente isolados.
+- **Privacidade do Conteúdo:** O AkiDocs não realiza leitura, interpretação ou análise do conteúdo dos documentos armazenados. A equipe da Work in Ideas não possui acesso ao conteúdo legível dos arquivos.
+- **Continuidade e Backup:** Backups diários com retenção de até 30 dias. RPO de até 24 horas e RTO objetivo de até 8 horas úteis para incidentes graves.
+- **Disponibilidade (SLA):** Compromisso mensal de 99,5% conforme SLA oficial.
+- **Portabilidade e Saída:** Lixeira com retenção de 30 dias. Em caso de encerramento da contratação, os dados permanecem disponíveis para download (pastas originais e planilhas cadastrais) por 90 dias antes da exclusão definitiva.
 
 ## Páginas Principais
-- [Página Inicial (Landing Page)](https://wiidocs.com.br/): Apresentação dos recursos, benefícios operacionais, demonstração da interface Dark Mode, diferenciais competitivos, tabela de planos, calculadora e FAQ.
-- [Sobre Nós](https://wiidocs.com.br/sobre): História da Work In Ideas, missão, valores, infraestrutura em nuvem, certificações de segurança e canais de contato.
-- [Cadastro Corporativo](https://wiidocs.com.br/cadastro): Criação de conta para novas empresas começarem a utilizar o sistema.
-- [Acesso à Plataforma (Login)](https://wiidocs.com.br/login): Autenticação corporativa para administradores e equipes de trabalho.
-- [Portal do Cliente](https://wiidocs.com.br/cliente): Acesso privativo para clientes externos consultarem documentos autorizados.
-- [Política de Privacidade](https://wiidocs.com.br/politica-de-privacidade): Normas de tratamento, retenção e segurança de dados pessoais em cumprimento à LGPD.
-- [Termos de Uso](https://wiidocs.com.br/termos-de-uso): Condições gerais de contratação, níveis de serviço (SLA) e licenciamento de software SaaS.
-
-## Modelos de Contratação
-- **Plano Básico:** Ideal para autônomos e pequenos escritórios iniciando a digitalização documental.
-- **Plano Pro:** Voltado para pequenas e médias empresas com fluxo intenso de contratos, equipes e clientes.
-- **Plano Enterprise:** Desenvolvido para organizações que demandam alta capacidade de armazenamento, múltiplos setores e atendimento prioritário.
+- [Página Inicial (Landing Page)](https://akidocs.com.br/): Apresentação dos recursos, benefícios operacionais, demonstração do produto, diferenciais, tabela de planos, segurança e FAQ.
+- [Sobre Nós](https://akidocs.com.br/sobre): História da Work in Ideas, missão, dados institucionais e canais de atendimento.
+- [Planos e Preços](https://akidocs.com.br/#planos): Planos Básico, Profissional e Empresarial com teste gratuito de 8 dias.
+- [Cadastro e Teste Grátis](https://akidocs.com.br/cadastro): Criação de conta corporativa com 8 dias de teste sem compromisso.
+- [Acesso à Plataforma (Login)](https://akidocs.com.br/login): Autenticação corporativa para colaboradores e administradores.
+- [Portal do Cliente](https://akidocs.com.br/cliente): Acesso exclusivo para clientes externos consultarem documentos autorizados.
+- [Política de Privacidade](https://akidocs.com.br/politica-de-privacidade): Normas de privacidade e papéis no tratamento de dados (LGPD).
+- [Termos de Uso](https://akidocs.com.br/termos-de-uso): Condições gerais de prestação de serviços SaaS.
+- [Acordo de Tratamento de Dados (DPA)](https://akidocs.com.br/dpa): Disciplina o tratamento de dados pessoais conforme a LGPD.
+- [Acordo de Nível de Serviço (SLA)](https://akidocs.com.br/sla): Metas de disponibilidade, tempos de resposta e suporte.
+- [Política de Cancelamento](https://akidocs.com.br/politica-de-cancelamento): Regras e condições para cancelamento de planos anuais.

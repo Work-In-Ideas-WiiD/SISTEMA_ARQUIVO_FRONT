@@ -30,6 +30,22 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/Institucionais/TermosUsoPage.vue')
   },
   {
+    path: '/dpa',
+    name: 'dpa',
+    component: () => import('@/pages/Institucionais/DpaPage.vue'),
+    alias: '/acordo-tratamento-dados'
+  },
+  {
+    path: '/sla',
+    name: 'sla',
+    component: () => import('@/pages/Institucionais/SlaPage.vue')
+  },
+  {
+    path: '/politica-de-cancelamento',
+    name: 'politica-cancelamento',
+    component: () => import('@/pages/Institucionais/PoliticaCancelamentoPage.vue')
+  },
+  {
     path: '/cliente',
     name: 'login-customer',
     component: () => import('@/pages/Login/LoginCustomer.vue')

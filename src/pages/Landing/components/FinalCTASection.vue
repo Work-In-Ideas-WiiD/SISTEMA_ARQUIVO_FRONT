@@ -21,18 +21,17 @@ function onEmailClick() {
     <div class="cta_watermark" aria-hidden="true">&lt;/DOC</div>
 
     <div class="final_cta_container">
-      <span class="cta_badge">TRANSFORMAÇÃO DIGITAL</span>
+      <span class="cta_badge">COMECE SEU TESTE GRÁTIS</span>
       <h2 id="cta-final-title" class="cta_title">
-        Pronto para transformar a gestão de documentos da sua empresa?
+        Seus documentos organizados. Seus acessos sob controle.
       </h2>
       <p class="cta_subtitle">
-        Junte-se a empresas que já abandonaram a lentidão de arquivos físicos e pastas dispersas.
-        Crie sua conta agora mesmo e organize sua operação em minutos.
+        Centralize os arquivos da sua empresa, compartilhe documentos com equipes e clientes e acompanhe os acessos em um ambiente desenvolvido para operações empresariais.
       </p>
 
       <div class="cta_actions">
         <RouterLink to="/cadastro" class="cta_btn cta_btn--primary" @click="onStartClick">
-          <span>COMEÇAR AGORA GRATUITAMENTE</span>
+          <span>TESTAR GRÁTIS POR 8 DIAS</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <line x1="5" y1="12" x2="19" y2="12"></line>
             <polyline points="12 5 19 12 12 19"></polyline>

@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import Cookies from 'js-cookie'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
-import logoWiidocs from '@/assets/imgs/login/logo-wiidocs-white.png'
+import logoAkidocs from '@/assets/imgs/login/logo-akidocs-white.png'
 import iconBackCircle from '@/assets/imgs/login/icon-back-circle.svg'
 import iconChevronLeft from '@/assets/imgs/login/icon-chevron-left.svg'
 import { getPlanosPublicos, type IPlanoPublico } from '@/services/http/planos'
@@ -13,6 +13,7 @@ import { getApiErrorMessage } from '@/utils/apiError'
 import { maskPhone, stripDigits } from '@/utils/formatPhone'
 import { useAuthStore } from '@/stores/auth'
 import { getSelectedPlan, trackBeginCheckout, trackPurchase } from '@/utils/tracking'
+import { setPageSeo } from '@/utils/seo'
 
 const router = useRouter()
 const toast = useToast()
@@ -53,6 +54,12 @@ function carregarSdk(): Promise<void> {
 }
 
 onMounted(async () => {
+  setPageSeo({
+    title: 'Contratar — AkiDocs | Planos de Gestão de Documentos',
+    description: 'Escolha seu plano e comece a gerenciar arquivos na nuvem com o AkiDocs.',
+    canonicalUrl: 'https://akidocs.com.br/contratar'
+  })
+
   // Fluxo pós-cadastro/login em modo pagamento: precisa do token.
   if (!Cookies.get('ana_lucia.token')) {
     router.push('/cadastro')
@@ -224,7 +231,7 @@ async function pagar() {
     <p class="contratar_page__watermark" aria-hidden="true">&lt;/DOC</p>
 
     <div v-if="sucesso" class="contratar_shell">
-      <img class="contratar_logo" :src="logoWiidocs" alt="Logotipo WiiDocs" />
+      <img class="contratar_logo" :src="logoAkidocs" alt="Logotipo AkiDocs" />
       <h1 class="contratar_title">Assinatura ativada</h1>
       <p class="contratar_subtitle">Seu pagamento foi aprovado. Você já pode acessar o sistema.</p>
       <button type="button" class="night_btn" @click="router.push('/')">
@@ -238,7 +245,7 @@ async function pagar() {
         <img class="back_btn__icon" :src="iconChevronLeft" alt="Ícone de seta para voltar" width="40" height="40" />
       </button>
 
-      <img class="contratar_logo" :src="logoWiidocs" alt="Logotipo WiiDocs" />
+      <img class="contratar_logo" :src="logoAkidocs" alt="Logotipo AkiDocs" />
       <h1 class="contratar_title">Pagamento</h1>
       <p class="contratar_subtitle">
         {{ planoSelecionado.nome }} —
@@ -318,7 +325,7 @@ async function pagar() {
         <img class="back_btn__icon" :src="iconChevronLeft" alt="Ícone de seta para voltar" width="40" height="40" />
       </button>
 
-      <img class="contratar_logo" :src="logoWiidocs" alt="Logotipo WiiDocs" />
+      <img class="contratar_logo" :src="logoAkidocs" alt="Logotipo AkiDocs" />
       <h1 class="contratar_title">Escolha seu plano</h1>
 
       <p v-if="fetching" class="contratar_loading">Carregando planos...</p>

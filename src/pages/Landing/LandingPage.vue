@@ -6,9 +6,13 @@ import BenefitsSection from './components/BenefitsSection.vue'
 import FeaturesSection from './components/FeaturesSection.vue'
 import HowItWorksSection from './components/HowItWorksSection.vue'
 import DifferentialsSection from './components/DifferentialsSection.vue'
+import SecuritySection from './components/SecuritySection.vue'
+import ContinuitySection from './components/ContinuitySection.vue'
 import PricingSection from './components/PricingSection.vue'
+import FreeTrialHighlight from './components/FreeTrialHighlight.vue'
 import FAQSection from './components/FAQSection.vue'
 import { faqs } from './components/faqData'
+import AboutSection from './components/AboutSection.vue'
 import FinalCTASection from './components/FinalCTASection.vue'
 import LandingFooter from './components/LandingFooter.vue'
 import { setPageSeo } from '@/utils/seo'
@@ -20,18 +24,18 @@ onMounted(() => {
 
   // 2. Configura SEO Técnico, Open Graph e Schema.org JSON-LD
   setPageSeo({
-    title: 'WiiDocs — Gestão Inteligente de Documentos, Contratos e Clientes na Nuvem',
+    title: 'AkiDocs — Gestão Segura de Documentos e Arquivos na Nuvem',
     description:
-      'Plataforma web corporativa para gestão segura de arquivos, minutas e contratos na nuvem. Organize empresas, setores, equipes e acelere assinaturas digitais com conformidade LGPD.',
+      'Plataforma web corporativa para gestão segura e centralizada de arquivos e documentos na nuvem. Organize clientes, setores e equipes com armazenamento estruturado, controle de acesso e conformidade com a LGPD.',
     jsonLd: [
       {
         '@context': 'https://schema.org',
         '@type': 'SoftwareApplication',
-        name: 'WiiDocs',
+        name: 'AkiDocs',
         applicationCategory: 'BusinessApplication',
         operatingSystem: 'All Web Browsers',
         description:
-          'Sistema em nuvem para gerenciamento centralizado de arquivos, minutas de contratos, clientes e fluxos de assinaturas digitais com segurança LGPD.',
+          'Plataforma web corporativa para gerenciamento centralizado de arquivos, clientes e permissões por setor com segurança e conformidade LGPD.',
         offers: {
           '@type': 'AggregateOffer',
           priceCurrency: 'BRL',
@@ -55,9 +59,19 @@ onMounted(() => {
       {
         '@context': 'https://schema.org',
         '@type': 'Organization',
-        name: 'WiiDocs',
-        url: typeof window !== 'undefined' ? window.location.origin : 'https://wiidocs.com.br',
-        logo: typeof window !== 'undefined' ? `${window.location.origin}/logo_ana_login.png` : 'https://wiidocs.com.br/logo_ana_login.png',
+        name: 'AkiDocs',
+        legalName: 'Work in Ideas Informática Ltda',
+        taxID: '17.808.481/0001-69',
+        url: typeof window !== 'undefined' ? window.location.origin : 'https://akidocs.com.br',
+        logo: typeof window !== 'undefined' ? `${window.location.origin}/logo-akidocs-white.png` : 'https://akidocs.com.br/logo-akidocs-white.png',
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: 'Av. T-1, 2266 — Setor Bueno',
+          addressLocality: 'Goiânia',
+          addressRegion: 'GO',
+          postalCode: '74215-022',
+          addressCountry: 'BR'
+        },
         contactPoint: [
           {
             '@type': 'ContactPoint',
@@ -68,7 +82,7 @@ onMounted(() => {
           {
             '@type': 'ContactPoint',
             contactType: 'technical support',
-            email: 'desenvolvimento@wi-id.com'
+            url: 'https://suporte.akidocs.com.br'
           }
         ]
       }
@@ -97,8 +111,12 @@ onMounted(() => {
       <FeaturesSection />
       <HowItWorksSection />
       <DifferentialsSection />
+      <SecuritySection />
+      <ContinuitySection />
       <PricingSection />
+      <FreeTrialHighlight />
       <FAQSection />
+      <AboutSection />
       <FinalCTASection />
     </main>
 

@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
-import logoWiidocs from '@/assets/imgs/login/logo-wiidocs-white.png'
+import logoAkidocs from '@/assets/imgs/login/logo-akidocs-white.png'
 import iconBuilding from '@/assets/imgs/login/icon-building.svg'
 import iconPerson from '@/assets/imgs/login/icon-person.svg'
 import iconLock from '@/assets/imgs/login/icon-lock.svg'
@@ -13,8 +13,9 @@ const authStore = useAuthStore()
 
 onMounted(() => {
   setPageSeo({
-    title: 'Portal do Cliente — WiiDocs | Acesso a Documentos',
-    description: 'Área exclusiva para clientes acessarem seus arquivos, contratos e documentos compartilhados na plataforma WiiDocs.'
+    title: 'Portal do Cliente — AkiDocs | Acesso a Documentos',
+    description: 'Área exclusiva para clientes acessarem seus arquivos e documentos compartilhados na plataforma AkiDocs.',
+    canonicalUrl: 'https://akidocs.com.br/cliente'
   })
 })
 
@@ -29,11 +30,11 @@ async function handleLogin() {
 
 <template>
   <main class="login_page">
-    <h1 class="sr-only">Portal do Cliente — WiiDocs</h1>
+    <h1 class="sr-only">Portal do Cliente — AkiDocs</h1>
     <p class="login_page__watermark" aria-hidden="true">&lt;/DOC</p>
 
     <form class="login_form" @submit.prevent="handleLogin">
-      <img class="login_form__logo" :src="logoWiidocs" alt="Logotipo WiiDocs" />
+      <img class="login_form__logo" :src="logoAkidocs" alt="Logotipo AkiDocs" />
 
       <div class="login_form__fields">
         <label class="login_field">

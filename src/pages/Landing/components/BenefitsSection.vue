@@ -2,33 +2,39 @@
 const benefits = [
   {
     icon: 'folder',
-    title: 'Organização Centralizada',
-    description: 'Acabe com documentos perdidos em e-mails e pastas locais. Tenha um repositório corporativo único e estruturado.'
-  },
-  {
-    icon: 'zap',
-    title: 'Agilidade Operacional',
-    description: 'Localize qualquer contrato ou arquivo em milissegundos com filtros por empresa, setor, função ou data de envio.'
-  },
-  {
-    icon: 'shield',
-    title: 'Segurança & LGPD',
-    description: 'Proteja dados confidenciais com criptografia robusta, isolamento de empresas e controle estrito de privacidade.'
-  },
-  {
-    icon: 'trending-down',
-    title: 'Redução de Custos',
-    description: 'Elimine impressões desnecessárias, cópias físicas e armários volumosos, migrando para uma gestão 100% em nuvem.'
+    title: 'Organização centralizada',
+    description:
+      'Organize arquivos por empresa, setor, função, cliente e usuário para que cada pessoa encontre o que precisa sem depender de pastas espalhadas.'
   },
   {
     icon: 'users',
-    title: 'Controle de Acessos',
-    description: 'Permissões sob medida para administradores, colaboradores e clientes, garantindo que cada usuário veja apenas o que deve.'
+    title: 'Controle de acesso',
+    description:
+      'Defina quem pode visualizar, enviar ou acessar determinados arquivos, setores e grupos.'
   },
   {
     icon: 'file-check',
-    title: 'Fluxos de Assinatura',
-    description: 'Envie e gerencie contratos para assinatura digital com rapidez e rastreabilidade do status em tempo real.'
+    title: 'Confirmação de leitura',
+    description:
+      'Saiba quando um documento disponibilizado foi acessado e tenha mais rastreabilidade sobre o compartilhamento das informações.'
+  },
+  {
+    icon: 'building',
+    title: 'Portal para clientes',
+    description:
+      'Disponibilize documentos aos seus clientes em um ambiente organizado, sem exigir a contratação de usuários adicionais.'
+  },
+  {
+    icon: 'shield',
+    title: 'Segurança e privacidade',
+    description:
+      'Utilize uma estrutura com criptografia de arquivos, controle de acesso, isolamento lógico entre empresas e proteção da aplicação.'
+  },
+  {
+    icon: 'cloud',
+    title: 'Operação 100% em nuvem',
+    description:
+      'Acesse o AkiDocs pelo navegador, sem instalar servidores ou softwares na empresa.'
   }
 ]
 </script>
@@ -39,10 +45,10 @@ const benefits = [
       <div class="section_header">
         <span class="section_badge">VANTAGENS COMPETITIVAS</span>
         <h2 id="benefits-title" class="section_title">
-          Por que a sua empresa precisa do WiiDocs?
+          Por que centralizar os documentos da sua empresa no AkiDocs?
         </h2>
         <p class="section_subtitle">
-          Elimine o atrito burocrático e impulsione a eficiência da sua equipe com ferramentas projetadas para o ambiente corporativo moderno.
+          Substitua pastas dispersas, anexos de e-mail e documentos enviados por WhatsApp por uma estrutura organizada, controlada e rastreável.
         </p>
       </div>
 
@@ -53,19 +59,6 @@ const benefits = [
             <svg v-if="item.icon === 'folder'" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
             </svg>
-            <!-- Zap Icon -->
-            <svg v-else-if="item.icon === 'zap'" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-            </svg>
-            <!-- Shield Icon -->
-            <svg v-else-if="item.icon === 'shield'" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            </svg>
-            <!-- Trending Down Icon -->
-            <svg v-else-if="item.icon === 'trending-down'" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
-              <polyline points="17 18 23 18 23 12"></polyline>
-            </svg>
             <!-- Users Icon -->
             <svg v-else-if="item.icon === 'users'" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -74,10 +67,29 @@ const benefits = [
               <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
             <!-- File Check Icon -->
-            <svg v-else width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg v-else-if="item.icon === 'file-check'" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
               <polyline points="9 15 11 17 15 13"></polyline>
+            </svg>
+            <!-- Building Icon -->
+            <svg v-else-if="item.icon === 'building'" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+              <path d="M9 22v-4h6v4"></path>
+              <line x1="8" y1="6" x2="8.01" y2="6"></line>
+              <line x1="16" y1="6" x2="16.01" y2="6"></line>
+              <line x1="8" y1="10" x2="8.01" y2="10"></line>
+              <line x1="16" y1="10" x2="16.01" y2="10"></line>
+              <line x1="8" y1="14" x2="8.01" y2="14"></line>
+              <line x1="16" y1="14" x2="16.01" y2="14"></line>
+            </svg>
+            <!-- Shield Icon -->
+            <svg v-else-if="item.icon === 'shield'" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            <!-- Cloud Icon -->
+            <svg v-else width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
             </svg>
           </div>
 

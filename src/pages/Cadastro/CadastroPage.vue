@@ -4,7 +4,7 @@ import { RouterLink } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
-import logoWiidocs from '@/assets/imgs/login/logo-wiidocs-white.png'
+import logoAkidocs from '@/assets/imgs/login/logo-akidocs-white.png'
 import iconPerson from '@/assets/imgs/login/icon-person.svg'
 import iconBuilding from '@/assets/imgs/login/icon-building.svg'
 import iconLock from '@/assets/imgs/login/icon-lock.svg'
@@ -25,8 +25,9 @@ const auth = useAuthStore()
 onMounted(() => {
   trackEvent('cadastro_iniciado')
   setPageSeo({
-    title: 'Cadastro — WiiDocs | Crie sua Conta',
-    description: 'Crie sua conta no WiiDocs e comece a gerenciar seus documentos e contratos na nuvem.'
+    title: 'Cadastro — AkiDocs | Crie sua Conta Corporativa',
+    description: 'Crie sua conta no AkiDocs e comece a gerenciar seus arquivos e clientes na nuvem.',
+    canonicalUrl: 'https://akidocs.com.br/cadastro'
   })
 })
 
@@ -91,7 +92,7 @@ async function handleSubmit() {
 
 <template>
   <main class="login_page">
-    <h1 class="sr-only">Cadastro de Empresa — WiiDocs</h1>
+    <h1 class="sr-only">Cadastro de Empresa — AkiDocs</h1>
     <p class="login_page__watermark" aria-hidden="true">&lt;/DOC</p>
 
     <RouterLink class="back_btn" to="/" aria-label="Voltar para a página inicial">
@@ -100,7 +101,7 @@ async function handleSubmit() {
     </RouterLink>
 
     <form class="login_form" @submit.prevent="handleSubmit">
-      <img class="login_form__logo" :src="logoWiidocs" alt="Logotipo WiiDocs" />
+      <img class="login_form__logo" :src="logoAkidocs" alt="Logotipo AkiDocs" />
 
       <div class="login_form__fields">
         <label class="login_field">

@@ -8,8 +8,8 @@ export interface ISeoOptions {
   jsonLd?: Record<string, any> | Array<Record<string, any>>
 }
 
-const DEFAULT_ORIGIN = typeof window !== 'undefined' ? window.location.origin : 'https://wiidocs.com.br'
-const DEFAULT_IMAGE = `${DEFAULT_ORIGIN}/logo_ana_login.png`
+const DEFAULT_ORIGIN = typeof window !== 'undefined' ? window.location.origin : 'https://akidocs.com.br'
+const DEFAULT_IMAGE = `${DEFAULT_ORIGIN}/logo-akidocs-white.png`
 
 /**
  * Atualiza dinamicamente as meta tags da página para SEO, Open Graph, Twitter e Schema.org
@@ -34,7 +34,7 @@ export function setPageSeo(options: ISeoOptions): void {
   setMetaProperty('og:url', canonical)
   setMetaProperty('og:type', options.ogType || 'website')
   setMetaProperty('og:image', options.ogImage || DEFAULT_IMAGE)
-  setMetaProperty('og:site_name', 'WiiDocs')
+  setMetaProperty('og:site_name', 'AkiDocs')
   setMetaProperty('og:locale', 'pt_BR')
 
   // 5. Twitter Card
@@ -79,7 +79,7 @@ function setLinkTag(rel: string, href: string): void {
   element.setAttribute('href', href)
 }
 
-const JSON_LD_SCRIPT_ID = 'wiidocs-schema-jsonld'
+const JSON_LD_SCRIPT_ID = 'akidocs-schema-jsonld'
 
 function setJsonLd(data: Record<string, any> | Array<Record<string, any>>): void {
   let script = document.getElementById(JSON_LD_SCRIPT_ID) as HTMLScriptElement | null

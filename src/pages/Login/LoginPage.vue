@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
-import logoWiidocs from '@/assets/imgs/login/logo-wiidocs-white.png'
+import logoAkidocs from '@/assets/imgs/login/logo-akidocs-white.png'
 import iconPerson from '@/assets/imgs/login/icon-person.svg'
 import iconLock from '@/assets/imgs/login/icon-lock.svg'
 import iconBackCircle from '@/assets/imgs/login/icon-back-circle.svg'
@@ -18,8 +18,9 @@ const password = ref('')
 
 onMounted(() => {
   setPageSeo({
-    title: 'Login — WiiDocs | Acesso à Plataforma',
-    description: 'Acesse sua conta no WiiDocs para gerenciar contratos, documentos e clientes na nuvem.'
+    title: 'Login — AkiDocs | Acesso à Plataforma',
+    description: 'Acesse sua conta no AkiDocs para gerenciar arquivos, clientes e equipes na nuvem.',
+    canonicalUrl: 'https://akidocs.com.br/login'
   })
 })
 
@@ -30,7 +31,7 @@ async function handleLogin() {
 
 <template>
   <main class="login_page">
-    <h1 class="sr-only">Login — Acesso à Plataforma WiiDocs</h1>
+    <h1 class="sr-only">Login — Acesso à Plataforma AkiDocs</h1>
     <p class="login_page__watermark" aria-hidden="true">&lt;/DOC</p>
 
     <RouterLink class="back_btn" to="/" aria-label="Voltar para a página inicial">
@@ -39,7 +40,7 @@ async function handleLogin() {
     </RouterLink>
 
     <form class="login_form" @submit.prevent="handleLogin">
-      <img class="login_form__logo" :src="logoWiidocs" alt="Logotipo WiiDocs" />
+      <img class="login_form__logo" :src="logoAkidocs" alt="Logotipo AkiDocs" />
 
       <div class="login_form__fields">
         <label class="login_field">

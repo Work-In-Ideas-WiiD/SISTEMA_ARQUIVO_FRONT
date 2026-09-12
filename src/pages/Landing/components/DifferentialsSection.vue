@@ -1,24 +1,24 @@
 <script setup lang="ts">
 const differentials = [
   {
+    tag: 'ACESSO EXTERNO',
+    title: 'Clientes sem licenças adicionais',
+    description: 'Compartilhe documentos com seus clientes sem exigir a contratação de usuários adicionais para cada acesso.'
+  },
+  {
     tag: 'ESTRUTURA DEDICADA',
-    title: 'Muito além de um drive compartilhado',
-    description: 'Drives convencionais viram labirintos de links e pastas desorganizadas. O WiiDocs cria um ecossistema corporativo completo com setores, cargos, clientes e controle rigoroso de governança documental.'
+    title: 'Organização empresarial',
+    description: 'Estruture documentos com base nos setores, funções, equipes e clientes da sua empresa.'
   },
   {
-    tag: 'FOCO OPERACIONAL',
-    title: 'Interface ultrarrápida sem ruídos visuais',
-    description: 'Desenvolvido sob uma arquitetura Dark Mode moderna de alto contraste que preserva a atenção visual, reduz cliques desnecessários e dispensa treinamentos complexos para a equipe.'
+    tag: 'RASTREAMENTO',
+    title: 'Controle e rastreabilidade',
+    description: 'Determine quem pode acessar cada informação e acompanhe os acessos realizados e confirmações de leitura.'
   },
   {
-    tag: 'ESCALABILIDADE',
-    title: 'Previsibilidade de custos sem surpresas',
-    description: 'Defina claramente suas necessidades de armazenamento e colaboradores com planos claros. Expanda seus clientes e arquivos conforme sua demanda cresce.'
-  },
-  {
-    tag: 'COMPLIANCE',
-    title: 'Segurança em nível empresarial & LGPD',
-    description: 'Tráfego criptografado, sessões autenticadas por token, separação lógica de dados e rastreabilidade total de acessos para manter sua operação segura contra incidentes e vazamentos.'
+    tag: 'OPERAÇÃO EM NUVEM',
+    title: 'Implantação simples',
+    description: 'Crie a conta e comece a operar pelo navegador imediatamente, sem instalar servidores ou softwares.'
   }
 ]
 </script>
@@ -29,10 +29,13 @@ const differentials = [
       <div class="section_header">
         <span class="section_badge">DIFERENCIAIS EXCLUSIVOS</span>
         <h2 id="diff-title" class="section_title">
-          Por que líderes corporativos escolhem o WiiDocs?
+          Mais do que um drive compartilhado
         </h2>
         <p class="section_subtitle">
-          Uma plataforma concebida para quem não pode perder tempo com ferramentas genéricas ou burocracia desnecessária.
+          Se você já utiliza Google Drive, Dropbox ou ferramentas similares, sabe que armazenar arquivos é apenas uma parte do problema. O desafio aparece quando é necessário organizar documentos por empresa, setor, função, cliente e usuário, além de controlar quem pode acessar cada informação.
+        </p>
+        <p class="section_highlight">
+          O AkiDocs combina armazenamento em nuvem com uma estrutura organizacional voltada ao ambiente empresarial.
         </p>
       </div>
 
@@ -90,12 +93,21 @@ const differentials = [
 }
 
 .section_subtitle {
-  margin: 0;
+  margin: 0 0 14px;
   font-family: 'Inter', sans-serif;
   font-size: 16px;
   font-weight: 400;
   line-height: 1.6;
-  color: rgba(247, 247, 247, 0.7);
+  color: rgba(247, 247, 247, 0.75);
+}
+
+.section_highlight {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #ff00ff;
 }
 
 .diff_grid {

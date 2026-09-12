@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
-import logoWiidocs from '@/assets/imgs/login/logo-wiidocs-white.png'
+import logoAkidocs from '@/assets/imgs/login/logo-akidocs-white.png'
 import { trackLoginClick, trackCtaClick } from '@/utils/tracking'
 
 const route = useRoute()
@@ -48,15 +48,15 @@ function onLoginClick(local: string = 'header') {
 
 function onStartClick(local: string = 'header') {
   closeMobileMenu()
-  trackCtaClick('comecar_agora', local)
+  trackCtaClick('testar_gratis', local)
 }
 </script>
 
 <template>
   <header class="landing_header" :class="{ 'landing_header--scrolled': isScrolled }">
     <div class="landing_header__container">
-      <RouterLink to="/" class="landing_header__logo_link" aria-label="WiiDocs Home">
-        <img :src="logoWiidocs" alt="WiiDocs - Gestão Eletrônica de Documentos" class="landing_header__logo" width="130" height="34" />
+      <RouterLink to="/" class="landing_header__logo_link" aria-label="AkiDocs Home">
+        <img :src="logoAkidocs" alt="AkiDocs — Todos os seus documentos, Aki!" class="landing_header__logo" width="130" height="34" />
       </RouterLink>
 
       <nav class="landing_header__nav" aria-label="Navegação principal">
@@ -69,6 +69,12 @@ function onStartClick(local: string = 'header') {
         <button type="button" class="nav_link" @click="handleNavClick('#como-funciona')">
           Como Funciona
         </button>
+        <button type="button" class="nav_link" @click="handleNavClick('#diferenciais')">
+          Diferenciais
+        </button>
+        <button type="button" class="nav_link" @click="handleNavClick('#seguranca')">
+          Segurança & LGPD
+        </button>
         <button type="button" class="nav_link" @click="handleNavClick('#planos')">
           Planos
         </button>
@@ -77,12 +83,14 @@ function onStartClick(local: string = 'header') {
         </button>
       </nav>
 
+      <div class="header_nav_divider" aria-hidden="true"></div>
+
       <div class="landing_header__actions">
         <RouterLink to="/login" class="header_btn header_btn--outline" @click="onLoginClick('header')">
           LOGIN
         </RouterLink>
         <RouterLink to="/cadastro" class="header_btn header_btn--primary" @click="onStartClick('header')">
-          COMEÇAR AGORA
+          TESTAR GRÁTIS
         </RouterLink>
       </div>
 
@@ -112,6 +120,12 @@ function onStartClick(local: string = 'header') {
           <button type="button" class="mobile_nav_link" @click="handleNavClick('#como-funciona')">
             Como Funciona
           </button>
+          <button type="button" class="mobile_nav_link" @click="handleNavClick('#diferenciais')">
+            Diferenciais
+          </button>
+          <button type="button" class="mobile_nav_link" @click="handleNavClick('#seguranca')">
+            Segurança & LGPD
+          </button>
           <button type="button" class="mobile_nav_link" @click="handleNavClick('#planos')">
             Planos & Preços
           </button>
@@ -127,7 +141,7 @@ function onStartClick(local: string = 'header') {
               LOGIN
             </RouterLink>
             <RouterLink to="/cadastro" class="mobile_btn mobile_btn--primary" @click="onStartClick('mobile_menu')">
-              COMEÇAR AGORA
+              TESTAR GRÁTIS
             </RouterLink>
           </div>
         </nav>
@@ -157,13 +171,12 @@ function onStartClick(local: string = 'header') {
   }
 
   &__container {
-    max-width: 1240px;
+    max-width: 1360px;
     height: 100%;
     margin: 0 auto;
     padding: 0 24px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     box-sizing: border-box;
   }
 
@@ -172,6 +185,7 @@ function onStartClick(local: string = 'header') {
     align-items: center;
     text-decoration: none;
     transition: opacity 0.2s ease;
+    flex-shrink: 0;
 
     &:hover {
       opacity: 0.9;
@@ -187,9 +201,11 @@ function onStartClick(local: string = 'header') {
   &__nav {
     display: flex;
     align-items: center;
-    gap: 32px;
+    gap: clamp(10px, 1.4vw, 22px);
+    margin-left: auto;
+    margin-right: clamp(16px, 2vw, 32px);
 
-    @media (max-width: 960px) {
+    @media (max-width: 1100px) {
       display: none;
     }
   }
@@ -197,9 +213,10 @@ function onStartClick(local: string = 'header') {
   &__actions {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
+    flex-shrink: 0;
 
-    @media (max-width: 960px) {
+    @media (max-width: 1100px) {
       display: none;
     }
   }
@@ -216,10 +233,23 @@ function onStartClick(local: string = 'header') {
     border: none;
     cursor: pointer;
     padding: 0;
+    margin-left: auto;
 
-    @media (max-width: 960px) {
+    @media (max-width: 1100px) {
       display: flex;
     }
+  }
+}
+
+.header_nav_divider {
+  width: 1px;
+  height: 22px;
+  background: rgba(247, 247, 247, 0.15);
+  margin-right: clamp(16px, 2vw, 28px);
+  flex-shrink: 0;
+
+  @media (max-width: 1100px) {
+    display: none;
   }
 }
 
@@ -247,7 +277,7 @@ function onStartClick(local: string = 'header') {
   background: transparent;
   border: none;
   font-family: 'Source Code Pro', monospace;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: #f7f7f7;
   opacity: 0.8;
@@ -255,6 +285,8 @@ function onStartClick(local: string = 'header') {
   padding: 6px 0;
   transition: opacity 0.2s ease, color 0.2s ease;
   text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
 
   &:hover {
     opacity: 1;
@@ -264,17 +296,18 @@ function onStartClick(local: string = 'header') {
 
 .header_btn {
   font-family: 'Source Code Pro', monospace;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 700;
   letter-spacing: 0.5px;
   text-decoration: none;
-  padding: 10px 22px;
+  padding: 8px 18px;
   border-radius: 30px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
   white-space: nowrap;
+  flex-shrink: 0;
 
   &--outline {
     background: transparent;

@@ -1,4 +1,4 @@
-# robots.txt para WiiDocs (https://wiidocs.com.br)
+# robots.txt para AkiDocs (https://akidocs.com.br)
 # Liberando indexação e citação para todos os robôs de busca e modelos de IA
 
 User-agent: *
@@ -7,6 +7,9 @@ Allow: /sobre
 Allow: /sobre-nos
 Allow: /politica-de-privacidade
 Allow: /termos-de-uso
+Allow: /dpa
+Allow: /sla
+Allow: /politica-de-cancelamento
 Allow: /login
 Allow: /cadastro
 Allow: /cliente
@@ -24,6 +27,9 @@ Allow: /
 Allow: /sobre
 Allow: /politica-de-privacidade
 Allow: /termos-de-uso
+Allow: /dpa
+Allow: /sla
+Allow: /politica-de-cancelamento
 Allow: /login
 Allow: /cadastro
 Allow: /cliente
@@ -36,6 +42,9 @@ Allow: /
 Allow: /sobre
 Allow: /politica-de-privacidade
 Allow: /termos-de-uso
+Allow: /dpa
+Allow: /sla
+Allow: /politica-de-cancelamento
 Allow: /login
 Allow: /cadastro
 Allow: /cliente
@@ -48,6 +57,9 @@ Allow: /
 Allow: /sobre
 Allow: /politica-de-privacidade
 Allow: /termos-de-uso
+Allow: /dpa
+Allow: /sla
+Allow: /politica-de-cancelamento
 Allow: /login
 Allow: /cadastro
 Allow: /cliente
@@ -61,6 +73,9 @@ Allow: /
 Allow: /sobre
 Allow: /politica-de-privacidade
 Allow: /termos-de-uso
+Allow: /dpa
+Allow: /sla
+Allow: /politica-de-cancelamento
 Allow: /login
 Allow: /cadastro
 Allow: /cliente
@@ -74,6 +89,9 @@ Allow: /
 Allow: /sobre
 Allow: /politica-de-privacidade
 Allow: /termos-de-uso
+Allow: /dpa
+Allow: /sla
+Allow: /politica-de-cancelamento
 Allow: /login
 Allow: /cadastro
 Allow: /cliente
@@ -86,6 +104,9 @@ Allow: /
 Allow: /sobre
 Allow: /politica-de-privacidade
 Allow: /termos-de-uso
+Allow: /dpa
+Allow: /sla
+Allow: /politica-de-cancelamento
 Allow: /login
 Allow: /cadastro
 Allow: /cliente
@@ -99,6 +120,9 @@ Allow: /
 Allow: /sobre
 Allow: /politica-de-privacidade
 Allow: /termos-de-uso
+Allow: /dpa
+Allow: /sla
+Allow: /politica-de-cancelamento
 Allow: /login
 Allow: /cadastro
 Allow: /cliente
@@ -111,6 +135,9 @@ Allow: /
 Allow: /sobre
 Allow: /politica-de-privacidade
 Allow: /termos-de-uso
+Allow: /dpa
+Allow: /sla
+Allow: /politica-de-cancelamento
 Allow: /login
 Allow: /cadastro
 Allow: /cliente
@@ -119,4 +146,4 @@ Disallow: /dashboard/
 Disallow: /api/
 
 # Linha do Sitemap
-Sitemap: https://wiidocs.com.br/sitemap.xml
+Sitemap: https://akidocs.com.br/sitemap.xml

@@ -1,46 +1,46 @@
 <script setup lang="ts">
 const features = [
   {
-    title: 'Gestão Inteligente de Contratos',
-    category: 'Documentos',
-    description: 'Centralize contratos em PDF com identificação rápida, upload simplificado, vínculo por empresa e histórico completo de arquivos.',
-    benefit: 'Reduz o tempo de busca de minutas em até 80%',
-    highlights: ['Upload rápido de PDFs', 'Vínculo direto com empresas', 'Histórico e downloads rastreados']
+    title: 'Armazenamento em Nuvem',
+    category: 'Armazenamento',
+    description: 'Envie e organize documentos em uma estrutura centralizada, com armazenamento em nuvem e controle de capacidade conforme o plano contratado.',
+    benefit: 'Até 150 MB por arquivo',
+    highlights: ['Upload rápido de arquivos', 'Limite de até 150 MB por arquivo', 'Organização por pastas', 'Histórico e backups diários']
   },
   {
-    title: 'Estrutura Organizacional Completa',
-    category: 'Gestão',
-    description: 'Modele a realidade da sua empresa com divisões por setores, funções, colaboradores e agrupamentos estratégicos de trabalho.',
-    benefit: 'Alinhamento imediato entre equipes e pastas',
-    highlights: ['Setores personalizados', 'Cargos e funções mapeados', 'Agrupamentos de funcionários']
+    title: 'Estrutura Organizacional',
+    category: 'Estrutura',
+    description: 'Reproduza a organização da empresa dentro da plataforma.',
+    benefit: 'Mapeamento fiel',
+    highlights: ['Setores e funções', 'Funcionários e colaboradores', 'Clientes e contatos vinculados', 'Grupos e estruturas de acesso']
   },
   {
-    title: 'Portal Exclusivo do Cliente',
+    title: 'Permissões de Acesso',
+    category: 'Controle',
+    description: 'Compartilhe um arquivo com toda uma equipe, determinado setor, grupo, cliente ou usuário específico.',
+    benefit: 'Segurança granular',
+    highlights: ['Controle individual de acesso', 'Permissões por estrutura', 'Administração de usuários', 'Controle de envio de arquivos']
+  },
+  {
+    title: 'Portal do Cliente',
     category: 'Acesso Externo',
-    description: 'Ofereça aos seus clientes um canal profissional e seguro para visualizar e baixar seus contratos com login dedicado.',
-    benefit: 'Transparência e credibilidade institucional',
-    highlights: ['Área de cliente com login próprio', 'Isolamento de documentos', 'Visualização descomplicada']
+    description: 'Ofereça aos clientes uma forma organizada de acessar somente os documentos disponibilizados para eles.',
+    benefit: 'Acessos ilimitados',
+    highlights: ['Ambiente separado e exclusivo', 'Acessos ilimitados para clientes', 'Sem licenças adicionais por cliente', 'Controle e rastreabilidade']
   },
   {
-    title: 'Módulo de Assinaturas Eletrônicas',
-    category: 'Compliance',
-    description: 'Acompanhe o ciclo de validação jurídica e assinaturas digitais com status em tempo real de quem já assinou ou está pendente.',
-    benefit: 'Fechamento de acordos até 5x mais rápido',
-    highlights: ['Controle de status em tempo real', 'Fluxo integrado com o sistema', 'Segurança jurídica para as partes']
+    title: 'Confirmação de Leitura',
+    category: 'Rastreabilidade',
+    description: 'Acompanhe quando os documentos compartilhados são acessados pelos usuários autorizados.',
+    benefit: 'Controle comprovado',
+    highlights: ['Registro de data e hora do acesso', 'Identificação do usuário leitor', 'Rastreabilidade de compartilhamento', 'Histórico de visualizações']
   },
   {
-    title: 'Armazenamento em Nuvem Dedicado',
-    category: 'Infraestrutura',
-    description: 'Armazene gigabytes de dados com controle transparente de cota, backups contínuos e alta disponibilidade de infraestrutura.',
-    benefit: 'Zero risco de perda de arquivos físicos',
-    highlights: ['Cotas de armazenamento em GB', 'Transferência criptografada', 'Disponibilidade 24/7']
-  },
-  {
-    title: 'Segurança & Controle Granular',
-    category: 'Auditoria',
-    description: 'Permissões por papel (Administradores, Colaboradores e Clientes) assegurando que cada arquivo seja acessado apenas por quem tem autorização.',
-    benefit: 'Proteção irrestrita contra vazamentos de dados',
-    highlights: ['Controle estrito de permissões', 'Tokens de acesso seguros', 'Auditoria de integridade']
+    title: 'Auditoria e Relatórios',
+    category: 'Governança',
+    description: 'Nos planos que incluírem o recurso, acompanhe registros e relatórios relacionados à utilização da plataforma.',
+    benefit: 'Visão operacional',
+    highlights: ['Registros operacionais de atividade', 'Relatórios de utilização do sistema', 'Visão consolidada de arquivos', 'Rastreabilidade corporativa']
   }
 ]
 </script>
@@ -51,10 +51,10 @@ const features = [
       <div class="section_header">
         <span class="section_badge">RECURSOS NATIVOS</span>
         <h2 id="features-title" class="section_title">
-          Tudo o que sua empresa precisa para gerenciar documentos
+          Tudo o que sua empresa precisa para organizar e compartilhar arquivos
         </h2>
         <p class="section_subtitle">
-          Construído para simplificar processos complexos com uma interface intuitiva, segura e veloz.
+          Construído para simplificar o armazenamento e compartilhamento de arquivos com uma interface intuitiva, segura e veloz.
         </p>
       </div>
 

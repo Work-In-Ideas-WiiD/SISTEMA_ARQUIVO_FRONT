@@ -21,7 +21,7 @@ const fallbackPlanos: IPlanoPublico[] = [
   {
     id: 'plano-starter',
     nome: 'Básico',
-    descricao: 'Ideal para escritórios e pequenas empresas organizarem seus primeiros arquivos e contratos.',
+    descricao: 'Ideal para escritórios e pequenas empresas organizarem seus arquivos com segurança na nuvem.',
     valor_mensal_centavos: 8990,
     max_usuarios: 5,
     armazenamento_bytes: 20 * 1024 * 1024 * 1024
@@ -29,7 +29,7 @@ const fallbackPlanos: IPlanoPublico[] = [
   {
     id: 'plano-pro',
     nome: 'Profissional',
-    descricao: 'A solução mais completa para empresas em crescimento com múltiplos setores e clientes.',
+    descricao: 'A solução ideal para empresas em crescimento com múltiplos setores e clientes.',
     valor_mensal_centavos: 17990,
     max_usuarios: 25,
     armazenamento_bytes: 100 * 1024 * 1024 * 1024
@@ -37,7 +37,7 @@ const fallbackPlanos: IPlanoPublico[] = [
   {
     id: 'plano-enterprise',
     nome: 'Empresarial',
-    descricao: 'Para grandes demandas documentais com alta volumetria e suporte corporativo dedicado.',
+    descricao: 'Para grandes demandas de arquivos com alta volumetria e suporte corporativo dedicado.',
     valor_mensal_centavos: 34990,
     max_usuarios: 100,
     armazenamento_bytes: 500 * 1024 * 1024 * 1024
@@ -81,20 +81,21 @@ function getFeaturesForPlan(plano: IPlanoPublico): string[] {
   const list = [
     users,
     `${gb} de Armazenamento Seguro`,
-    'Gestão Centralizada de Contratos',
+    'Limite de até 150 MB por arquivo',
+    'Acessos Ilimitados para Clientes',
     'Organização por Setores e Funções',
-    'Portal Exclusivo do Cliente',
-    'Criptografia de Ponta a Ponta'
+    'Confirmação de Leitura de Documentos',
+    'Criptografia na Infraestrutura',
+    'Backups Diários Inclusos'
   ]
 
   if (plano.max_usuarios > 5) {
-    list.push('Módulo de Assinaturas Digitais')
     list.push('Suporte Técnico Prioritário')
   }
 
   if (plano.max_usuarios >= 50) {
-    list.push('Auditoria e Relatórios Avançados')
-    list.push('SLA Garantido de Disponibilidade')
+    list.push('Auditoria e Relatórios de Utilização')
+    list.push('Compromisso de SLA 99,5%')
   }
 
   return list
@@ -143,6 +144,29 @@ function onWhatsAppContactClick() {
         <p class="section_subtitle">
           Escolha a capacidade ideal para o momento da sua empresa. Sem taxas ocultas, sem fidelidade forçada.
         </p>
+
+        <!-- Commercial Conditions Bar -->
+        <div class="commercial_specs_bar">
+          <div class="spec_item">
+            <strong>150 MB</strong>
+            <span>Limite por arquivo</span>
+          </div>
+          <div class="spec_divider"></div>
+          <div class="spec_item">
+            <strong>1 TB</strong>
+            <span>Banda de transferência</span>
+          </div>
+          <div class="spec_divider"></div>
+          <div class="spec_item">
+            <strong>Ilimitados</strong>
+            <span>Acessos de clientes</span>
+          </div>
+          <div class="spec_divider"></div>
+          <div class="spec_item">
+            <strong>8 Dias</strong>
+            <span>Teste 100% grátis</span>
+          </div>
+        </div>
 
         <!-- Billing Toggle -->
         <div class="billing_toggle_wrap" role="group" aria-label="Opções de faturamento">
@@ -203,7 +227,7 @@ function onWhatsAppContactClick() {
             :class="{ 'plan_cta_btn--popular': index === 1 }"
             @click="handleSelectPlan(plano)"
           >
-            COMEÇAR AGORA
+            TESTAR GRÁTIS POR 8 DIAS
           </button>
 
           <div class="features_divider"></div>
@@ -282,12 +306,55 @@ function onWhatsAppContactClick() {
 }
 
 .section_subtitle {
-  margin: 0 0 32px;
+  margin: 0 0 24px;
   font-family: 'Inter', sans-serif;
   font-size: 16px;
   font-weight: 400;
   line-height: 1.6;
   color: rgba(247, 247, 247, 0.7);
+}
+
+.commercial_specs_bar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: rgba(33, 33, 33, 0.85);
+  border: 1px solid rgba(255, 0, 255, 0.25);
+  border-radius: 40px;
+  padding: 12px 28px;
+  margin-bottom: 32px;
+}
+
+.spec_item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+
+  strong {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: #ff00ff;
+  }
+
+  span {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: rgba(247, 247, 247, 0.75);
+  }
+}
+
+.spec_divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(247, 247, 247, 0.15);
+
+  @media (max-width: 600px) {
+    display: none;
+  }
 }
 
 /* Billing Toggle Switch */

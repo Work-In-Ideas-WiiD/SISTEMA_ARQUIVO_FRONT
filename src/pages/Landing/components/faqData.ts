@@ -5,35 +5,80 @@ export interface IFaqItem {
 
 export const faqs: IFaqItem[] = [
   {
-    question: 'O que é o WiiDocs?',
-    answer: 'O WiiDocs é uma plataforma web corporativa completa para gestão de documentos, arquivos e contratos na nuvem. Ela centraliza arquivos por empresa, setor e função, além de disponibilizar um portal exclusivo para clientes e ferramentas de assinatura eletrônica.'
+    question: 'O que é o AkiDocs?',
+    answer:
+      'O AkiDocs é uma plataforma SaaS B2B de gestão documental. Ela permite armazenar, organizar e compartilhar arquivos em nuvem, estruturando o acesso por empresa, setor, função, cliente, grupos e usuários.'
   },
   {
-    question: 'Preciso instalar algum software ou servidor no meu computador?',
-    answer: 'Não. O WiiDocs é 100% baseado em nuvem (SaaS). Você e sua equipe só precisam de um navegador web moderno e conexão com a internet para acessar o sistema de qualquer computador, tablet ou smartphone.'
+    question: 'O AkiDocs gerencia contratos?',
+    answer:
+      'Não. O AkiDocs gerencia arquivos. Contratos podem ser armazenados e compartilhados como qualquer outro documento, mas a plataforma não possui atualmente um módulo específico de gestão de contratos.'
   },
   {
-    question: 'Como funciona o armazenamento de arquivos e contratos?',
-    answer: 'Seus arquivos são armazenados em infraestrutura de nuvem segura com backups automáticos, alta disponibilidade e controle de cotas em GB conforme o plano contratado. Você pode enviar PDFs de contratos, minutas, planilhas e documentos diversos.'
+    question: 'O AkiDocs possui assinatura eletrônica?',
+    answer:
+      'Não. A assinatura de documentos não faz parte das funcionalidades atuais da plataforma.'
   },
   {
-    question: 'Meus clientes também podem acessar o sistema?',
-    answer: 'Sim! O WiiDocs possui um Portal do Cliente exclusivo onde seus clientes acessam apenas os documentos e contratos pertinentes a eles, sem acesso a dados internos ou a outros clientes da sua organização.'
+    question: 'Preciso instalar algum software?',
+    answer:
+      'Não. O AkiDocs funciona em nuvem e pode ser acessado por navegador compatível.'
   },
   {
-    question: 'Posso mudar de plano ou cancelar minha assinatura a qualquer momento?',
-    answer: 'Sim, você tem total liberdade. Você pode realizar o upgrade ou downgrade do seu plano diretamente na plataforma conforme a necessidade da sua empresa, além de poder cancelar a qualquer momento sem multas rescisórias.'
+    question: 'Meus clientes podem acessar documentos?',
+    answer:
+      'Sim. O AkiDocs permite disponibilizar documentos aos clientes autorizados, com acessos ilimitados para clientes e sem necessidade de contratar uma licença adicional para cada acesso.'
   },
   {
-    question: 'Os dados e contratos da minha empresa estão seguros e em conformidade com a LGPD?',
-    answer: 'Sim. Todos os dados trafegam com criptografia SSL/TLS e são armazenados com segurança em repouso. O sistema segue rigorosamente as diretrizes da Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018), com controle estrito de permissões e isolamento lógico entre empresas.'
+    question: 'Qual o limite de tamanho por arquivo?',
+    answer: 'Cada arquivo pode ter até 150 MB.'
   },
   {
-    question: 'Como funciona o suporte técnico?',
-    answer: 'Oferecemos atendimento humanizado através de e-mail e canais de suporte técnico direto. Clientes dos planos Profissional e Empresarial contam com atendimento prioritário e tempo de resposta acelerado.'
+    question: 'Qual o limite de banda?',
+    answer: 'O limite de banda é de 1 TB.'
   },
   {
-    question: 'Quais são as formas de pagamento disponíveis?',
-    answer: 'Aceitamos cartões de crédito com processamento seguro e criptografado diretamente no seu navegador através de operadoras certificadas (PCI-DSS compliant). Para planos anuais ou corporativos, consulte opções via faturamento bancário.'
+    question: 'Existe teste grátis?',
+    answer: 'Sim. Todos os planos podem ser testados gratuitamente por 8 dias.'
+  },
+  {
+    question: 'Onde meus dados ficam hospedados?',
+    answer:
+      'A infraestrutura principal utilizada para armazenamento e processamento está configurada em datacenters no Brasil, em São Paulo, utilizando serviços como DigitalOcean e Amazon Web Services (AWS).'
+  },
+  {
+    question: 'O AkiDocs utiliza criptografia de ponta a ponta?',
+    answer:
+      'Não utilizamos essa expressão para descrever a arquitetura do AkiDocs. Os arquivos permanecem criptografados na infraestrutura utilizada pela plataforma, e o serviço adota controles de acesso e proteção da aplicação.'
+  },
+  {
+    question: 'A equipe do AkiDocs lê meus arquivos?',
+    answer:
+      'Não. O AkiDocs não realiza leitura, interpretação ou análise do conteúdo dos documentos armazenados. Conforme a arquitetura definida para o serviço, a equipe da Work in Ideas não possui acesso ao conteúdo legível dos arquivos.'
+  },
+  {
+    question: 'Como funcionam os backups?',
+    answer:
+      'São realizados backups diários, mantidos por até 30 dias, destinados à continuidade e recuperação da infraestrutura.'
+  },
+  {
+    question: 'O que acontece com os dados se eu cancelar?',
+    answer:
+      'Após o encerramento, os arquivos e dados permanecem disponíveis exclusivamente para a empresa-cliente durante 90 dias para consulta e exportação. Depois desse período, são removidos dos sistemas ativos, e eventuais cópias residuais são eliminadas conforme o ciclo normal dos backups.'
+  },
+  {
+    question: 'Posso levar meus dados para outro sistema?',
+    answer:
+      'Sim. É possível baixar os arquivos mantendo a estrutura de pastas e exportar em planilha os dados cadastrais disponibilizados pela plataforma.'
+  },
+  {
+    question: 'Qual é o SLA?',
+    answer:
+      'O compromisso de disponibilidade mensal é de 99,5%, conforme critérios, exclusões e compensações definidos no SLA oficial do AkiDocs.'
+  },
+  {
+    question: 'Como funciona o suporte?',
+    answer:
+      'O suporte técnico é realizado exclusivamente pela plataforma oficial de tickets em suporte.akidocs.com.br. Os horários, prioridades e prazos de primeira resposta estão definidos no SLA.'
   }
 ]
