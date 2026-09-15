@@ -13,7 +13,7 @@ export interface ISelectedPlan {
   periodicidade?: string
 }
 
-export const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-6DQ5G4E85Q'
+export const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-PWFC43ZMWV'
 
 const STORAGE_KEY = 'akidocs_utm_params'
 const PLANO_STORAGE_KEY = 'akidocs_selected_plan'
