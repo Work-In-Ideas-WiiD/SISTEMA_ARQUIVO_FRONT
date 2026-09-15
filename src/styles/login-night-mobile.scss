@@ -2,7 +2,7 @@ $login-mobile-bp: 768px;
 
 @mixin login-mobile-gradient {
   @media (max-width: $login-mobile-bp) {
-    background: linear-gradient(98deg, #212121 0%, #ff00ff 90%);
+    background: linear-gradient(135deg, #0B1B2B 0%, #1F3A5F 100%);
   }
 }
 

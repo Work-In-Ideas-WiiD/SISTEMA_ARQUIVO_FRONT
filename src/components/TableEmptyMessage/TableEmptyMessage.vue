@@ -49,14 +49,16 @@ withDefaults(
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(33, 33, 33, 0.2);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(176, 141, 87, 0.15);
       border-radius: 30px;
-      font-family: 'Source Code Pro', monospace;
+      font-family: 'Inter', sans-serif;
       font-size: 14px;
-      font-weight: 300;
+      font-weight: 400;
       line-height: 1;
       letter-spacing: 0;
-      color: #f7f7f7;
+      color: #FFFCFF;
+      opacity: 0.8;
     }
   }
 }

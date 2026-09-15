@@ -417,7 +417,7 @@ function statusClass(s?: string | null) {
     min-height: 200px;
 
     p {
-      font-family: 'Source Code Pro', monospace;
+      font-family: var(--night-font, 'Inter', sans-serif);
       font-size: 14px;
       color: #f7f7f7;
       opacity: 0.7;
@@ -429,8 +429,9 @@ function statusClass(s?: string | null) {
     max-width: 100%;
     box-sizing: border-box;
     padding: 48px 75px 40px;
-    background: rgba(121, 121, 121, 0.1);
-    border-radius: var(--night-radius, 30px);
+    background: var(--night-surface, #132438);
+    border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
+    border-radius: var(--night-radius, 20px);
   }
 
   &__form {
@@ -475,7 +476,7 @@ function statusClass(s?: string | null) {
     margin: 0;
     padding-left: 20px;
     box-sizing: border-box;
-    font-family: var(--night-font, 'Source Code Pro', monospace);
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
     font-weight: 700;
     line-height: 18px;
@@ -489,12 +490,12 @@ function statusClass(s?: string | null) {
     height: 49px;
     box-sizing: border-box;
     padding: 0 20px;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 30px;
-    background: rgba(121, 121, 121, 0.3);
-    font-family: 'Source Code Pro', monospace;
+    background: rgba(255, 255, 255, 0.06);
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1;
     color: #ffffff;
     outline: none;
@@ -506,7 +507,7 @@ function statusClass(s?: string | null) {
       opacity: 1;
       color: #ffffff;
       -webkit-text-fill-color: #ffffff;
-      background: rgba(121, 121, 121, 0.3);
+      background: rgba(255, 255, 255, 0.06);
     }
   }
 
@@ -525,16 +526,17 @@ function statusClass(s?: string | null) {
     justify-content: center;
     padding: 8px 14px;
     border-radius: 20px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 12px;
     font-weight: 700;
     line-height: 1;
     text-transform: uppercase;
     white-space: nowrap;
+    transition: all 0.2s ease;
 
     &--ativa {
-      background: rgba(76, 175, 80, 0.25);
-      color: #8ee99a;
+      background: rgba(47, 111, 109, 0.25);
+      color: #4EBEB9;
     }
 
     &--pendente,
@@ -549,14 +551,14 @@ function statusClass(s?: string | null) {
     }
 
     &--suspensa {
-      background: rgba(121, 121, 121, 0.4);
+      background: rgba(255, 255, 255, 0.1);
       color: rgba(247, 247, 247, 0.8);
     }
 
     &--cancelada,
     &--expirada,
     &--desconhecido {
-      background: rgba(121, 121, 121, 0.35);
+      background: rgba(255, 255, 255, 0.06);
       color: rgba(247, 247, 247, 0.65);
     }
   }
@@ -570,7 +572,7 @@ function statusClass(s?: string | null) {
   &__block-title {
     margin: 0;
     padding-left: 8px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 16px;
     font-weight: 700;
     color: #f7f7f7;
@@ -578,7 +580,7 @@ function statusClass(s?: string | null) {
 
   &__empty {
     padding: 12px 8px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 13px;
     color: rgba(247, 247, 247, 0.65);
   }
@@ -587,7 +589,8 @@ function statusClass(s?: string | null) {
     width: 100%;
     overflow-x: auto;
     border-radius: 20px;
-    background: rgba(121, 121, 121, 0.18);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   &__table {
@@ -599,7 +602,7 @@ function statusClass(s?: string | null) {
     td {
       padding: 14px 16px;
       text-align: left;
-      font-family: 'Source Code Pro', monospace;
+      font-family: var(--night-font, 'Inter', sans-serif);
       color: #f7f7f7;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -611,17 +614,17 @@ function statusClass(s?: string | null) {
       font-weight: 700;
       opacity: 0.7;
       text-transform: uppercase;
-      background: rgba(33, 33, 33, 0.35);
+      background: rgba(255, 255, 255, 0.05);
     }
 
     td {
       font-size: 13px;
-      font-weight: 300;
-      border-top: 1px solid rgba(121, 121, 121, 0.25);
+      font-weight: 400;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     tbody tr:nth-child(odd) td {
-      background: rgba(33, 33, 33, 0.28);
+      background: rgba(255, 255, 255, 0.02);
     }
 
     small {
@@ -646,13 +649,14 @@ function statusClass(s?: string | null) {
     height: 46px;
     padding: 0 22px;
     border-radius: 30px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
     font-weight: 700;
     line-height: 1;
     text-transform: uppercase;
     white-space: nowrap;
     cursor: pointer;
+    transition: all 0.2s ease;
 
     &:disabled {
       opacity: 0.45;
@@ -665,17 +669,18 @@ function statusClass(s?: string | null) {
       color: #ffffff;
 
       &:hover:not(:disabled) {
-        opacity: 0.85;
+        background: rgba(255, 255, 255, 0.08);
       }
     }
 
     &--primary {
       border: none;
-      background: #ff00ff;
+      background: #B08D57;
       color: #ffffff;
 
       &:hover:not(:disabled) {
-        opacity: 0.92;
+        background: #C29F68;
+        box-shadow: 0 4px 12px rgba(176, 141, 87, 0.3);
       }
     }
 
@@ -685,7 +690,7 @@ function statusClass(s?: string | null) {
       color: #ffffff;
 
       &:hover:not(:disabled) {
-        opacity: 0.92;
+        background: rgba(220, 53, 69, 1);
       }
     }
   }
@@ -705,14 +710,14 @@ function statusClass(s?: string | null) {
     width: 100%;
     max-width: 440px;
     padding: 28px 24px;
-    background: rgba(33, 33, 33, 0.98);
-    border: 1px solid rgba(121, 121, 121, 0.45);
+    background: #10243B;
+    border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
     border-radius: 24px;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
 
     h3 {
       margin: 0 0 10px;
-      font-family: 'Source Code Pro', monospace;
+      font-family: var(--night-font, 'Inter', sans-serif);
       font-size: 18px;
       font-weight: 700;
       color: #f7f7f7;
@@ -720,9 +725,9 @@ function statusClass(s?: string | null) {
 
     p {
       margin: 0 0 24px;
-      font-family: 'Source Code Pro', monospace;
+      font-family: var(--night-font, 'Inter', sans-serif);
       font-size: 14px;
-      font-weight: 300;
+      font-weight: 400;
       line-height: 1.45;
       color: rgba(247, 247, 247, 0.75);
     }

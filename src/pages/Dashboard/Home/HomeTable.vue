@@ -91,8 +91,10 @@ function navigateTo() {
   flex-shrink: 0;
 
   &__panel {
-    background: var(--night-surface, rgba(121, 121, 121, 0.25));
-    border-radius: var(--night-radius, 30px);
+    background: var(--night-surface, #132438);
+    border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.15));
+    border-radius: var(--night-radius, 20px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
     overflow: hidden;
   }
 
@@ -114,13 +116,13 @@ function navigateTo() {
     th {
       padding: 24px 16px 18px;
       text-align: left;
-      font-family: 'Source Code Pro', monospace;
-      font-size: 18px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
       font-weight: 700;
       line-height: 1;
-      letter-spacing: 0;
-      color: #f7f7f7;
-      opacity: 0.7;
+      letter-spacing: 0.02em;
+      color: #FFFCFF;
+      opacity: 0.85;
       text-transform: uppercase;
       white-space: nowrap;
       overflow: hidden;
@@ -142,12 +144,12 @@ function navigateTo() {
       padding: 0 16px;
       text-align: left;
       vertical-align: middle;
-      font-family: 'Source Code Pro', monospace;
+      font-family: 'Inter', sans-serif;
       font-size: 14px;
-      font-weight: 300;
+      font-weight: 400;
       line-height: 1;
       letter-spacing: 0;
-      color: #f7f7f7;
+      color: #FFFCFF;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -243,12 +245,12 @@ function navigateTo() {
 
   &__title {
     margin: 0;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-weight: 700;
     font-size: 20px;
     line-height: 1;
-    letter-spacing: 0;
-    color: #f7f7f7;
+    letter-spacing: 0.02em;
+    color: #FFFCFF;
     text-transform: uppercase;
   }
 
@@ -259,13 +261,13 @@ function navigateTo() {
     padding: 0;
     border: none;
     border-radius: 30px;
-    background: #ff00ff;
+    background: #B08D57;
     color: #ffffff;
-    font-family: 'Source Code Pro', monospace;
-    font-weight: 800;
-    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
     line-height: 1;
-    letter-spacing: 0;
+    letter-spacing: 0.03em;
     text-transform: uppercase;
     cursor: pointer;
     white-space: nowrap;
@@ -273,16 +275,20 @@ function navigateTo() {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 4px 14px rgba(176, 141, 87, 0.25);
+    transition: all 0.2s ease;
 
     &:hover {
-      opacity: 0.92;
+      background: #C29F68;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(176, 141, 87, 0.35);
     }
 
     @media (max-width: 1100px) {
       width: 120px;
       min-width: 120px;
       height: 40px;
-      font-size: 14px;
+      font-size: 13px;
     }
   }
 }

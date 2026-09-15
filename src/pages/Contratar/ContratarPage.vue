@@ -355,9 +355,10 @@ async function pagar() {
 @import '@/styles/login-night-mobile.scss';
 
 .contratar_page {
-  --login-black: #212121;
-  --login-magenta: #ff00ff;
-  --login-gray: #f7f7f7;
+  --login-black: #0B1B2B;
+  --login-navy: #1F3A5F;
+  --login-gold: #B08D57;
+  --login-gray: #FFFCFF;
 
   position: fixed;
   inset: 0;
@@ -365,8 +366,8 @@ async function pagar() {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: linear-gradient(119deg, var(--login-black) 0%, var(--login-magenta) 90%);
-  font-family: 'Source Code Pro', monospace;
+  background: radial-gradient(circle at 85% 15%, rgba(176, 141, 87, 0.12) 0%, transparent 40%), linear-gradient(135deg, #0B1B2B 0%, #1F3A5F 100%);
+  font-family: 'Inter', sans-serif;
 
   @include login-mobile-gradient;
   @include login-mobile-shell;
@@ -381,7 +382,7 @@ async function pagar() {
     font-size: clamp(90px, 24.07vh, 260px);
     font-weight: 700;
     line-height: 0.9;
-    color: var(--login-gray);
+    color: rgba(255, 252, 255, 0.05);
     pointer-events: none;
     user-select: none;
     white-space: nowrap;
@@ -419,7 +420,7 @@ async function pagar() {
 
 .contratar_title {
   margin: 0 0 8px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 20px;
   font-weight: 700;
   line-height: 1;
@@ -429,7 +430,7 @@ async function pagar() {
 
 .contratar_subtitle {
   margin: 0 0 28px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: #f7f7f7;
@@ -443,7 +444,7 @@ async function pagar() {
 
 .contratar_loading {
   margin: 24px 0 0;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
   color: #f7f7f7;
   opacity: 0.7;
@@ -462,8 +463,9 @@ async function pagar() {
   width: 280px;
   max-width: 100%;
   padding: 28px 24px;
-  border-radius: 30px;
-  background: rgba(121, 121, 121, 0.25);
+  border-radius: 24px;
+  background: var(--night-surface, #132438);
+  border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -471,7 +473,7 @@ async function pagar() {
 
   &__nome {
     margin: 0 0 10px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 16px;
     font-weight: 700;
     color: #f7f7f7;
@@ -481,7 +483,7 @@ async function pagar() {
 
   &__valor {
     margin: 0 0 16px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 28px;
     font-weight: 700;
     line-height: 1;
@@ -499,11 +501,10 @@ async function pagar() {
 
   &__desc {
     margin: 0 0 16px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 13px;
     font-weight: 400;
-    color: #f7f7f7;
-    opacity: 0.7;
+    color: rgba(255, 252, 255, 0.75);
     text-align: center;
   }
 
@@ -516,11 +517,11 @@ async function pagar() {
 
     li {
       padding: 10px 0;
-      border-bottom: 1px solid rgba(247, 247, 247, 0.15);
-      font-family: 'Source Code Pro', monospace;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      font-family: 'Inter', sans-serif;
       font-size: 14px;
       font-weight: 400;
-      color: #f7f7f7;
+      color: #FFFCFF;
       text-align: center;
     }
   }
@@ -534,23 +535,26 @@ async function pagar() {
   padding: 0 24px;
   border: none;
   border-radius: 30px;
-  background: #f7f7f7;
-  color: #212121;
-  font-family: 'Source Code Pro', monospace;
+  background: #B08D57;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(176, 141, 87, 0.3);
+  font-family: 'Inter', sans-serif;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
-  letter-spacing: 0;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: opacity 0.15s ease;
+  transition: all 0.2s ease;
 
   &:hover:not(:disabled) {
-    opacity: 0.9;
+    background: #C29F68;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(176, 141, 87, 0.4);
   }
 
   &:disabled {
@@ -624,11 +628,10 @@ async function pagar() {
 
   &__label {
     padding-left: 20px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 12px;
-    font-weight: 700;
-    color: #f7f7f7;
-    opacity: 0.7;
+    font-weight: 600;
+    color: rgba(255, 252, 255, 0.85);
     text-transform: uppercase;
   }
 
@@ -636,18 +639,24 @@ async function pagar() {
     width: 100%;
     height: 49px;
     padding: 0 22px;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 30px;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
     outline: none;
     color: #fff;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
     font-weight: 400;
     box-sizing: border-box;
+    transition: all 0.2s ease;
+
+    &:focus {
+      border-color: #B08D57;
+      box-shadow: 0 0 0 3px rgba(176, 141, 87, 0.25);
+    }
 
     &::placeholder {
-      color: rgba(255, 255, 255, 0.85);
+      color: rgba(255, 255, 255, 0.65);
     }
 
     @include login-input-autofill(#fff);
@@ -657,12 +666,11 @@ async function pagar() {
 .secure_note {
   margin: 20px 0 0;
   padding: 0 8px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 400;
   line-height: 1.5;
-  color: #f7f7f7;
-  opacity: 0.85;
+  color: rgba(255, 252, 255, 0.8);
   text-align: center;
 }
 

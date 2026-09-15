@@ -90,8 +90,8 @@ function onEmailClick() {
 .about_section {
   position: relative;
   padding: 100px 24px;
-  background: #252525;
-  border-top: 1px solid rgba(247, 247, 247, 0.05);
+  background: #0B1B2B;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .about_container {
@@ -113,24 +113,24 @@ function onEmailClick() {
 
 .about_badge {
   display: inline-block;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: #ff00ff;
+  color: #B08D57;
   letter-spacing: 1px;
   padding: 6px 14px;
-  background: rgba(255, 0, 255, 0.1);
-  border: 1px solid rgba(255, 0, 255, 0.25);
+  background: rgba(176, 141, 87, 0.12);
+  border: 1px solid rgba(176, 141, 87, 0.3);
   border-radius: 20px;
   margin-bottom: 16px;
 }
 
 .about_title {
   margin: 0 0 20px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: clamp(26px, 2.5vw, 36px);
   font-weight: 800;
-  color: #f7f7f7;
+  color: #FFFCFF;
   line-height: 1.25;
 }
 
@@ -140,10 +140,10 @@ function onEmailClick() {
   font-size: 16px;
   font-weight: 400;
   line-height: 1.65;
-  color: rgba(247, 247, 247, 0.85);
+  color: rgba(255, 252, 255, 0.85);
 
   strong {
-    color: #f7f7f7;
+    color: #FFFCFF;
   }
 }
 
@@ -153,30 +153,30 @@ function onEmailClick() {
   font-size: 15px;
   font-weight: 400;
   line-height: 1.65;
-  color: rgba(247, 247, 247, 0.7);
+  color: rgba(255, 252, 255, 0.7);
 }
 
 .about_learn_more {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 700;
-  color: #ff00ff;
+  color: #B08D57;
   text-decoration: none;
   transition: all 0.2s ease;
 
   &:hover {
-    color: #ffffff;
+    color: #C29F68;
     transform: translateX(4px);
   }
 }
 
 /* Institutional Card */
 .about_card {
-  background: rgba(33, 33, 33, 0.85);
-  border: 1px solid rgba(247, 247, 247, 0.1);
+  background: var(--night-surface, #132438);
+  border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
   border-radius: 24px;
   padding: 36px 32px;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
@@ -189,24 +189,24 @@ function onEmailClick() {
   flex-wrap: wrap;
   gap: 8px;
   padding-bottom: 20px;
-  border-bottom: 1px solid rgba(247, 247, 247, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   margin-bottom: 24px;
 }
 
 .card_company {
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: #ff00ff;
+  color: #B08D57;
   letter-spacing: 0.8px;
 }
 
 .card_status {
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 10px;
   font-weight: 700;
-  color: rgba(247, 247, 247, 0.7);
-  background: rgba(121, 121, 121, 0.2);
+  color: rgba(255, 252, 255, 0.7);
+  background: rgba(255, 255, 255, 0.08);
   padding: 3px 8px;
   border-radius: 6px;
 }
@@ -224,10 +224,10 @@ function onEmailClick() {
 }
 
 .info_label {
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 10px;
   font-weight: 600;
-  color: rgba(247, 247, 247, 0.5);
+  color: rgba(255, 252, 255, 0.5);
   text-transform: uppercase;
 }
 
@@ -235,13 +235,13 @@ function onEmailClick() {
   font-family: 'Inter', sans-serif;
   font-size: 15px;
   font-weight: 600;
-  color: #f7f7f7;
+  color: #FFFCFF;
 }
 
 .info_sub {
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 12px;
-  color: rgba(247, 247, 247, 0.6);
+  color: rgba(255, 252, 255, 0.6);
 }
 
 .contact_links {
@@ -255,19 +255,19 @@ function onEmailClick() {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(121, 121, 121, 0.15);
-  border: 1px solid rgba(247, 247, 247, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   padding: 6px 12px;
   border-radius: 20px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 12px;
-  color: #f7f7f7;
+  color: #FFFCFF;
   text-decoration: none;
   transition: all 0.2s ease;
 
   &:hover {
-    border-color: #ff00ff;
-    color: #ff00ff;
+    border-color: #B08D57;
+    color: #B08D57;
   }
 
   &--wa:hover {

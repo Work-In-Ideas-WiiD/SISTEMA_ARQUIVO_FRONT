@@ -65,35 +65,80 @@ form {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  font-family: 'Inter', sans-serif;
 
-  h2, p {
-    color: white;
+  h2 {
+    color: #FFFCFF;
+    font-size: 20px;
+    font-weight: 700;
     text-align: center;
+    margin: 0;
+  }
+
+  p {
+    color: rgba(255, 252, 255, 0.85);
+    font-size: 14px;
+    text-align: center;
+    margin: 0;
   }
 
   input {
-    height: 51px;
-    padding: 0 20px;
-    border: 1px solid var(--color-gray-500);
-    font-size: 1rem;
+    height: 49px;
+    padding: 0 22px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.08);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #fff;
+    outline: none;
+    transition: all 0.2s ease;
+
+    &:focus {
+      border-color: #B08D57;
+      box-shadow: 0 0 0 3px rgba(176, 141, 87, 0.25);
+    }
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.65);
+    }
   }
 
   button {
-    height: 52px;
-    background-color: white;
+    height: 49px;
+    background-color: #B08D57;
     border: none;
-    color: var(--color-blue-700);
-    font-size: 1rem;
+    border-radius: 30px;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
     cursor: pointer;
+    box-shadow: 0 4px 14px rgba(176, 141, 87, 0.3);
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background-color: #C29F68;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(176, 141, 87, 0.4);
+    }
 
     &:disabled {
       opacity: 0.7;
+      cursor: wait;
     }
   }
 
   a {
-    color: var(--color-orange-500);
+    color: #B08D57;
     text-align: center;
+    font-size: 14px;
+    text-decoration: underline;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+      opacity: 0.85;
+    }
   }
 }
 </style>

@@ -427,8 +427,9 @@ function goBack() {
     min-height: 481px;
     box-sizing: border-box;
     padding: 48px 75px 56px;
-    background: rgba(121, 121, 121, 0.1);
-    border-radius: var(--night-radius, 30px);
+    background: var(--night-surface, #132438);
+    border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
+    border-radius: var(--night-radius, 20px);
   }
 
   &__form {
@@ -454,7 +455,7 @@ function goBack() {
     height: 18px;
     padding-left: 20px;
     box-sizing: border-box;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
     font-weight: 700;
     font-style: normal;
@@ -477,16 +478,22 @@ function goBack() {
     height: 49px;
     box-sizing: border-box;
     padding: 0 20px;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 30px;
-    background: rgba(121, 121, 121, 0.3);
-    font-family: 'Source Code Pro', monospace;
+    background: rgba(255, 255, 255, 0.06);
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1;
     color: #ffffff;
     outline: none;
     appearance: none;
+    transition: all 0.2s ease;
+
+    &:focus {
+      border-color: #B08D57;
+      box-shadow: 0 0 0 2px rgba(176, 141, 87, 0.2);
+    }
 
     &::placeholder {
       color: #ffffff;
@@ -504,21 +511,22 @@ function goBack() {
   &__select-trigger {
     width: 100%;
     height: 49px;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.12);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
     padding: 0 20px;
-    background: rgba(121, 121, 121, 0.3);
+    background: rgba(255, 255, 255, 0.06);
     border-radius: 30px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1;
     color: #ffffff;
     cursor: pointer;
     text-align: left;
+    transition: all 0.2s ease;
 
     span {
       overflow: hidden;
@@ -535,7 +543,7 @@ function goBack() {
     }
 
     &:hover {
-      background: rgba(121, 121, 121, 0.4);
+      background: rgba(255, 255, 255, 0.09);
     }
   }
 
@@ -562,8 +570,8 @@ function goBack() {
     flex-direction: column;
     gap: 4px;
     overflow-y: auto;
-    background: rgba(33, 33, 33, 0.96);
-    border: 1px solid rgba(121, 121, 121, 0.45);
+    background: #10243B;
+    border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
     border-radius: 16px;
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
     z-index: 10;
@@ -576,23 +584,24 @@ function goBack() {
     background: transparent;
     text-align: left;
     padding: 10px 14px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1.2;
     color: #f7f7f7;
     border-radius: 10px;
     cursor: pointer;
     white-space: nowrap;
+    transition: all 0.2s ease;
 
     &:hover {
-      background: rgba(121, 121, 121, 0.35);
+      background: rgba(255, 255, 255, 0.08);
     }
 
     &.is-active {
-      background: #ff00ff;
+      background: #B08D57;
       color: #ffffff;
-      font-weight: 400;
+      font-weight: 600;
     }
   }
 
@@ -606,15 +615,16 @@ function goBack() {
     padding: 14px 16px;
     min-height: 49px;
     border-radius: 30px;
-    background: rgba(121, 121, 121, 0.3);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     max-height: 160px;
     overflow-y: auto;
   }
 
   &__checks-empty {
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 13px;
-    font-weight: 300;
+    font-weight: 400;
     color: #f7f7f7;
     opacity: 0.6;
     font-style: italic;
@@ -626,12 +636,17 @@ function goBack() {
     gap: 8px;
     padding: 6px 12px;
     border-radius: 20px;
-    background: rgba(33, 33, 33, 0.4);
+    background: rgba(255, 255, 255, 0.06);
     cursor: pointer;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 13px;
-    font-weight: 300;
+    font-weight: 400;
     color: #f7f7f7;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(176, 141, 87, 0.15);
+    }
 
     input[type='checkbox'] {
       appearance: none;
@@ -648,8 +663,8 @@ function goBack() {
       transition: background 0.15s ease, border-color 0.15s ease;
 
       &:checked {
-        border-color: #ff00ff;
-        background-color: #ff00ff;
+        border-color: #B08D57;
+        background-color: #B08D57;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M2.5 6.2l2.4 2.4 4.6-4.8'/%3E%3C/svg%3E");
         background-size: 12px 12px;
         background-position: center;
@@ -657,7 +672,7 @@ function goBack() {
       }
 
       &:focus-visible {
-        outline: 2px solid rgba(255, 0, 255, 0.45);
+        outline: 2px solid rgba(176, 141, 87, 0.45);
         outline-offset: 2px;
       }
     }
@@ -680,13 +695,15 @@ function goBack() {
     max-width: 100%;
     height: 49px;
     padding: 0 24px;
-    border: 3px solid #f7f7f7;
+    border: 2px solid rgba(176, 141, 87, 0.5);
     border-radius: 30px;
-    background: rgba(121, 121, 121, 0.3);
+    background: rgba(255, 255, 255, 0.06);
     cursor: pointer;
+    transition: all 0.2s ease;
 
     &:hover {
-      opacity: 0.9;
+      border-color: #B08D57;
+      background: rgba(176, 141, 87, 0.15);
     }
   }
 
@@ -697,7 +714,7 @@ function goBack() {
   }
 
   &__upload-text {
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
     font-weight: 700;
     line-height: 1;
@@ -715,18 +732,20 @@ function goBack() {
     align-self: center;
     border: none;
     border-radius: 30px;
-    background: #ff00ff;
+    background: #B08D57;
     color: #ffffff;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 16px;
     font-weight: 700;
     line-height: 1;
     letter-spacing: 0;
     text-transform: uppercase;
     cursor: pointer;
+    transition: all 0.2s ease;
 
     &:hover:not(:disabled) {
-      opacity: 0.92;
+      background: #C29F68;
+      box-shadow: 0 4px 12px rgba(176, 141, 87, 0.3);
     }
 
     &:disabled {

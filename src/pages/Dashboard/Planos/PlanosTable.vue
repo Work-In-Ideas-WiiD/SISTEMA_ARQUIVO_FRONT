@@ -280,8 +280,9 @@ async function handleDelete(id: string) {
 }
 
 .planos-panel {
-  background: var(--night-surface, rgba(121, 121, 121, 0.25));
-  border-radius: var(--night-radius, 30px);
+  background: var(--night-surface, #132438);
+  border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
+  border-radius: var(--night-radius, 20px);
   overflow: hidden;
 }
 
@@ -303,9 +304,16 @@ async function handleDelete(id: string) {
   align-items: center;
   gap: 14px;
   padding: 0 20px;
-  background: rgba(121, 121, 121, 0.3);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 30px;
   cursor: text;
+  transition: all 0.2s ease;
+
+  &:focus-within {
+    border-color: #B08D57;
+    box-shadow: 0 0 0 2px rgba(176, 141, 87, 0.2);
+  }
 
   &__btn {
     flex-shrink: 0;
@@ -325,14 +333,14 @@ async function handleDelete(id: string) {
     border: none;
     outline: none;
     background: transparent;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1;
     color: #ffffff;
 
     &::placeholder {
-      color: #ffffff;
+      color: rgba(255, 255, 255, 0.6);
       opacity: 1;
     }
   }
@@ -346,23 +354,25 @@ async function handleDelete(id: string) {
   padding: 0 18px;
   border: none;
   border-radius: 30px;
-  background: #ff00ff;
+  background: #B08D57;
   color: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   cursor: pointer;
-  font-family: 'Source Code Pro', monospace;
+  font-family: var(--night-font, 'Inter', sans-serif);
   font-size: 16px;
   font-weight: 700;
   line-height: 1;
   letter-spacing: 0;
   text-transform: uppercase;
   white-space: nowrap;
+  transition: all 0.2s ease;
 
   &:hover {
-    opacity: 0.92;
+    background: #C29F68;
+    box-shadow: 0 4px 12px rgba(176, 141, 87, 0.3);
   }
 }
 
@@ -383,8 +393,8 @@ async function handleDelete(id: string) {
   th {
     padding: 24px 16px 18px;
     text-align: left;
-    font-family: 'Source Code Pro', monospace;
-    font-size: 18px;
+    font-family: var(--night-font, 'Inter', sans-serif);
+    font-size: 14px;
     font-weight: 700;
     line-height: 1;
     letter-spacing: 0;
@@ -416,9 +426,9 @@ async function handleDelete(id: string) {
     padding: 0 16px;
     text-align: left;
     vertical-align: middle;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1;
     letter-spacing: 0;
     color: #f7f7f7;
@@ -463,12 +473,12 @@ async function handleDelete(id: string) {
   }
 
   tbody tr:nth-child(odd) {
-    background: var(--night-row, rgba(33, 33, 33, 0.5));
+    background: rgba(255, 255, 255, 0.02);
   }
 
   @media (max-width: 1440px) {
     th {
-      font-size: 14px;
+      font-size: 13px;
       padding: 18px 10px 14px;
     }
 
@@ -484,7 +494,7 @@ async function handleDelete(id: string) {
 
     td {
       padding: 0 10px;
-      font-size: 12px;
+      font-size: 13px;
     }
   }
 
@@ -506,7 +516,7 @@ async function handleDelete(id: string) {
 
     td {
       padding: 0 8px;
-      font-size: 11px;
+      font-size: 12px;
       height: 52px;
     }
   }
@@ -517,20 +527,21 @@ async function handleDelete(id: string) {
   cursor: pointer;
   padding: 6px 14px;
   border-radius: 20px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: var(--night-font, 'Inter', sans-serif);
   font-size: 12px;
   font-weight: 700;
   line-height: 1;
   text-transform: uppercase;
   white-space: nowrap;
+  transition: all 0.2s ease;
 
   &--ativo {
-    background: rgba(76, 175, 80, 0.25);
-    color: #8ee99a;
+    background: rgba(47, 111, 109, 0.25);
+    color: #4EBEB9;
   }
 
   &--inativo {
-    background: rgba(121, 121, 121, 0.35);
+    background: rgba(255, 255, 255, 0.08);
     color: rgba(247, 247, 247, 0.65);
   }
 
@@ -551,13 +562,14 @@ async function handleDelete(id: string) {
   height: 40px;
   border: none;
   border-radius: 50%;
-  background: rgba(121, 121, 121, 0.3);
+  background: rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
+  transition: all 0.2s ease;
 
   img {
     width: 24px;
@@ -566,7 +578,8 @@ async function handleDelete(id: string) {
   }
 
   &:hover {
-    opacity: 0.85;
+    background: rgba(176, 141, 87, 0.25);
+    transform: scale(1.05);
   }
 }
 

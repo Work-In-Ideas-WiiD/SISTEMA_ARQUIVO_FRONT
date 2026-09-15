@@ -590,8 +590,9 @@ watch(viewMode, () => {
 }
 
 .arquivos-panel {
-  background: var(--night-surface, rgba(121, 121, 121, 0.25));
-  border-radius: var(--night-radius, 30px);
+  background: var(--night-surface, #132438);
+  border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
+  border-radius: var(--night-radius, 20px);
   overflow-x: clip;
   overflow-y: visible;
   max-width: 100%;
@@ -689,8 +690,8 @@ watch(viewMode, () => {
       margin: 0;
       box-sizing: border-box;
       border-radius: 0;
-      border-top-right-radius: var(--night-radius, 30px);
-      border-bottom-right-radius: var(--night-radius, 30px);
+      border-top-right-radius: var(--night-radius, 20px);
+      border-bottom-right-radius: var(--night-radius, 20px);
     }
 
     .arquivos-paginator {
@@ -735,9 +736,16 @@ watch(viewMode, () => {
   align-items: center;
   gap: 14px;
   padding: 0 20px;
-  background: rgba(121, 121, 121, 0.3);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 30px;
   cursor: text;
+  transition: all 0.2s ease;
+
+  &:focus-within {
+    border-color: #B08D57;
+    box-shadow: 0 0 0 2px rgba(176, 141, 87, 0.2);
+  }
 
   &__btn {
     flex-shrink: 0;
@@ -757,15 +765,15 @@ watch(viewMode, () => {
     border: none;
     outline: none;
     background: transparent;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1;
     color: #ffffff;
 
     &::placeholder {
       color: #ffffff;
-      opacity: 1;
+      opacity: 0.7;
     }
   }
 }
@@ -775,9 +783,9 @@ watch(viewMode, () => {
   height: 49px;
   max-width: 100%;
   padding: 0 20px;
-  border: 3px solid #f7f7f7;
+  border: 2px solid rgba(176, 141, 87, 0.5);
   border-radius: 30px;
-  background: rgba(121, 121, 121, 0.3);
+  background: rgba(255, 255, 255, 0.06);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -785,9 +793,10 @@ watch(viewMode, () => {
   cursor: pointer;
   white-space: nowrap;
   min-width: 0;
+  transition: all 0.2s ease;
 
   span {
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
     font-weight: 700;
     line-height: 1;
@@ -800,7 +809,8 @@ watch(viewMode, () => {
   }
 
   &:hover {
-    opacity: 0.9;
+    border-color: #B08D57;
+    background: rgba(176, 141, 87, 0.15);
   }
 }
 
@@ -812,23 +822,25 @@ watch(viewMode, () => {
   padding: 0 18px;
   border: none;
   border-radius: 30px;
-  background: #ff00ff;
+  background: #B08D57;
   color: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   cursor: pointer;
-  font-family: 'Source Code Pro', monospace;
+  font-family: var(--night-font, 'Inter', sans-serif);
   font-size: 16px;
   font-weight: 700;
   line-height: 1;
   letter-spacing: 0;
   text-transform: uppercase;
   white-space: nowrap;
+  transition: all 0.2s ease;
 
   &:hover {
-    opacity: 0.92;
+    background: #C29F68;
+    box-shadow: 0 4px 12px rgba(176, 141, 87, 0.3);
   }
 
   &--folder {
@@ -856,8 +868,9 @@ watch(viewMode, () => {
     min-width: 0;
     min-height: 0;
     padding: 28px 24px 32px;
-    border-radius: 29px;
-    background: rgba(121, 121, 121, 0.3);
+    border-radius: var(--night-radius, 20px);
+    background: var(--night-surface, #132438);
+    border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -866,12 +879,12 @@ watch(viewMode, () => {
 
   &__sidebar-title {
     margin: 0;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 20px;
-    font-weight: 400;
+    font-weight: 700;
     line-height: 1;
     color: #f7f7f7;
-    opacity: 0.7;
+    opacity: 0.8;
     text-transform: uppercase;
   }
 
@@ -886,16 +899,17 @@ watch(viewMode, () => {
 
   &__info-line {
     margin: 0;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
     font-weight: 400;
-    line-height: 1.28;
+    line-height: 1.4;
     color: #ffffff;
     word-break: break-word;
 
     strong {
       display: block;
       font-weight: 700;
+      color: #B08D57;
       margin-bottom: 2px;
     }
   }
@@ -903,9 +917,9 @@ watch(viewMode, () => {
   &__empty-info {
     margin: 0;
     flex: 1;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     color: #f7f7f7;
     opacity: 0.6;
   }
@@ -928,24 +942,27 @@ watch(viewMode, () => {
     width: 110px;
     height: 94px;
     border-radius: 15px;
-    background: rgba(121, 121, 121, 0.3);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.15s ease, outline 0.15s ease;
+    transition: all 0.2s ease;
 
     &--active {
-      background: rgba(121, 121, 121, 0.5);
-      outline: 2px solid rgba(247, 247, 247, 0.35);
+      background: rgba(176, 141, 87, 0.15);
+      border-color: #B08D57;
+      outline: 2px solid rgba(176, 141, 87, 0.45);
     }
   }
 
   &:hover &__box {
-    background: rgba(121, 121, 121, 0.45);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(176, 141, 87, 0.3);
   }
 
   &:hover &__box--active {
-    background: rgba(121, 121, 121, 0.5);
+    background: rgba(176, 141, 87, 0.2);
   }
 
   &__options-btn {
@@ -1012,9 +1029,9 @@ watch(viewMode, () => {
     }
 
     span {
-      font-family: 'Source Code Pro', monospace;
+      font-family: var(--night-font, 'Inter', sans-serif);
       font-size: 14px;
-      font-weight: 400;
+      font-weight: 500;
       line-height: 18px;
       color: #212121;
       white-space: nowrap;
@@ -1037,7 +1054,7 @@ watch(viewMode, () => {
     width: 110px;
     max-width: 100%;
     min-height: 18px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
     font-weight: 400;
     line-height: 18px;
@@ -1072,8 +1089,8 @@ watch(viewMode, () => {
   th {
     padding: 24px 16px 18px;
     text-align: left;
-    font-family: 'Source Code Pro', monospace;
-    font-size: 18px;
+    font-family: var(--night-font, 'Inter', sans-serif);
+    font-size: 16px;
     font-weight: 700;
     line-height: 1;
     letter-spacing: 0;
@@ -1105,9 +1122,9 @@ watch(viewMode, () => {
     padding: 0 16px;
     text-align: left;
     vertical-align: middle;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1;
     letter-spacing: 0;
     color: #f7f7f7;
@@ -1152,7 +1169,7 @@ watch(viewMode, () => {
   }
 
   tbody tr:nth-child(odd) {
-    background: var(--night-row, rgba(33, 33, 33, 0.5));
+    background: rgba(255, 255, 255, 0.02);
   }
 
   @media (max-width: 1440px) {
@@ -1544,15 +1561,15 @@ watch(viewMode, () => {
     box-sizing: border-box;
 
     input {
-      font-family: 'Source Code Pro', monospace !important;
+      font-family: var(--night-font, 'Inter', sans-serif) !important;
       font-size: 14px !important;
-      font-weight: 300 !important;
+      font-weight: 400 !important;
       line-height: 1 !important;
       color: #f7f7f7 !important;
 
       &::placeholder {
         color: #f7f7f7 !important;
-        opacity: 1 !important;
+        opacity: 0.7 !important;
       }
     }
   }
@@ -1629,7 +1646,7 @@ watch(viewMode, () => {
 
     &__name {
       min-width: 0;
-      font-family: 'Source Code Pro', monospace;
+      font-family: var(--night-font, 'Inter', sans-serif);
       font-size: 16px;
       font-weight: 400;
       line-height: 1;
@@ -1668,7 +1685,8 @@ watch(viewMode, () => {
       height: auto;
       aspect-ratio: 110 / 94;
       border-radius: 15px;
-      background: rgba(121, 121, 121, 0.3);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1687,7 +1705,7 @@ watch(viewMode, () => {
       width: 100%;
       max-width: 100%;
       min-height: 18px;
-      font-family: 'Source Code Pro', monospace;
+      font-family: var(--night-font, 'Inter', sans-serif);
       font-size: 14px;
       font-weight: 400;
       line-height: 18px;

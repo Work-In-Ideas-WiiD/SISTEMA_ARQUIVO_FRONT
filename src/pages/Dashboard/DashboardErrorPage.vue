@@ -17,10 +17,17 @@ import { RouterLink } from 'vue-router'
   display: flex;
   flex-direction: column;
   gap: 20px;
+  font-family: var(--night-font, 'Inter', sans-serif);
+  color: #f7f7f7;
 
   .back-link {
-    color: var(--color-orange-500);
+    color: #B08D57;
     text-decoration: underline;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #C29F68;
+    }
   }
 }
 </style>

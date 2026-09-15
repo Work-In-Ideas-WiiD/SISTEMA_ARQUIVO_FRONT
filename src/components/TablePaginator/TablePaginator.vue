@@ -112,28 +112,37 @@ function goToPage(page: number) {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Source Code Pro', monospace;
-      font-size: 14px;
-      font-weight: 400;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
       line-height: 1;
-      color: #f7f7f7;
-      background: rgba(121, 121, 121, 0.2);
-      border-radius: 4px;
+      color: #FFFCFF;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      transition: all 0.15s ease;
+
+      &:hover:not(:disabled):not(.active) {
+        background: rgba(176, 141, 87, 0.15);
+        border-color: rgba(176, 141, 87, 0.3);
+      }
 
       &:disabled {
         color: rgba(247, 247, 247, 0.35);
         cursor: default;
-        opacity: 0.6;
+        opacity: 0.5;
       }
     }
 
     .page_btn {
-      background: rgba(121, 121, 121, 0.2);
+      background: rgba(255, 255, 255, 0.08);
 
       &.active {
-        background: #ff00ff;
+        background: #B08D57;
+        border-color: #B08D57;
         color: #ffffff;
         font-weight: 700;
+        box-shadow: 0 0 10px rgba(176, 141, 87, 0.35);
       }
     }
   }

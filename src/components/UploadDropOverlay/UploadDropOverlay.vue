@@ -44,25 +44,25 @@ defineProps<{
     align-items: center;
     gap: 16px;
     padding: 40px 48px;
-    border: 2px dashed rgba(255, 0, 255, 0.65);
-    border-radius: 24px;
-    background: rgba(33, 33, 33, 0.96);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
-    color: #f7f7f7;
+    border: 2px dashed #B08D57;
+    border-radius: 20px;
+    background: #0B1B2B;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    color: #FFFCFF;
     max-width: min(90vw, 420px);
     text-align: center;
   }
 
   &__icon {
-    color: #ff00ff;
+    color: #B08D57;
   }
 
   &__text {
     margin: 0;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 1.125rem;
     font-weight: 600;
-    color: #f7f7f7;
+    color: #FFFCFF;
   }
 }
 </style>

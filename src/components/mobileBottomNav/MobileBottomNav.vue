@@ -116,8 +116,9 @@ const activeKey = computed(() => {
   width: 240px;
   height: 74px;
   border-radius: 20px;
-  /* Figma Rectangle 25: #797979 @ 25% */
-  background: rgba(121, 121, 121, 0.25);
+  background: #132438;
+  border: 1px solid rgba(176, 141, 87, 0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: stretch;
   justify-content: space-between;
@@ -149,7 +150,7 @@ const activeKey = computed(() => {
   opacity: 1;
 }
 
-/* Figma Rectangle 23: 31×6, radius 11, #FF00FF */
+/* Indicador ativo Ouro AkiDocs */
 .mobile-bottom-nav__indicator {
   position: absolute;
   top: 0;
@@ -158,7 +159,8 @@ const activeKey = computed(() => {
   width: 31px;
   height: 6px;
   border-radius: 11px;
-  background: #ff00ff;
+  background: #B08D57;
+  box-shadow: 0 0 10px rgba(176, 141, 87, 0.5);
   opacity: 0;
 }
 
@@ -169,9 +171,9 @@ const activeKey = computed(() => {
 }
 
 .mobile-bottom-nav__label {
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1;
   letter-spacing: 0;
   color: #ffffff;

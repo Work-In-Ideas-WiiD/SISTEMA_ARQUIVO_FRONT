@@ -30,8 +30,10 @@ const emit = defineEmits<{
 
 <style lang="scss" scoped>
 .custom_button {
+  font-family: 'Inter', sans-serif;
   font-size: 1rem;
-  font-weight: 400;
+  font-weight: 600;
+  border-radius: 30px;
   text-transform: uppercase;
   cursor: pointer;
   display: flex;
@@ -39,6 +41,7 @@ const emit = defineEmits<{
   gap: 10px;
   align-items: center;
   white-space: nowrap;
+  transition: all 0.2s ease;
 
   .loader {
     width: 24px;

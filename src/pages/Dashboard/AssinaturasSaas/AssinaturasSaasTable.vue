@@ -435,8 +435,9 @@ function statusClass(s?: string) {
 }
 
 .saas-panel {
-  background: var(--night-surface, rgba(121, 121, 121, 0.25));
-  border-radius: var(--night-radius, 30px);
+  background: var(--night-surface, #132438);
+  border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
+  border-radius: var(--night-radius, 20px);
   overflow: hidden;
 }
 
@@ -479,9 +480,16 @@ function statusClass(s?: string) {
   align-items: center;
   gap: 14px;
   padding: 0 20px;
-  background: rgba(121, 121, 121, 0.3);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 30px;
   cursor: text;
+  transition: all 0.2s ease;
+
+  &:focus-within {
+    border-color: #B08D57;
+    box-shadow: 0 0 0 2px rgba(176, 141, 87, 0.2);
+  }
 
   &__btn {
     flex-shrink: 0;
@@ -501,14 +509,14 @@ function statusClass(s?: string) {
     border: none;
     outline: none;
     background: transparent;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1;
     color: #ffffff;
 
     &::placeholder {
-      color: #ffffff;
+      color: rgba(255, 255, 255, 0.6);
       opacity: 1;
     }
   }
@@ -531,21 +539,22 @@ function statusClass(s?: string) {
   &__trigger {
     width: 100%;
     height: 100%;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.12);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
     padding: 0 16px;
-    background: rgba(121, 121, 121, 0.3);
+    background: rgba(255, 255, 255, 0.06);
     border-radius: 30px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1;
     color: #f7f7f7;
     cursor: pointer;
     text-align: left;
+    transition: all 0.2s ease;
 
     span {
       overflow: hidden;
@@ -554,7 +563,7 @@ function statusClass(s?: string) {
     }
 
     &:hover {
-      background: rgba(121, 121, 121, 0.4);
+      background: rgba(255, 255, 255, 0.09);
     }
   }
 
@@ -580,8 +589,8 @@ function statusClass(s?: string) {
     flex-direction: column;
     gap: 4px;
     overflow-y: auto;
-    background: rgba(33, 33, 33, 0.96);
-    border: 1px solid rgba(121, 121, 121, 0.45);
+    background: #10243B;
+    border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
     border-radius: 16px;
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
     box-sizing: border-box;
@@ -594,23 +603,24 @@ function statusClass(s?: string) {
     background: transparent;
     text-align: left;
     padding: 10px 12px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1.2;
     color: #f7f7f7;
     border-radius: 10px;
     cursor: pointer;
     white-space: nowrap;
+    transition: all 0.2s ease;
 
     &:hover {
-      background: rgba(121, 121, 121, 0.35);
+      background: rgba(255, 255, 255, 0.08);
     }
 
     &.is-active {
-      background: #ff00ff;
+      background: #B08D57;
       color: #ffffff;
-      font-weight: 400;
+      font-weight: 600;
     }
   }
 }
@@ -623,13 +633,14 @@ function statusClass(s?: string) {
   min-width: 110px;
   padding: 0 20px;
   border-radius: 30px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: var(--night-font, 'Inter', sans-serif);
   font-size: 14px;
   font-weight: 700;
   line-height: 1;
   text-transform: uppercase;
   cursor: pointer;
   white-space: nowrap;
+  transition: all 0.2s ease;
 
   &--ghost {
     border: 1px solid rgba(247, 247, 247, 0.7);
@@ -637,7 +648,7 @@ function statusClass(s?: string) {
     color: #ffffff;
 
     &:hover {
-      opacity: 0.85;
+      background: rgba(255, 255, 255, 0.08);
     }
   }
 }
@@ -659,8 +670,8 @@ function statusClass(s?: string) {
   th {
     padding: 24px 16px 18px;
     text-align: left;
-    font-family: 'Source Code Pro', monospace;
-    font-size: 18px;
+    font-family: var(--night-font, 'Inter', sans-serif);
+    font-size: 14px;
     font-weight: 700;
     line-height: 1;
     letter-spacing: 0;
@@ -689,9 +700,9 @@ function statusClass(s?: string) {
     padding: 0 16px;
     text-align: left;
     vertical-align: middle;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1;
     letter-spacing: 0;
     color: #f7f7f7;
@@ -730,12 +741,12 @@ function statusClass(s?: string) {
   }
 
   tbody tr:nth-child(odd) {
-    background: var(--night-row, rgba(33, 33, 33, 0.5));
+    background: rgba(255, 255, 255, 0.02);
   }
 
   @media (max-width: 1440px) {
     th {
-      font-size: 14px;
+      font-size: 13px;
       padding: 18px 10px 14px;
     }
 
@@ -751,7 +762,7 @@ function statusClass(s?: string) {
 
     td {
       padding: 0 10px;
-      font-size: 12px;
+      font-size: 13px;
     }
   }
 
@@ -773,7 +784,7 @@ function statusClass(s?: string) {
 
     td {
       padding: 0 8px;
-      font-size: 11px;
+      font-size: 12px;
       height: 52px;
     }
   }
@@ -804,16 +815,17 @@ function statusClass(s?: string) {
   justify-content: center;
   padding: 6px 12px;
   border-radius: 20px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: var(--night-font, 'Inter', sans-serif);
   font-size: 11px;
   font-weight: 700;
   line-height: 1;
   text-transform: uppercase;
   white-space: nowrap;
+  transition: all 0.2s ease;
 
   &--ativa {
-    background: rgba(76, 175, 80, 0.25);
-    color: #8ee99a;
+    background: rgba(47, 111, 109, 0.25);
+    color: #4EBEB9;
   }
 
   &--pendente,
@@ -828,14 +840,14 @@ function statusClass(s?: string) {
   }
 
   &--suspensa {
-    background: rgba(121, 121, 121, 0.4);
+    background: rgba(255, 255, 255, 0.1);
     color: rgba(247, 247, 247, 0.8);
   }
 
   &--cancelada,
   &--expirada,
   &--desconhecido {
-    background: rgba(121, 121, 121, 0.35);
+    background: rgba(255, 255, 255, 0.06);
     color: rgba(247, 247, 247, 0.65);
   }
 }
@@ -851,13 +863,14 @@ function statusClass(s?: string) {
   height: 40px;
   border: none;
   border-radius: 50%;
-  background: rgba(121, 121, 121, 0.3);
+  background: rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
+  transition: all 0.2s ease;
 
   img {
     width: 24px;
@@ -866,7 +879,8 @@ function statusClass(s?: string) {
   }
 
   &:hover {
-    opacity: 0.85;
+    background: rgba(176, 141, 87, 0.25);
+    transform: scale(1.05);
   }
 }
 

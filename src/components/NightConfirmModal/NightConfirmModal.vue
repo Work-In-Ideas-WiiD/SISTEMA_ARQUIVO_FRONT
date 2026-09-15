@@ -64,26 +64,26 @@ const emit = defineEmits<{
     width: 100%;
     max-width: 440px;
     padding: 28px 24px;
-    background: rgba(33, 33, 33, 0.98);
-    border: 1px solid rgba(121, 121, 121, 0.45);
-    border-radius: 24px;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    background: #0B1B2B;
+    border: 1px solid rgba(176, 141, 87, 0.25);
+    border-radius: 20px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
 
     h3 {
       margin: 0 0 10px;
-      font-family: 'Source Code Pro', monospace;
+      font-family: 'Inter', sans-serif;
       font-size: 18px;
       font-weight: 700;
-      color: #f7f7f7;
+      color: #FFFCFF;
     }
 
     p {
       margin: 0 0 24px;
-      font-family: 'Source Code Pro', monospace;
+      font-family: 'Inter', sans-serif;
       font-size: 14px;
-      font-weight: 300;
-      line-height: 1.45;
-      color: rgba(247, 247, 247, 0.75);
+      font-weight: 400;
+      line-height: 1.5;
+      color: rgba(255, 252, 255, 0.75);
     }
   }
 
@@ -102,13 +102,15 @@ const emit = defineEmits<{
     height: 46px;
     padding: 0 22px;
     border-radius: 30px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
     font-weight: 700;
     line-height: 1;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
     white-space: nowrap;
     cursor: pointer;
+    transition: all 0.2s ease;
 
     &:disabled {
       opacity: 0.45;
@@ -116,22 +118,26 @@ const emit = defineEmits<{
     }
 
     &--ghost {
-      border: 1px solid rgba(247, 247, 247, 0.7);
+      border: 1px solid rgba(255, 252, 255, 0.3);
       background: transparent;
-      color: #ffffff;
+      color: #FFFCFF;
 
       &:hover:not(:disabled) {
-        opacity: 0.85;
+        border-color: rgba(255, 252, 255, 0.6);
+        background: rgba(255, 255, 255, 0.05);
       }
     }
 
     &--primary {
       border: none;
-      background: #ff00ff;
+      background: #B08D57;
       color: #ffffff;
+      box-shadow: 0 4px 14px rgba(176, 141, 87, 0.25);
 
       &:hover:not(:disabled) {
-        opacity: 0.92;
+        background: #C29F68;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(176, 141, 87, 0.35);
       }
     }
 

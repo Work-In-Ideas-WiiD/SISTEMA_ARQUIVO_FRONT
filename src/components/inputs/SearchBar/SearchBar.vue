@@ -46,9 +46,12 @@ function onSubmit() {
   padding-left: 20px;
   align-items: center;
   background-color: var(--color-white-100);
+  border-radius: 30px;
+  border: 1px solid rgba(176, 141, 87, 0.2);
   height: 49px;
   width: 100%;
   max-width: 468px;
+  font-family: 'Inter', sans-serif;
 
   .search_btn {
     display: flex;

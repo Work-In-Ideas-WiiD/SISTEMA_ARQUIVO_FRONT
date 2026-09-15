@@ -1,16 +1,18 @@
 .dashboard-night {
-  --night-black: #212121;
-  --night-bg: #252525;
-  --night-gray: #f7f7f7;
-  --night-pink: #ff00ff;
-  /* Cards + painel Clientes — Cinza escuro #797979 @ 25% (Figma) */
-  --night-surface: rgba(121, 121, 121, 0.25);
-  /* Elipse do ícone nos cards — Cinza escuro #797979 @ 30% (Figma) */
-  --night-icon-bg: rgba(121, 121, 121, 0.3);
-  /* Linhas zebradas da tabela — Preto #212121 @ 50% (Figma) */
-  --night-row: rgba(33, 33, 33, 0.5);
-  --night-radius: 30px;
-  --night-font: 'Source Code Pro', monospace;
+  --night-black: #0B1B2B;
+  --night-bg: #0B1B2B;
+  --night-gray: #FFFCFF;
+  --night-pink: #B08D57;
+  --night-gold: #B08D57;
+  --night-gold-hover: #C29F68;
+  --night-surface: #132438;
+  --night-surface-hover: #1A304B;
+  --night-surface-border: rgba(176, 141, 87, 0.15);
+  --night-icon-bg: rgba(176, 141, 87, 0.12);
+  --night-row: rgba(19, 36, 56, 0.5);
+  --night-row-hover: rgba(31, 58, 95, 0.35);
+  --night-radius: 20px;
+  --night-font: 'Inter', sans-serif;
 
   font-family: var(--night-font);
 
@@ -47,10 +49,10 @@
     color: var(--night-gray);
     font-family: var(--night-font);
     font-size: 20px;
-    font-weight: 400;
-    line-height: 1;
-    letter-spacing: 0;
-    opacity: 0.7;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+    opacity: 0.95;
     text-transform: uppercase;
   }
 
@@ -62,11 +64,11 @@
     box-sizing: border-box;
     font-family: var(--night-font);
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 18px;
-    letter-spacing: 0;
-    color: var(--night-gray);
-    opacity: 0.7;
+    letter-spacing: 0.02em;
+    color: rgba(255, 252, 255, 0.85);
+    opacity: 1;
     text-transform: uppercase;
   }
 }

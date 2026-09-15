@@ -229,7 +229,9 @@ function goBack() {
   }
 
   .form_wrapper {
-    background-color: rgba(207, 198, 188, 0.1);
+    background-color: var(--night-surface, #132438);
+    border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
+    border-radius: var(--night-radius, 20px);
     padding: 45px 50px;
     max-width: 1050px;
 
@@ -271,26 +273,38 @@ function goBack() {
       }
 
       label {
+        font-family: var(--night-font, 'Inter', sans-serif);
         font-size: 0.875rem;
-        color: var(--color-blue-700);
+        font-weight: 700;
+        color: var(--night-gray, #f7f7f7);
+        opacity: 0.8;
+        text-transform: uppercase;
       }
 
       input, select {
         height: 51px;
-        border: 1px solid var(--color-gray-500);
-        padding: 0 15px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 30px;
+        padding: 0 20px;
+        font-family: var(--night-font, 'Inter', sans-serif);
         font-size: 0.938rem;
-        color: var(--color-blue-700);
+        color: #ffffff;
         outline: none;
-        background: white;
+        background: rgba(255, 255, 255, 0.06);
+        transition: all 0.2s ease;
+
+        &:focus {
+          border-color: #B08D57;
+          box-shadow: 0 0 0 2px rgba(176, 141, 87, 0.2);
+        }
 
         &:disabled {
-          background: #f5f5f5;
-          color: #888;
+          background: rgba(255, 255, 255, 0.03);
+          color: rgba(255, 255, 255, 0.5);
         }
 
         &::placeholder {
-          color: var(--color-gray-500);
+          color: rgba(255, 255, 255, 0.5);
         }
       }
     }

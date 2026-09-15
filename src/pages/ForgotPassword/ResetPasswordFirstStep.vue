@@ -127,21 +127,21 @@ async function handleSubmit() {
 
   &__title {
     margin: 0;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 20px;
     font-weight: 700;
     line-height: normal;
-    color: #f7f7f7;
+    color: #FFFCFF;
     text-align: center;
   }
 
   &__subtitle {
     margin: clamp(12px, 1.6vh, 17px) 0 0;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
     font-weight: 400;
     line-height: normal;
-    color: #f7f7f7;
+    color: rgba(255, 252, 255, 0.85);
     text-align: center;
     white-space: nowrap;
 
@@ -150,16 +150,17 @@ async function handleSubmit() {
 
   &__back_link {
     margin-top: clamp(20px, 3vh, 32px);
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
-    font-weight: 400;
+    font-weight: 500;
     line-height: normal;
-    color: #f7f7f7;
+    color: rgba(255, 252, 255, 0.85);
     text-align: center;
     text-decoration: none;
+    transition: color 0.2s ease;
 
     &:hover {
-      opacity: 0.85;
+      color: #B08D57;
     }
   }
 }
@@ -173,9 +174,16 @@ async function handleSubmit() {
   height: 49px;
   padding: 0 22px;
   border-radius: 30px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.2s ease;
   overflow: hidden;
   cursor: text;
+
+  &:focus-within {
+    border-color: #B08D57;
+    box-shadow: 0 0 0 3px rgba(176, 141, 87, 0.25);
+  }
 
   &__icon {
     @include login-field-icon;
@@ -188,12 +196,12 @@ async function handleSubmit() {
     outline: none;
     background: transparent;
     color: #fff;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
     font-weight: 400;
 
     &::placeholder {
-      color: rgba(255, 255, 255, 0.85);
+      color: rgba(255, 255, 255, 0.65);
     }
 
     @include login-input-autofill(#fff);
@@ -209,17 +217,21 @@ async function handleSubmit() {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #f7f7f7;
-  color: #212121;
-  font-family: 'Source Code Pro', monospace;
+  background: #B08D57;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(176, 141, 87, 0.3);
+  font-family: 'Inter', sans-serif;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.02em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: opacity 0.15s ease;
+  transition: all 0.2s ease;
 
   &:hover:not(:disabled) {
-    opacity: 0.9;
+    background: #C29F68;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(176, 141, 87, 0.4);
   }
 
   &:disabled {

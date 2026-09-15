@@ -137,11 +137,11 @@ const figmaIcons: Record<string, { src: string; w: number; h: number }> = {
 
   .title {
     color: #ffffff;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 500;
     line-height: 1;
     letter-spacing: 0;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     text-transform: none;
   }
 
@@ -150,6 +150,7 @@ const figmaIcons: Record<string, { src: string; w: number; h: number }> = {
 
     .title {
       font-weight: 700;
+      color: #FFFCFF;
     }
 
     &::before {
@@ -160,8 +161,9 @@ const figmaIcons: Record<string, { src: string; w: number; h: number }> = {
       transform: translateY(-50%);
       width: 11px;
       height: 50px;
-      background-color: #ff00ff;
+      background-color: #B08D57;
       border-radius: 0 11px 11px 0;
+      box-shadow: 0 0 12px rgba(176, 141, 87, 0.5);
     }
   }
 

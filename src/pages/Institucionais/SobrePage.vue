@@ -126,7 +126,7 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .institutional_page {
-  background-color: #212121;
+  background-color: #0B1B2B;
   color: #f7f7f7;
   min-height: 100vh;
   display: flex;
@@ -152,7 +152,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   color: rgba(247, 247, 247, 0.5);
   margin-bottom: 32px;
@@ -164,7 +164,7 @@ onMounted(() => {
   transition: color 0.2s ease;
 
   &:hover {
-    color: #ff00ff;
+    color: #B08D57;
   }
 }
 
@@ -173,7 +173,7 @@ onMounted(() => {
 }
 
 .breadcrumb_current {
-  color: #00f0ff;
+  color: #B08D57;
   font-weight: 600;
 }
 
@@ -185,21 +185,21 @@ onMounted(() => {
 
 .page_badge {
   display: inline-block;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: #00f0ff;
+  color: #B08D57;
   letter-spacing: 1.5px;
   padding: 6px 14px;
-  background: rgba(0, 240, 255, 0.08);
-  border: 1px solid rgba(0, 240, 255, 0.25);
+  background: rgba(176, 141, 87, 0.12);
+  border: 1px solid rgba(176, 141, 87, 0.3);
   border-radius: 20px;
   margin-bottom: 16px;
 }
 
 .page_title {
   margin: 0 0 16px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: clamp(28px, 3.5vw, 42px);
   font-weight: 800;
   color: #f7f7f7;
@@ -222,7 +222,7 @@ onMounted(() => {
 
 .content_section {
   h2 {
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 20px;
     font-weight: 700;
     color: #f7f7f7;
@@ -278,17 +278,17 @@ onMounted(() => {
 }
 
 .value_card {
-  background: rgba(121, 121, 121, 0.12);
-  border: 1px solid rgba(247, 247, 247, 0.08);
+  background: var(--night-surface, #132438);
+  border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
   border-radius: 18px;
   padding: 24px;
 
   h3 {
     margin: 0 0 10px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 16px;
     font-weight: 700;
-    color: #00f0ff;
+    color: #B08D57;
   }
 
   p {
@@ -300,8 +300,8 @@ onMounted(() => {
 }
 
 .contact_box {
-  background: rgba(121, 121, 121, 0.15);
-  border: 1px solid rgba(247, 247, 247, 0.1);
+  background: var(--night-surface, #132438);
+  border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
   border-radius: 16px;
   padding: 24px;
   margin-top: 16px;
@@ -318,31 +318,32 @@ onMounted(() => {
   }
 
   a {
-    color: #00f0ff;
+    color: #B08D57;
     text-decoration: underline;
     text-underline-offset: 3px;
+    transition: color 0.2s ease;
 
     &:hover {
-      color: #ff00ff;
+      color: #C29F68;
     }
   }
 
   &.dpo_box {
-    background: rgba(0, 240, 255, 0.04);
-    border-color: rgba(0, 240, 255, 0.2);
+    background: rgba(176, 141, 87, 0.08);
+    border-color: rgba(176, 141, 87, 0.25);
   }
 }
 
 .page_cta {
   margin-top: 64px;
   padding: 48px 32px;
-  background: radial-gradient(circle at 50% 50%, rgba(255, 0, 255, 0.12) 0%, rgba(33, 33, 33, 0.9) 100%);
-  border: 1px solid rgba(255, 0, 255, 0.3);
+  background: radial-gradient(circle at 50% 50%, rgba(176, 141, 87, 0.15) 0%, rgba(19, 36, 56, 0.95) 100%);
+  border: 1px solid rgba(176, 141, 87, 0.3);
   border-radius: 24px;
   text-align: center;
 
   h2 {
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 24px;
     font-weight: 800;
     margin: 0 0 12px;
@@ -361,18 +362,18 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   padding: 14px 32px;
-  background: #f7f7f7;
-  color: #212121;
-  font-family: 'Source Code Pro', monospace;
+  background: #B08D57;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 700;
   border-radius: 30px;
   text-decoration: none;
   transition: all 0.2s ease;
 
   &:hover {
-    background: #ffffff;
-    box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+    background: #C29F68;
+    box-shadow: 0 4px 16px rgba(176, 141, 87, 0.4);
     transform: translateY(-2px);
   }
 }

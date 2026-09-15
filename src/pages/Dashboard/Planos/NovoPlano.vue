@@ -290,8 +290,9 @@ function goBack() {
     max-width: 100%;
     box-sizing: border-box;
     padding: 48px 75px 40px;
-    background: rgba(121, 121, 121, 0.1);
-    border-radius: var(--night-radius, 30px);
+    background: var(--night-surface, #132438);
+    border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
+    border-radius: var(--night-radius, 20px);
   }
 
   &__form {
@@ -324,7 +325,7 @@ function goBack() {
     margin: 0;
     padding-left: 20px;
     box-sizing: border-box;
-    font-family: var(--night-font, 'Source Code Pro', monospace);
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
     font-weight: 700;
     line-height: 18px;
@@ -338,16 +339,22 @@ function goBack() {
   &__textarea {
     width: 100%;
     box-sizing: border-box;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 30px;
-    background: rgba(121, 121, 121, 0.3);
-    font-family: 'Source Code Pro', monospace;
+    background: rgba(255, 255, 255, 0.06);
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1.4;
     color: #ffffff;
     outline: none;
     -webkit-text-fill-color: #ffffff;
+    transition: all 0.2s ease;
+
+    &:focus {
+      border-color: #B08D57;
+      box-shadow: 0 0 0 2px rgba(176, 141, 87, 0.2);
+    }
 
     &::placeholder {
       color: #f7f7f7;
@@ -371,21 +378,22 @@ function goBack() {
   &__select-trigger {
     width: 100%;
     height: 49px;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.12);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
     padding: 0 20px;
-    background: rgba(121, 121, 121, 0.3);
+    background: rgba(255, 255, 255, 0.06);
     border-radius: 30px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1;
     color: #ffffff;
     cursor: pointer;
     text-align: left;
+    transition: all 0.2s ease;
 
     span {
       overflow: hidden;
@@ -394,7 +402,7 @@ function goBack() {
     }
 
     &:hover {
-      background: rgba(121, 121, 121, 0.4);
+      background: rgba(255, 255, 255, 0.09);
     }
   }
 
@@ -419,8 +427,8 @@ function goBack() {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    background: rgba(33, 33, 33, 0.96);
-    border: 1px solid rgba(121, 121, 121, 0.45);
+    background: #10243B;
+    border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
     border-radius: 16px;
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
     z-index: 10;
@@ -432,22 +440,24 @@ function goBack() {
     background: transparent;
     text-align: left;
     padding: 10px 14px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1.2;
     color: #f7f7f7;
     border-radius: 10px;
     cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
 
     &:hover {
-      background: rgba(121, 121, 121, 0.35);
+      background: rgba(255, 255, 255, 0.08);
     }
 
     &.is-active {
-      background: #ff00ff;
+      background: #B08D57;
       color: #ffffff;
-      font-weight: 400;
+      font-weight: 600;
     }
   }
 
@@ -474,7 +484,7 @@ function goBack() {
     height: 46px;
     padding: 0 28px;
     border-radius: 30px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 16px;
     font-weight: 700;
     line-height: 1;
@@ -482,6 +492,7 @@ function goBack() {
     text-transform: uppercase;
     white-space: nowrap;
     cursor: pointer;
+    transition: all 0.2s ease;
   }
 
   &__cancel {
@@ -490,17 +501,18 @@ function goBack() {
     color: #ffffff;
 
     &:hover {
-      opacity: 0.85;
+      background: rgba(255, 255, 255, 0.08);
     }
   }
 
   &__submit {
     border: none;
-    background: #ff00ff;
+    background: #B08D57;
     color: #ffffff;
 
     &:hover:not(:disabled) {
-      opacity: 0.92;
+      background: #C29F68;
+      box-shadow: 0 4px 12px rgba(176, 141, 87, 0.3);
     }
 
     &:disabled {

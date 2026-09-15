@@ -55,22 +55,22 @@ withDefaults(
   &--sm &__ring {
     width: 24px;
     height: 24px;
-    border: 3px solid rgba(121, 121, 121, 0.3);
-    border-top-color: var(--night-pink, #ff00ff);
+    border: 3px solid rgba(176, 141, 87, 0.2);
+    border-top-color: var(--night-gold, #B08D57);
   }
 
   &--md &__ring {
     width: 36px;
     height: 36px;
-    border: 3px solid rgba(121, 121, 121, 0.3);
-    border-top-color: var(--night-pink, #ff00ff);
+    border: 3px solid rgba(176, 141, 87, 0.2);
+    border-top-color: var(--night-gold, #B08D57);
   }
 
   &--lg &__ring {
     width: 48px;
     height: 48px;
-    border: 4px solid rgba(121, 121, 121, 0.3);
-    border-top-color: var(--night-pink, #ff00ff);
+    border: 4px solid rgba(176, 141, 87, 0.2);
+    border-top-color: var(--night-gold, #B08D57);
   }
 
   &--default.spinner--sm &__arc {

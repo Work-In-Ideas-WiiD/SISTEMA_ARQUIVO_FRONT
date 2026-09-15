@@ -345,8 +345,9 @@ function getMembrosInfo(item: IAgrupamento): string {
 }
 
 .agrup-panel {
-  background: var(--night-surface, rgba(121, 121, 121, 0.25));
-  border-radius: var(--night-radius, 30px);
+  background: var(--night-surface, #132438);
+  border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
+  border-radius: var(--night-radius, 20px);
   overflow: hidden;
 }
 
@@ -373,9 +374,16 @@ function getMembrosInfo(item: IAgrupamento): string {
   align-items: center;
   gap: 14px;
   padding: 0 20px;
-  background: rgba(121, 121, 121, 0.3);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 30px;
   cursor: text;
+  transition: all 0.2s ease;
+
+  &:focus-within {
+    border-color: #B08D57;
+    box-shadow: 0 0 0 2px rgba(176, 141, 87, 0.2);
+  }
 
   &__btn {
     flex-shrink: 0;
@@ -395,15 +403,15 @@ function getMembrosInfo(item: IAgrupamento): string {
     border: none;
     outline: none;
     background: transparent;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1;
     color: #ffffff;
 
     &::placeholder {
       color: #ffffff;
-      opacity: 1;
+      opacity: 0.7;
     }
   }
 }
@@ -418,23 +426,24 @@ function getMembrosInfo(item: IAgrupamento): string {
   &__trigger {
     width: 100%;
     height: 100%;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.12);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
     padding: 0 14px;
-    background: rgba(121, 121, 121, 0.3);
+    background: rgba(255, 255, 255, 0.06);
     border-radius: 30px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1;
     color: #f7f7f7;
     cursor: pointer;
+    transition: all 0.2s ease;
 
     &:hover {
-      background: rgba(121, 121, 121, 0.4);
+      background: rgba(255, 255, 255, 0.09);
     }
   }
 
@@ -459,8 +468,8 @@ function getMembrosInfo(item: IAgrupamento): string {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    background: rgba(33, 33, 33, 0.96);
-    border: 1px solid rgba(121, 121, 121, 0.45);
+    background: #10243B;
+    border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
     border-radius: 16px;
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
     overflow: hidden;
@@ -473,23 +482,24 @@ function getMembrosInfo(item: IAgrupamento): string {
     background: transparent;
     text-align: center;
     padding: 10px 12px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1;
     color: #f7f7f7;
     border-radius: 10px;
     cursor: pointer;
     white-space: nowrap;
+    transition: all 0.2s ease;
 
     &:hover {
-      background: rgba(121, 121, 121, 0.35);
+      background: rgba(255, 255, 255, 0.08);
     }
 
     &.is-active {
-      background: #ff00ff;
+      background: #B08D57;
       color: #ffffff;
-      font-weight: 400;
+      font-weight: 600;
     }
   }
 }
@@ -503,23 +513,25 @@ function getMembrosInfo(item: IAgrupamento): string {
   padding: 0 18px;
   border: none;
   border-radius: 30px;
-  background: #ff00ff;
+  background: #B08D57;
   color: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   cursor: pointer;
-  font-family: 'Source Code Pro', monospace;
+  font-family: var(--night-font, 'Inter', sans-serif);
   font-size: 16px;
   font-weight: 700;
   line-height: 1;
   letter-spacing: 0;
   text-transform: uppercase;
   white-space: nowrap;
+  transition: all 0.2s ease;
 
   &:hover {
-    opacity: 0.92;
+    background: #C29F68;
+    box-shadow: 0 4px 12px rgba(176, 141, 87, 0.3);
   }
 }
 
@@ -540,8 +552,8 @@ function getMembrosInfo(item: IAgrupamento): string {
   th {
     padding: 24px 16px 18px;
     text-align: left;
-    font-family: 'Source Code Pro', monospace;
-    font-size: 18px;
+    font-family: var(--night-font, 'Inter', sans-serif);
+    font-size: 16px;
     font-weight: 700;
     line-height: 1;
     letter-spacing: 0;
@@ -573,9 +585,9 @@ function getMembrosInfo(item: IAgrupamento): string {
     padding: 0 16px;
     text-align: left;
     vertical-align: middle;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1;
     letter-spacing: 0;
     color: #f7f7f7;
@@ -621,7 +633,7 @@ function getMembrosInfo(item: IAgrupamento): string {
   }
 
   tbody tr:nth-child(odd) {
-    background: var(--night-row, rgba(33, 33, 33, 0.5));
+    background: rgba(255, 255, 255, 0.02);
   }
 
   @media (max-width: 1440px) {
@@ -691,7 +703,7 @@ function getMembrosInfo(item: IAgrupamento): string {
   height: 26px;
   padding: 0 10px;
   border-radius: 30px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--night-font, 'Inter', sans-serif);
   font-size: 12px;
   font-weight: 700;
   line-height: 1;
@@ -702,13 +714,15 @@ function getMembrosInfo(item: IAgrupamento): string {
   text-overflow: ellipsis;
 
   &--funcionario {
-    background: #ffed82;
-    color: #a8910a;
+    background: rgba(176, 141, 87, 0.2);
+    color: #E5C38C;
+    border: 1px solid rgba(176, 141, 87, 0.4);
   }
 
   &--setor {
-    background: #ffbdff;
-    color: #de41de;
+    background: rgba(47, 111, 109, 0.25);
+    color: #72D0CE;
+    border: 1px solid rgba(47, 111, 109, 0.4);
   }
 }
 
@@ -724,13 +738,14 @@ function getMembrosInfo(item: IAgrupamento): string {
   height: 40px;
   border: none;
   border-radius: 50%;
-  background: rgba(121, 121, 121, 0.3);
+  background: rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
+  transition: all 0.2s ease;
 
   img {
     width: 24px;
@@ -739,7 +754,8 @@ function getMembrosInfo(item: IAgrupamento): string {
   }
 
   &:hover {
-    opacity: 0.85;
+    background: rgba(176, 141, 87, 0.25);
+    transform: scale(1.05);
   }
 }
 

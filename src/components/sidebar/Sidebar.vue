@@ -164,13 +164,15 @@ function shouldShowItem(item: IMenuItem): boolean {
   width: 364px;
   height: 100vh;
   min-height: 100vh;
-  background: linear-gradient(110deg, #212121 27%, #ff00ff 94%);
+  background: linear-gradient(180deg, #0B1B2B 0%, #10243B 100%);
+  border-right: 1px solid rgba(176, 141, 87, 0.15);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
   border-radius: 0 50px 50px 0;
   position: fixed;
   top: 0;
   left: 0;
   overflow: hidden;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   display: flex;
   flex-direction: column;
   z-index: 10;

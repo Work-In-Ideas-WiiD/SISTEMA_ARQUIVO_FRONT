@@ -56,16 +56,16 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   gap: 20px;
-  background-color: var(--night-bg, #252525);
+  background-color: var(--night-bg, #0B1B2B);
 
   &__text {
-    font-family: var(--night-font, 'Source Code Pro', monospace);
+    font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 400;
+    font-weight: 500;
     line-height: 1;
-    letter-spacing: 0;
-    color: var(--night-gray, #f7f7f7);
-    opacity: 0.7;
+    letter-spacing: 0.05em;
+    color: var(--night-gray, #FFFCFF);
+    opacity: 0.85;
     text-transform: uppercase;
   }
 }
@@ -75,7 +75,7 @@ onMounted(async () => {
   min-height: 100vh;
   display: flex;
   flex-direction: row;
-  background-color: #252525;
+  background-color: #0B1B2B;
 
   .aside_container {
     flex-shrink: 0;
@@ -88,7 +88,7 @@ onMounted(async () => {
     min-width: 0;
     min-height: 100vh;
     width: auto;
-    background-color: #252525;
+    background-color: #0B1B2B;
     overflow-x: hidden;
   }
 
@@ -105,13 +105,12 @@ onMounted(async () => {
   }
 
   @media (max-width: 900px) {
-    /* Figma mobile: fundo #212121 (evita corte cinza abaixo do conteúdo) */
-    background-color: #212121;
+    background-color: #0B1B2B;
 
     .outlat_container {
       min-height: 100vh;
       width: 100%;
-      background-color: #212121;
+      background-color: #0B1B2B;
       /* Espaço pro menu flutuante 74px + margem */
       padding-bottom: 106px;
       box-sizing: border-box;

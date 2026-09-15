@@ -48,7 +48,8 @@ const isAdmin = authStore.userRole === 'administrador'
 .mobile-header {
   display: none;
   padding: 15px;
-  background: linear-gradient(110deg, #212121 27%, #ff00ff 94%);
+  background: linear-gradient(135deg, #0B1B2B 0%, #1F3A5F 100%);
+  border-bottom: 1px solid rgba(176, 141, 87, 0.15);
 
   @media (max-width: 900px) {
     display: block;
@@ -57,7 +58,7 @@ const isAdmin = authStore.userRole === 'administrador'
   .menu-button {
     background: none;
     border: none;
-    color: white;
+    color: #FFFCFF;
     cursor: pointer;
   }
 
@@ -66,29 +67,34 @@ const isAdmin = authStore.userRole === 'administrador'
     top: 54px;
     left: 0;
     right: 0;
-    background: #212121;
+    background: #0B1B2B;
+    border-bottom: 1px solid rgba(176, 141, 87, 0.2);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     padding: 20px;
     z-index: 100;
 
     nav {
       display: flex;
       flex-direction: column;
-      gap: 15px;
-      font-family: 'Source Code Pro', monospace;
+      gap: 12px;
+      font-family: 'Inter', sans-serif;
 
       a, button {
-        color: white;
+        color: #FFFCFF;
         text-decoration: none;
         font-size: 1rem;
-        padding: 10px;
+        font-weight: 500;
+        padding: 10px 14px;
         background: none;
         border: none;
         text-align: left;
         cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.2s ease;
 
         &:hover {
-          background-color: rgba(255, 0, 255, 0.15);
-          border-radius: 4px;
+          background-color: rgba(176, 141, 87, 0.15);
+          color: #B08D57;
         }
       }
     }

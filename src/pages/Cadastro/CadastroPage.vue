@@ -218,10 +218,11 @@ async function handleSubmit() {
 @import '@/styles/login-night-mobile.scss';
 
 .login_page {
-  --login-black: #212121;
-  --login-magenta: #ff00ff;
-  --login-gray: #f7f7f7;
-  --login-input-bg: rgba(255, 255, 255, 0.2);
+  --login-black: #0B1B2B;
+  --login-navy: #1F3A5F;
+  --login-gold: #B08D57;
+  --login-gray: #FFFCFF;
+  --login-input-bg: rgba(255, 255, 255, 0.08);
 
   position: fixed;
   inset: 0;
@@ -229,8 +230,8 @@ async function handleSubmit() {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: linear-gradient(119deg, var(--login-black) 0%, var(--login-magenta) 90%);
-  font-family: 'Source Code Pro', monospace;
+  background: radial-gradient(circle at 85% 15%, rgba(176, 141, 87, 0.12) 0%, transparent 40%), linear-gradient(135deg, #0B1B2B 0%, #1F3A5F 100%);
+  font-family: 'Inter', sans-serif;
 
   @include login-mobile-gradient;
   @include login-mobile-shell;
@@ -245,7 +246,7 @@ async function handleSubmit() {
     font-size: clamp(90px, 24.07vh, 260px);
     font-weight: 700;
     line-height: 0.9;
-    color: var(--login-gray);
+    color: rgba(255, 252, 255, 0.05);
     pointer-events: none;
     user-select: none;
     white-space: nowrap;
@@ -366,8 +367,15 @@ async function handleSubmit() {
   padding: 0 22px;
   border-radius: 30px;
   background: var(--login-input-bg);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.2s ease;
   overflow: hidden;
   cursor: text;
+
+  &:focus-within {
+    border-color: #B08D57;
+    box-shadow: 0 0 0 3px rgba(176, 141, 87, 0.25);
+  }
 
   &__icon {
     @include login-field-icon;
@@ -380,12 +388,12 @@ async function handleSubmit() {
     outline: none;
     background: transparent;
     color: #fff;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
     font-weight: 400;
 
     &::placeholder {
-      color: rgba(255, 255, 255, 0.85);
+      color: rgba(255, 255, 255, 0.65);
     }
 
     @include login-input-autofill(#fff);
@@ -400,17 +408,17 @@ async function handleSubmit() {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
-  letter-spacing: 0;
+  letter-spacing: 0.02em;
   text-decoration: none;
   border: none;
-  transition: opacity 0.15s ease;
+  transition: all 0.2s ease;
 
   &:hover {
-    opacity: 0.9;
+    transform: translateY(-1px);
   }
 
   &:disabled {
@@ -419,8 +427,14 @@ async function handleSubmit() {
   }
 
   &--primary {
-    background: #f7f7f7;
-    color: #212121;
+    background: #B08D57;
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(176, 141, 87, 0.3);
+
+    &:hover {
+      background: #C29F68;
+      box-shadow: 0 6px 18px rgba(176, 141, 87, 0.4);
+    }
   }
 }
 

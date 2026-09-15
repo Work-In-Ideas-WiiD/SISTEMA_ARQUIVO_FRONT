@@ -365,7 +365,7 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .institutional_page {
-  background-color: #212121;
+  background-color: #0B1B2B;
   color: #f7f7f7;
   min-height: 100vh;
   display: flex;
@@ -391,7 +391,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   color: rgba(247, 247, 247, 0.5);
   margin-bottom: 32px;
@@ -403,7 +403,7 @@ onMounted(() => {
   transition: color 0.2s ease;
 
   &:hover {
-    color: #ff00ff;
+    color: #B08D57;
   }
 }
 
@@ -412,7 +412,7 @@ onMounted(() => {
 }
 
 .breadcrumb_current {
-  color: #00f0ff;
+  color: #B08D57;
   font-weight: 600;
 }
 
@@ -424,21 +424,21 @@ onMounted(() => {
 
 .page_badge {
   display: inline-block;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: #00f0ff;
+  color: #B08D57;
   letter-spacing: 1.5px;
   padding: 6px 14px;
-  background: rgba(0, 240, 255, 0.08);
-  border: 1px solid rgba(0, 240, 255, 0.25);
+  background: rgba(176, 141, 87, 0.12);
+  border: 1px solid rgba(176, 141, 87, 0.3);
   border-radius: 20px;
   margin-bottom: 16px;
 }
 
 .page_title {
   margin: 0 0 12px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: clamp(26px, 3.5vw, 40px);
   font-weight: 800;
   color: #f7f7f7;
@@ -448,7 +448,7 @@ onMounted(() => {
 
 .page_subtitle {
   margin: 0;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
   color: rgba(247, 247, 247, 0.6);
 }
@@ -466,7 +466,7 @@ onMounted(() => {
 
 .legal_section {
   h2 {
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 20px;
     font-weight: 700;
     color: #f7f7f7;
@@ -477,10 +477,10 @@ onMounted(() => {
   }
 
   h3 {
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 16px;
     font-weight: 600;
-    color: #00f0ff;
+    color: #B08D57;
     margin: 20px 0 12px;
   }
 
@@ -519,26 +519,26 @@ onMounted(() => {
   }
 
   a {
-    color: #00f0ff;
+    color: #B08D57;
     text-decoration: underline;
     text-underline-offset: 3px;
     transition: color 0.2s ease;
 
     &:hover {
-      color: #ff00ff;
+      color: #C29F68;
     }
   }
 }
 
 .code_callout {
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
-  background: rgba(0, 240, 255, 0.08);
-  border: 1px solid rgba(0, 240, 255, 0.25);
+  background: rgba(176, 141, 87, 0.1);
+  border: 1px solid rgba(176, 141, 87, 0.25);
   border-radius: 8px;
   padding: 12px 18px;
   margin: 14px 0;
-  color: #00f0ff;
+  color: #B08D57;
   overflow-x: auto;
 }
 
@@ -549,15 +549,15 @@ onMounted(() => {
 }
 
 .back_link {
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 600;
-  color: #00f0ff;
+  color: #B08D57;
   text-decoration: none;
   transition: all 0.2s ease;
 
   &:hover {
-    color: #ff00ff;
+    color: #C29F68;
     text-decoration: underline;
   }
 }

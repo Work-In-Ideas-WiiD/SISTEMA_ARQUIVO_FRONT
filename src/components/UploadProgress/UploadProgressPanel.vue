@@ -125,8 +125,8 @@ function dismiss(id: string) {
   min-width: 0;
   padding: 10px;
   border-radius: 12px;
-  background: rgba(121, 121, 121, 0.2);
-  border: 1px solid rgba(121, 121, 121, 0.35);
+  background: #132438;
+  border: 1px solid rgba(176, 141, 87, 0.2);
 
   &--success {
     border-color: rgba(76, 175, 80, 0.55);
@@ -147,10 +147,10 @@ function dismiss(id: string) {
   &__name {
     margin: 0;
     flex: 1;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 0.75rem;
-    font-weight: 400;
-    color: #f7f7f7;
+    font-weight: 500;
+    color: #FFFCFF;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -159,7 +159,7 @@ function dismiss(id: string) {
   &__close {
     border: none;
     background: transparent;
-    color: rgba(247, 247, 247, 0.65);
+    color: rgba(255, 252, 255, 0.65);
     cursor: pointer;
     line-height: 1;
     font-size: 1rem;
@@ -173,14 +173,14 @@ function dismiss(id: string) {
   &__bar {
     height: 6px;
     border-radius: 999px;
-    background: rgba(121, 121, 121, 0.45);
+    background: rgba(255, 255, 255, 0.12);
     overflow: hidden;
   }
 
   &__bar_fill {
     height: 100%;
     border-radius: inherit;
-    background: #ff00ff;
+    background: #B08D57;
     transition: width 0.15s ease;
   }
 
@@ -201,10 +201,10 @@ function dismiss(id: string) {
 
   &__status,
   &__percent {
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 0.6875rem;
     font-weight: 300;
-    color: rgba(247, 247, 247, 0.65);
+    color: rgba(255, 252, 255, 0.65);
   }
 
   &__status {

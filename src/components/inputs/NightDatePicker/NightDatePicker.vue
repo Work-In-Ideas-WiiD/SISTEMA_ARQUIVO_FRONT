@@ -307,7 +307,7 @@ function clearDate() {
     border-radius: 30px;
     background: rgba(121, 121, 121, 0.3);
     color: #ffffff;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
     font-weight: 300;
     line-height: 1;
@@ -360,7 +360,7 @@ function clearDate() {
   }
 
   &__month {
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
     font-weight: 700;
     color: #f7f7f7;
@@ -390,7 +390,7 @@ function clearDate() {
 
     span {
       text-align: center;
-      font-family: 'Source Code Pro', monospace;
+      font-family: 'Inter', sans-serif;
       font-size: 11px;
       font-weight: 700;
       color: rgba(247, 247, 247, 0.55);
@@ -409,7 +409,7 @@ function clearDate() {
     border-radius: 8px;
     background: transparent;
     color: #f7f7f7;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 12px;
     cursor: pointer;
 
@@ -422,11 +422,11 @@ function clearDate() {
     }
 
     &.is-today {
-      box-shadow: inset 0 0 0 1px rgba(255, 0, 255, 0.7);
+      box-shadow: inset 0 0 0 1px rgba(176, 141, 87, 0.7);
     }
 
     &.is-selected {
-      background: #ff00ff;
+      background: #B08D57;
       color: #fff;
       box-shadow: none;
     }
@@ -444,7 +444,7 @@ function clearDate() {
   &__clear {
     border: none;
     background: transparent;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;

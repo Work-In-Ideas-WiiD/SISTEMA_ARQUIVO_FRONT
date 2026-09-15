@@ -51,8 +51,10 @@ const iconSize: Record<typeof props.icon, { w: number; h: number }> = {
   display: flex;
   align-items: center;
   gap: 16px;
-  border-radius: 30px;
-  background: rgba(121, 121, 121, 0.25);
+  border-radius: 20px;
+  background: #132438;
+  border: 1px solid rgba(176, 141, 87, 0.18);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 
   &__icon {
     width: 67px;
@@ -62,8 +64,8 @@ const iconSize: Record<typeof props.icon, { w: number; h: number }> = {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(121, 121, 121, 0.3);
-    border: none;
+    background: rgba(176, 141, 87, 0.12);
+    border: 1px solid rgba(176, 141, 87, 0.25);
 
     img {
       display: block;
@@ -80,14 +82,13 @@ const iconSize: Record<typeof props.icon, { w: number; h: number }> = {
 
   &__label {
     margin: 0;
-    font-family: 'Source Code Pro', monospace;
-    font-weight: 700;
-    font-size: 14px;
-    line-height: 1.15;
-    letter-spacing: 0;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 1.2;
+    letter-spacing: 0.03em;
     text-transform: uppercase;
-    color: #f7f7f7;
-    opacity: 0.7;
+    color: rgba(255, 252, 255, 0.75);
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -96,12 +97,12 @@ const iconSize: Record<typeof props.icon, { w: number; h: number }> = {
 
   &__value {
     margin: 0;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-weight: 700;
-    font-size: 24px;
+    font-size: 26px;
     line-height: 1;
-    letter-spacing: 0;
-    color: #f7f7f7;
+    letter-spacing: -0.02em;
+    color: #FFFCFF;
   }
 
   @media (max-width: 1440px) {

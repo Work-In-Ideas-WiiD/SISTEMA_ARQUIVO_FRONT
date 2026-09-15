@@ -210,8 +210,10 @@ function getContato(item: IGetClientesDataRes): string {
 }
 
 .clientes-panel {
-  background: var(--night-surface, rgba(121, 121, 121, 0.25));
-  border-radius: var(--night-radius, 30px);
+  background: var(--night-surface, #132438);
+  border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.15));
+  border-radius: var(--night-radius, 20px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   overflow: hidden;
 }
 
@@ -233,9 +235,16 @@ function getContato(item: IGetClientesDataRes): string {
   align-items: center;
   gap: 14px;
   padding: 0 20px;
-  background: rgba(121, 121, 121, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 30px;
   cursor: text;
+  transition: all 0.2s ease;
+
+  &:focus-within {
+    border-color: #B08D57;
+    box-shadow: 0 0 0 3px rgba(176, 141, 87, 0.25);
+  }
 
   &__btn {
     flex-shrink: 0;
@@ -255,14 +264,15 @@ function getContato(item: IGetClientesDataRes): string {
     border: none;
     outline: none;
     background: transparent;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1;
     color: #ffffff;
+    -webkit-text-fill-color: #ffffff;
 
     &::placeholder {
-      color: #ffffff;
+      color: rgba(255, 255, 255, 0.6);
       opacity: 1;
     }
   }
@@ -276,23 +286,27 @@ function getContato(item: IGetClientesDataRes): string {
   padding: 0 18px;
   border: none;
   border-radius: 30px;
-  background: #ff00ff;
+  background: #B08D57;
   color: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   cursor: pointer;
-  font-family: 'Source Code Pro', monospace;
-  font-size: 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
   font-weight: 700;
   line-height: 1;
-  letter-spacing: 0;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(176, 141, 87, 0.25);
+  transition: all 0.2s ease;
 
   &:hover {
-    opacity: 0.92;
+    background: #C29F68;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(176, 141, 87, 0.35);
   }
 }
 
@@ -313,7 +327,7 @@ function getContato(item: IGetClientesDataRes): string {
   th {
     padding: 24px 16px 18px;
     text-align: left;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 18px;
     font-weight: 700;
     line-height: 1;
@@ -346,7 +360,7 @@ function getContato(item: IGetClientesDataRes): string {
     padding: 0 16px;
     text-align: left;
     vertical-align: middle;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
     font-weight: 300;
     line-height: 1;

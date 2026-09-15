@@ -63,9 +63,9 @@ function onEmailClick() {
 .final_cta_section {
   position: relative;
   padding: 110px 24px;
-  background: radial-gradient(circle at 50% 50%, rgba(255, 0, 255, 0.15) 0%, rgba(33, 33, 33, 1) 85%),
-              #212121;
-  border-top: 1px solid rgba(247, 247, 247, 0.08);
+  background: radial-gradient(circle at 50% 50%, rgba(176, 141, 87, 0.15) 0%, rgba(11, 27, 43, 1) 85%),
+              #0B1B2B;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
   text-align: center;
 }
@@ -77,7 +77,7 @@ function onEmailClick() {
   transform: translate(-50%, -50%);
   width: 600px;
   height: 350px;
-  background: radial-gradient(circle, rgba(255, 0, 255, 0.22) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(176, 141, 87, 0.25) 0%, transparent 70%);
   filter: blur(80px);
   pointer-events: none;
 }
@@ -88,7 +88,7 @@ function onEmailClick() {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: clamp(120px, 20vw, 240px);
   font-weight: 800;
   line-height: 0.8;
@@ -108,24 +108,24 @@ function onEmailClick() {
 
 .cta_badge {
   display: inline-block;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: #ff00ff;
+  color: #B08D57;
   letter-spacing: 1px;
   padding: 6px 14px;
-  background: rgba(255, 0, 255, 0.12);
-  border: 1px solid rgba(255, 0, 255, 0.3);
+  background: rgba(176, 141, 87, 0.12);
+  border: 1px solid rgba(176, 141, 87, 0.3);
   border-radius: 20px;
   margin-bottom: 20px;
 }
 
 .cta_title {
   margin: 0 0 20px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: clamp(28px, 3.2vw, 42px);
   font-weight: 800;
-  color: #f7f7f7;
+  color: #FFFCFF;
   line-height: 1.2;
 }
 
@@ -135,7 +135,7 @@ function onEmailClick() {
   font-size: clamp(15px, 1.2vw, 17px);
   font-weight: 400;
   line-height: 1.6;
-  color: rgba(247, 247, 247, 0.8);
+  color: rgba(255, 252, 255, 0.8);
   max-width: 680px;
   margin-left: auto;
   margin-right: auto;
@@ -150,9 +150,9 @@ function onEmailClick() {
 }
 
 .cta_btn {
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.5px;
   border-radius: 30px;
   padding: 16px 32px;
@@ -165,28 +165,28 @@ function onEmailClick() {
   text-decoration: none;
 
   &--primary {
-    background: #f7f7f7;
-    color: #212121;
+    background: #B08D57;
+    color: #ffffff;
     border: none;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 14px rgba(176, 141, 87, 0.3);
 
     &:hover {
-      background: #ffffff;
-      box-shadow: 0 0 30px rgba(255, 0, 255, 0.6);
+      background: #C29F68;
+      box-shadow: 0 6px 22px rgba(176, 141, 87, 0.45);
       transform: translateY(-2px);
     }
   }
 
   &--secondary {
-    background: rgba(121, 121, 121, 0.2);
-    color: #f7f7f7;
-    border: 1px solid rgba(247, 247, 247, 0.3);
+    background: rgba(255, 255, 255, 0.06);
+    color: #FFFCFF;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(10px);
 
     &:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: #ff00ff;
-      color: #ff00ff;
+      background: rgba(255, 255, 255, 0.12);
+      border-color: #B08D57;
+      color: #B08D57;
       transform: translateY(-2px);
     }
   }
@@ -196,15 +196,15 @@ function onEmailClick() {
   margin: 24px 0 0;
   font-family: 'Inter', sans-serif;
   font-size: 14px;
-  color: rgba(247, 247, 247, 0.6);
+  color: rgba(255, 252, 255, 0.7);
 
   a {
-    color: #ff00ff;
+    color: #B08D57;
     text-decoration: underline;
     font-weight: 500;
 
     &:hover {
-      color: #ffffff;
+      color: #C29F68;
     }
   }
 }
