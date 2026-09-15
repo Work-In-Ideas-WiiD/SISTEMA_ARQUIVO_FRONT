@@ -234,8 +234,8 @@ function scrollToPricing() {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.28;
-  filter: saturate(0.85) contrast(1.1);
+  opacity: 0.68;
+  filter: saturate(0.95) contrast(1.05);
 }
 
 .hero_video_overlay {
@@ -244,7 +244,27 @@ function scrollToPricing() {
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at 80% 20%, rgba(31, 58, 95, 0.75) 0%, rgba(11, 27, 43, 0.92) 60%, #0B1B2B 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(11, 27, 43, 0.82) 0%,
+    rgba(11, 27, 43, 0.58) 45%,
+    rgba(11, 27, 43, 0.32) 100%
+  ),
+  linear-gradient(
+    180deg,
+    rgba(11, 27, 43, 0.2) 0%,
+    rgba(11, 27, 43, 0.5) 75%,
+    #0B1B2B 100%
+  );
+
+  @media (max-width: 1024px) {
+    background: linear-gradient(
+      180deg,
+      rgba(11, 27, 43, 0.82) 0%,
+      rgba(11, 27, 43, 0.60) 45%,
+      rgba(11, 27, 43, 0.85) 100%
+    );
+  }
 }
 
 .hero_watermark {
