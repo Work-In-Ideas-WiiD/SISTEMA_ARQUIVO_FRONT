@@ -28,31 +28,29 @@ function handleAnchor(hash: string) {
             <img :src="logoAkidocs" alt="AkiDocs — Todos os seus documentos, Aki!" class="footer_logo" width="140" height="36" />
           </RouterLink>
           <p class="footer_brand_desc">
-            Todos os seus documentos, Aki! Plataforma SaaS B2B de gestão e compartilhamento seguro de arquivos para empresas.
+            Todos os seus documentos, Aki!<br />
+            Gestão de compartilhamento seguro de arquivos para empresas.
           </p>
           <div class="footer_company_data">
+            <span class="dev_by_label">Desenvolvido por:</span>
             <strong>Work in Ideas</strong>
             <span>CNPJ: 17.808.481/0001-69</span>
             <span>Av. T-1, 2266 — Setor Bueno</span>
             <span>Goiânia — GO, CEP 74215-025</span>
           </div>
-          <div class="footer_badges">
-            <span class="cert_badge">INFRAESTRUTURA NO BRASIL</span>
-            <span class="cert_badge">CONFORME LGPD</span>
-          </div>
         </div>
 
-        <!-- Col 2: Platform Links -->
+        <!-- Col 2: Platform Links (Ordem reorganizada) -->
         <div class="footer_col">
           <span class="footer_col_title">Plataforma</span>
           <ul class="footer_links">
             <li><button type="button" class="footer_link_btn" @click="handleAnchor('#beneficios')">Benefícios</button></li>
             <li><button type="button" class="footer_link_btn" @click="handleAnchor('#funcionalidades')">Funcionalidades</button></li>
             <li><button type="button" class="footer_link_btn" @click="handleAnchor('#como-funciona')">Como Funciona</button></li>
-            <li><button type="button" class="footer_link_btn" @click="handleAnchor('#diferenciais')">Diferenciais</button></li>
-            <li><button type="button" class="footer_link_btn" @click="handleAnchor('#seguranca')">Segurança & LGPD</button></li>
-            <li><button type="button" class="footer_link_btn" @click="handleAnchor('#continuidade')">Continuidade & SLA</button></li>
             <li><button type="button" class="footer_link_btn" @click="handleAnchor('#planos')">Planos & Preços</button></li>
+            <li><button type="button" class="footer_link_btn" @click="handleAnchor('#diferenciais')">Diferenciais</button></li>
+            <li><button type="button" class="footer_link_btn" @click="handleAnchor('#seguranca')">Segurança & Privacidade</button></li>
+            <li><button type="button" class="footer_link_btn" @click="handleAnchor('#continuidade')">Resiliência & Governança</button></li>
             <li><button type="button" class="footer_link_btn" @click="handleAnchor('#faq')">Perguntas Frequentes</button></li>
           </ul>
         </div>
@@ -71,18 +69,12 @@ function handleAnchor(hash: string) {
           </ul>
         </div>
 
-        <!-- Col 4: DPO & Suporte Oficial -->
+        <!-- Col 4: Suporte Oficial & Horários -->
         <div class="footer_col">
-          <span class="footer_col_title">Privacidade & Suporte</span>
-          
-          <div class="footer_dpo_snippet">
-            <span class="footer_dpo_tag">ENCARREGADO DE DADOS (DPO)</span>
-            <strong class="footer_dpo_name">Charles Egidio</strong>
-            <a href="mailto:charles@wi-id.com" class="footer_dpo_link">charles@wi-id.com</a>
-          </div>
+          <span class="footer_col_title">Atendimento & Suporte</span>
 
           <div class="footer_support_snippet">
-            <span class="footer_dpo_tag">SUPORTE TÉCNICO OFICIAL</span>
+            <span class="footer_section_tag">SUPORTE TÉCNICO OFICIAL</span>
             <a href="https://suporte.akidocs.com.br" target="_blank" rel="noopener noreferrer" class="footer_support_link">
               <span>suporte.akidocs.com.br</span>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -91,20 +83,34 @@ function handleAnchor(hash: string) {
                 <line x1="10" y1="14" x2="21" y2="3"></line>
               </svg>
             </a>
+
+            <div class="footer_schedule_block">
+              <span class="footer_schedule_heading">HORÁRIOS DE ATENDIMENTO</span>
+              <div class="schedule_item">
+                <strong class="schedule_channel">COMERCIAL</strong>
+                <span>Segunda à Sexta (exceto feriados)</span>
+                <span>09h00 às 18h00</span>
+              </div>
+              <div class="schedule_item">
+                <strong class="schedule_channel">SUPORTE</strong>
+                <span>24h por dia - 7 dias por semana</span>
+                <span>no Atendimento aos tickets de suporte</span>
+              </div>
+            </div>
           </div>
 
           <ul class="footer_links footer_contacts">
             <li>
               <a
-                href="mailto:contato@wi-id.com"
+                href="mailto:suporte@akidocs.com.br"
                 class="footer_contact_item"
-                @click="trackContactClick('email', 'footer', 'contato@wi-id.com')"
+                @click="trackContactClick('email', 'footer', 'suporte@akidocs.com.br')"
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff00ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B08D57" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                   <polyline points="22,6 12,13 2,6"></polyline>
                 </svg>
-                <span>contato@wi-id.com</span>
+                <span>suporte@akidocs.com.br</span>
               </a>
             </li>
             <li>
@@ -147,10 +153,10 @@ function handleAnchor(hash: string) {
 
 <style lang="scss" scoped>
 .landing_footer {
-  background: #1a1a1a;
-  border-top: 1px solid rgba(247, 247, 247, 0.08);
+  background: #0B1B2B;
+  border-top: 1px solid rgba(255, 252, 255, 0.08);
   padding: 80px 24px 40px;
-  color: #f7f7f7;
+  color: #FFFCFF;
 }
 
 .footer_container {
@@ -160,7 +166,7 @@ function handleAnchor(hash: string) {
 
 .footer_grid {
   display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  grid-template-columns: 1.4fr 1fr 1fr 1.3fr;
   gap: 48px;
   margin-bottom: 60px;
 
@@ -197,77 +203,55 @@ function handleAnchor(hash: string) {
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   line-height: 1.6;
-  color: rgba(247, 247, 247, 0.65);
+  color: rgba(255, 252, 255, 0.7);
   max-width: 320px;
-}
-
-.footer_badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.cert_badge {
-  display: inline-block;
-  font-family: 'Source Code Pro', monospace;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: #ff00ff;
-  background: rgba(255, 0, 255, 0.1);
-  border: 1px solid rgba(255, 0, 255, 0.25);
-  padding: 3px 8px;
-  border-radius: 6px;
 }
 
 .footer_company_data {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   font-family: 'Inter', sans-serif;
   font-size: 12px;
-  color: rgba(247, 247, 247, 0.6);
+  color: rgba(255, 252, 255, 0.55);
+
+  .dev_by_label {
+    color: #B08D57;
+    font-weight: 600;
+    margin-top: 4px;
+  }
 
   strong {
-    color: #f7f7f7;
+    color: #FFFCFF;
     font-size: 13px;
     margin-bottom: 2px;
   }
 }
 
-.footer_dpo_snippet,
 .footer_support_snippet {
-  background: rgba(121, 121, 121, 0.12);
-  border: 1px solid rgba(247, 247, 247, 0.08);
-  border-radius: 12px;
-  padding: 12px 14px;
+  background: #1F2933;
+  border: 1px solid rgba(255, 252, 255, 0.08);
+  border-radius: 14px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-bottom: 14px;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
-.footer_dpo_tag {
-  font-family: 'Source Code Pro', monospace;
-  font-size: 9px;
+.footer_section_tag {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
   font-weight: 700;
-  color: #ff00ff;
+  color: #B08D57;
   letter-spacing: 0.5px;
 }
 
-.footer_dpo_name {
-  font-family: 'Source Code Pro', monospace;
-  font-size: 13px;
-  font-weight: 700;
-  color: #f7f7f7;
-}
-
-.footer_dpo_link,
 .footer_support_link {
-  font-family: 'Source Code Pro', monospace;
-  font-size: 12px;
-  color: rgba(247, 247, 247, 0.75);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: #FFFCFF;
+  font-weight: 600;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -275,7 +259,39 @@ function handleAnchor(hash: string) {
   transition: color 0.2s ease;
 
   &:hover {
-    color: #ff00ff;
+    color: #B08D57;
+  }
+}
+
+.footer_schedule_block {
+  border-top: 1px solid rgba(255, 252, 255, 0.08);
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer_schedule_heading {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  color: #B08D57;
+  letter-spacing: 0.6px;
+}
+
+.schedule_item {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  line-height: 1.4;
+  color: rgba(255, 252, 255, 0.65);
+
+  .schedule_channel {
+    color: #FFFCFF;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 1px;
   }
 }
 
@@ -285,12 +301,12 @@ function handleAnchor(hash: string) {
 }
 
 .footer_col_title {
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: #f7f7f7;
+  color: #FFFCFF;
   margin-bottom: 20px;
 }
 
@@ -300,44 +316,45 @@ function handleAnchor(hash: string) {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .footer_link,
 .footer_link_btn {
   font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  color: rgba(247, 247, 247, 0.65);
+  font-size: 13px;
+  color: rgba(255, 252, 255, 0.65);
   text-decoration: none;
   background: transparent;
   border: none;
   padding: 0;
   cursor: pointer;
   text-align: left;
-  transition: color 0.2s ease, opacity 0.2s ease;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: inline-block;
 
   &:hover {
-    color: #ff00ff;
+    color: #B08D57;
+    transform: translateX(2px);
   }
+}
+
+.footer_contacts {
+  gap: 8px;
 }
 
 .footer_contact_item {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  font-family: 'Source Code Pro', monospace;
+  gap: 8px;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
-  color: rgba(247, 247, 247, 0.75);
+  color: rgba(255, 252, 255, 0.7);
   text-decoration: none;
-  transition: all 0.2s ease;
-
-  svg {
-    flex-shrink: 0;
-  }
+  transition: color 0.2s ease;
 
   &:hover {
-    color: #ff00ff;
-    transform: translateX(2px);
+    color: #B08D57;
   }
 
   &--whatsapp:hover {
@@ -346,40 +363,47 @@ function handleAnchor(hash: string) {
 }
 
 .footer_bottom {
-  border-top: 1px solid rgba(247, 247, 247, 0.08);
+  border-top: 1px solid rgba(255, 252, 255, 0.08);
   padding-top: 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 16px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+  }
 }
 
 .copyright_text {
   margin: 0;
   font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  color: rgba(247, 247, 247, 0.5);
+  font-size: 12px;
+  color: rgba(255, 252, 255, 0.5);
 }
 
 .footer_legal_links {
   display: flex;
   align-items: center;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
   font-family: 'Inter', sans-serif;
-  font-size: 13px;
+  font-size: 12px;
 
   a {
-    color: rgba(247, 247, 247, 0.5);
+    color: rgba(255, 252, 255, 0.5);
     text-decoration: none;
+    transition: color 0.2s ease;
 
     &:hover {
-      color: #ff00ff;
+      color: #B08D57;
     }
   }
 
   .sep {
-    color: rgba(247, 247, 247, 0.3);
+    color: rgba(255, 252, 255, 0.25);
   }
 }
 </style>

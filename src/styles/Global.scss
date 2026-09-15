@@ -8,30 +8,30 @@ html {
   font-family: 'Inter', sans-serif;
 }
 
-$color-orange-100: #CFC6BC;
-$color-green-200: #5C7866;
-$color-orange-500: #CE6E40;
+$color-orange-100: #B08D57;
+$color-green-200: #1F3A5F;
+$color-orange-500: #1F3A5F;
 
 :root {
-  --color-white-100: #ffffff;
-  --color-white-300: #F8F8F8;
+  --color-white-100: #FFFCFF;
+  --color-white-300: #FFFCFF;
 
-  --color-black-900: #000000;
+  --color-black-900: #0B1B2B;
 
-  --color-orange-100: #CFC6BC;
+  --color-orange-100: #B08D57;
 
-  --color-orange-500: #CE6E40;
-  --color-orange-600: #C7633B;
+  --color-orange-500: #1F3A5F;
+  --color-orange-600: #B08D57;
 
-  --color-red-500: #D64646;
+  --color-red-500: #AB052D;
 
-  --color-green-200: #A7BFB0;
-  --color-green-400: #5C7866;
+  --color-green-200: #1F3A5F;
+  --color-green-400: #1F3A5F;
 
-  --color-blue-600: #263E48;
-  --color-blue-700: #1E3F49;
+  --color-blue-600: #1F3A5F;
+  --color-blue-700: #0B1B2B;
 
-  --color-gray-500: #707070;
+  --color-gray-500: #1F2933;
 }
 
 @mixin background-opacity($color, $opacity: 0.3) {

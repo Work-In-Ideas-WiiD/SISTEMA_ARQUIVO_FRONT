@@ -80,9 +80,9 @@ function getFeaturesForPlan(plano: IPlanoPublico): string[] {
 
   const list = [
     users,
-    `${gb} de Armazenamento Seguro`,
+    `${gb} de Armazenamento Total`,
     'Limite de até 150 MB por arquivo',
-    'Acessos Ilimitados para Clientes',
+    'Acessos Ilimitados para seus Clientes',
     'Organização por Setores e Funções',
     'Confirmação de Leitura de Documentos',
     'Criptografia na Infraestrutura',
@@ -124,12 +124,8 @@ function handleSelectPlan(plano: IPlanoPublico) {
   })
 }
 
-function onEmailContactClick() {
-  trackContactClick('email', 'pricing_guarantee', 'contato@wi-id.com')
-}
-
 function onWhatsAppContactClick() {
-  trackContactClick('whatsapp', 'pricing_guarantee', '5562983398612')
+  trackContactClick('whatsapp', 'pricing_custom_plan', '5562983398612')
 }
 </script>
 
@@ -236,7 +232,7 @@ function onWhatsAppContactClick() {
             <span class="features_label">O que está incluído:</span>
             <ul class="features_list">
               <li v-for="(feat, fIdx) in getFeaturesForPlan(plano)" :key="fIdx">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff00ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B08D57" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
                 <span>{{ feat }}</span>
@@ -246,18 +242,21 @@ function onWhatsAppContactClick() {
         </article>
       </div>
 
+      <!-- Novo Bloco Sob Medida -->
       <div class="pricing_guarantee">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff00ff" stroke-width="2" aria-hidden="true">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-          <line x1="12" y1="17" x2="12.01" y2="17"></line>
-        </svg>
-        <span>
-          Precisa de um plano sob medida para alta volumetria?
-          <a href="mailto:contato@wi-id.com" class="guarantee_link" @click="onEmailContactClick">Fale com nossos consultores (contato@wi-id.com)</a>
-          ou pelo
-          <a href="https://wa.me/5562983398612" target="_blank" rel="noopener noreferrer" class="guarantee_link" @click="onWhatsAppContactClick">WhatsApp (62) 98339-8612</a>.
-        </span>
+        <span class="custom_plan_text">Precisa de um plano sob medida para demanda?</span>
+        <a
+          href="https://wa.me/5562983398612"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="custom_plan_btn"
+          @click="onWhatsAppContactClick"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+          </svg>
+          <span>Chame a gente no WhatsApp</span>
+        </a>
       </div>
     </div>
   </section>
@@ -267,8 +266,8 @@ function onWhatsAppContactClick() {
 .pricing_section {
   position: relative;
   padding: 100px 24px;
-  background: #212121;
-  border-top: 1px solid rgba(247, 247, 247, 0.05);
+  background: #0B1B2B;
+  border-top: 1px solid rgba(255, 252, 255, 0.08);
 }
 
 .pricing_container {
@@ -278,30 +277,30 @@ function onWhatsAppContactClick() {
 
 .section_header {
   text-align: center;
-  max-width: 720px;
+  max-width: 760px;
   margin: 0 auto 56px;
 }
 
 .section_badge {
   display: inline-block;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: #ff00ff;
+  color: #B08D57;
   letter-spacing: 1px;
   padding: 6px 14px;
-  background: rgba(255, 0, 255, 0.1);
-  border: 1px solid rgba(255, 0, 255, 0.25);
+  background: rgba(176, 141, 87, 0.15);
+  border: 1px solid rgba(176, 141, 87, 0.35);
   border-radius: 20px;
   margin-bottom: 16px;
 }
 
 .section_title {
   margin: 0 0 16px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: clamp(26px, 2.5vw, 36px);
   font-weight: 700;
-  color: #f7f7f7;
+  color: #FFFCFF;
   line-height: 1.25;
 }
 
@@ -311,7 +310,7 @@ function onWhatsAppContactClick() {
   font-size: 16px;
   font-weight: 400;
   line-height: 1.6;
-  color: rgba(247, 247, 247, 0.7);
+  color: rgba(255, 252, 255, 0.7);
 }
 
 .commercial_specs_bar {
@@ -320,8 +319,8 @@ function onWhatsAppContactClick() {
   justify-content: center;
   flex-wrap: wrap;
   gap: 16px;
-  background: rgba(33, 33, 33, 0.85);
-  border: 1px solid rgba(255, 0, 255, 0.25);
+  background: rgba(11, 27, 43, 0.85);
+  border: 1px solid rgba(255, 252, 255, 0.15);
   border-radius: 40px;
   padding: 12px 28px;
   margin-bottom: 32px;
@@ -334,23 +333,23 @@ function onWhatsAppContactClick() {
   gap: 2px;
 
   strong {
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
     font-weight: 700;
-    color: #ff00ff;
+    color: #B08D57;
   }
 
   span {
     font-family: 'Inter', sans-serif;
     font-size: 11px;
-    color: rgba(247, 247, 247, 0.75);
+    color: rgba(255, 252, 255, 0.75);
   }
 }
 
 .spec_divider {
   width: 1px;
   height: 24px;
-  background: rgba(247, 247, 247, 0.15);
+  background: rgba(255, 252, 255, 0.15);
 
   @media (max-width: 600px) {
     display: none;
@@ -361,8 +360,8 @@ function onWhatsAppContactClick() {
 .billing_toggle_wrap {
   display: inline-flex;
   align-items: center;
-  background: rgba(121, 121, 121, 0.2);
-  border: 1px solid rgba(247, 247, 247, 0.1);
+  background: #1F2933;
+  border: 1px solid rgba(255, 252, 255, 0.12);
   padding: 4px;
   border-radius: 40px;
   gap: 4px;
@@ -371,10 +370,10 @@ function onWhatsAppContactClick() {
 .toggle_btn {
   background: transparent;
   border: none;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 600;
-  color: rgba(247, 247, 247, 0.7);
+  color: rgba(255, 252, 255, 0.7);
   padding: 8px 18px;
   border-radius: 30px;
   cursor: pointer;
@@ -384,20 +383,20 @@ function onWhatsAppContactClick() {
   transition: all 0.2s ease;
 
   &--active {
-    background: #f7f7f7;
-    color: #212121;
+    background: #FFFCFF;
+    color: #0B1B2B;
     font-weight: 700;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(11, 27, 43, 0.5);
   }
 }
 
 .discount_badge {
   font-size: 10px;
-  font-weight: 800;
-  background: #ff00ff;
-  color: #ffffff;
+  font-weight: 700;
+  background: #2F6F6D;
+  color: #FFFCFF;
   padding: 2px 6px;
-  border-radius: 12px;
+  border-radius: 10px;
 }
 
 /* Pricing Grid */
@@ -418,24 +417,25 @@ function onWhatsAppContactClick() {
 
 .pricing_card {
   position: relative;
-  background: rgba(121, 121, 121, 0.12);
-  border: 1px solid rgba(247, 247, 247, 0.1);
-  border-radius: 28px;
+  background: #1F2933;
+  border: 1px solid rgba(255, 252, 255, 0.1);
+  border-radius: 24px;
   padding: 40px 32px;
   display: flex;
   flex-direction: column;
   transition: all 0.25s ease;
+  box-shadow: 0 12px 30px rgba(11, 27, 43, 0.5);
 
   &:hover {
     transform: translateY(-4px);
-    border-color: rgba(255, 0, 255, 0.4);
-    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+    border-color: rgba(176, 141, 87, 0.4);
+    box-shadow: 0 20px 45px rgba(11, 27, 43, 0.8);
   }
 
   &--popular {
-    background: rgba(121, 121, 121, 0.22);
-    border-color: #ff00ff;
-    box-shadow: 0 0 35px rgba(255, 0, 255, 0.18);
+    background: #1F2933;
+    border-color: #B08D57;
+    box-shadow: 0 0 35px rgba(31, 58, 95, 0.5), 0 12px 30px rgba(11, 27, 43, 0.6);
   }
 }
 
@@ -444,9 +444,9 @@ function onWhatsAppContactClick() {
   top: -14px;
   left: 50%;
   transform: translateX(-50%);
-  background: #ff00ff;
-  color: #ffffff;
-  font-family: 'Source Code Pro', monospace;
+  background: #B08D57;
+  color: #0B1B2B;
+  font-family: 'Inter', sans-serif;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 1px;
@@ -461,10 +461,10 @@ function onWhatsAppContactClick() {
 
 .plan_name {
   margin: 0 0 8px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 24px;
   font-weight: 800;
-  color: #f7f7f7;
+  color: #FFFCFF;
   text-transform: uppercase;
 }
 
@@ -474,7 +474,7 @@ function onWhatsAppContactClick() {
   font-size: 13px;
   font-weight: 400;
   line-height: 1.5;
-  color: rgba(247, 247, 247, 0.65);
+  color: rgba(255, 252, 255, 0.65);
   min-height: 40px;
 }
 
@@ -482,46 +482,46 @@ function onWhatsAppContactClick() {
   display: flex;
   align-items: baseline;
   gap: 4px;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 .currency {
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 18px;
   font-weight: 700;
-  color: #f7f7f7;
+  color: #B08D57;
 }
 
 .amount {
-  font-family: 'Source Code Pro', monospace;
-  font-size: 40px;
+  font-family: 'Inter', sans-serif;
+  font-size: 38px;
   font-weight: 800;
-  color: #f7f7f7;
-  line-height: 1;
+  color: #FFFCFF;
+  letter-spacing: -1px;
 }
 
 .period {
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
-  font-weight: 500;
-  color: rgba(247, 247, 247, 0.6);
+  color: rgba(255, 252, 255, 0.6);
 }
 
 .annual_note {
   margin: 0 0 28px;
-  font-family: 'Source Code Pro', monospace;
-  font-size: 11px;
-  color: #ff00ff;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: #2F6F6D;
+  font-weight: 600;
 }
 
 .plan_cta_btn {
   width: 100%;
   padding: 14px;
   border-radius: 30px;
-  border: 1px solid rgba(247, 247, 247, 0.3);
+  border: 1px solid rgba(255, 252, 255, 0.25);
   background: transparent;
-  color: #f7f7f7;
-  font-family: 'Source Code Pro', monospace;
+  color: #FFFCFF;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.5px;
@@ -530,27 +530,27 @@ function onWhatsAppContactClick() {
   margin-bottom: 28px;
 
   &:hover {
-    background: rgba(255, 0, 255, 0.15);
-    border-color: #ff00ff;
-    color: #ff00ff;
+    background: rgba(31, 58, 95, 0.4);
+    border-color: #B08D57;
+    color: #B08D57;
   }
 
   &--popular {
-    background: #f7f7f7;
-    color: #212121;
+    background: #B08D57;
+    color: #FFFFFF;
     border: none;
 
     &:hover {
-      background: #ffffff;
-      box-shadow: 0 0 20px rgba(255, 0, 255, 0.6);
-      color: #212121;
+      background: #FFFCFF;
+      color: #0B1B2B;
+      box-shadow: 0 0 20px rgba(176, 141, 87, 0.5);
     }
   }
 }
 
 .features_divider {
   height: 1px;
-  background: rgba(247, 247, 247, 0.08);
+  background: rgba(255, 252, 255, 0.08);
   margin-bottom: 24px;
 }
 
@@ -560,12 +560,13 @@ function onWhatsAppContactClick() {
 
 .features_label {
   display: block;
-  font-family: 'Source Code Pro', monospace;
-  font-size: 11px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
   font-weight: 700;
+  color: rgba(255, 252, 255, 0.5);
   text-transform: uppercase;
-  color: rgba(247, 247, 247, 0.55);
-  margin-bottom: 14px;
+  letter-spacing: 0.8px;
+  margin-bottom: 16px;
 }
 
 .features_list {
@@ -582,33 +583,57 @@ function onWhatsAppContactClick() {
     gap: 10px;
     font-family: 'Inter', sans-serif;
     font-size: 13px;
-    line-height: 1.45;
-    color: rgba(247, 247, 247, 0.85);
+    color: rgba(255, 252, 255, 0.85);
+    line-height: 1.4;
+
+    svg {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
   }
 }
 
+/* Novo Bloco Sob Medida */
 .pricing_guarantee {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 18px;
   text-align: center;
+  background: #1F2933;
+  padding: 18px 28px;
+  border-radius: 20px;
+  border: 1px solid #B08D57;
+  box-shadow: 0 10px 30px rgba(11, 27, 43, 0.6);
+  flex-wrap: wrap;
+}
+
+.custom_plan_text {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #FFFCFF;
+}
+
+.custom_plan_btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #25D366;
+  color: #FFFFFF;
   font-family: 'Inter', sans-serif;
   font-size: 14px;
-  color: rgba(247, 247, 247, 0.7);
-  background: rgba(121, 121, 121, 0.12);
-  padding: 16px 24px;
-  border-radius: 18px;
-  border: 1px solid rgba(247, 247, 247, 0.06);
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: 30px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
 
-  .guarantee_link {
-    color: #ff00ff;
-    text-decoration: underline;
-    font-weight: 600;
-
-    &:hover {
-      color: #ffffff;
-    }
+  &:hover {
+    background: #20BA5A;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.45);
   }
 }
 </style>

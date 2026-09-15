@@ -21,6 +21,20 @@ function scrollToPricing() {
     <!-- Signature background watermark </DOC -->
     <div class="hero_watermark" aria-hidden="true">&lt;/DOC</div>
 
+    <!-- Video background com overlay escuro -->
+    <div class="hero_video_container" aria-hidden="true">
+      <video
+        class="hero_video_bg"
+        autoplay
+        loop
+        muted
+        playsinline
+      >
+        <source src="/videos/hero-catalog-bg.mp4" type="video/mp4" />
+      </video>
+      <div class="hero_video_overlay"></div>
+    </div>
+
     <!-- Ambient glow lights -->
     <div class="hero_glow hero_glow--magenta" aria-hidden="true"></div>
     <div class="hero_glow hero_glow--subtle" aria-hidden="true"></div>
@@ -56,36 +70,6 @@ function scrollToPricing() {
           <button type="button" class="hero_btn hero_btn--secondary" @click="scrollToPricing">
             VER PLANOS E PREÇOS
           </button>
-        </div>
-
-        <div class="hero_trust">
-          <div class="trust_item">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff00ff" stroke-width="2" aria-hidden="true">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12 6 12 12 14 14"/>
-            </svg>
-            <span>8 dias grátis</span>
-          </div>
-          <div class="trust_item">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff00ff" stroke-width="2" aria-hidden="true">
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
-            <span>Sem instalação</span>
-          </div>
-          <div class="trust_item">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff00ff" stroke-width="2" aria-hidden="true">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-            <span>Dados hospedados no Brasil</span>
-          </div>
-          <div class="trust_item">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff00ff" stroke-width="2" aria-hidden="true">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-            </svg>
-            <span>Acessos ilimitados para clientes</span>
-          </div>
         </div>
       </div>
 
@@ -130,9 +114,9 @@ function scrollToPricing() {
               </div>
               <div class="mockup_nav_item">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                  <polyline points="2 17 12 22 22 17"></polyline>
+                  <polyline points="2 12 12 17 22 12"></polyline>
                 </svg>
                 <span>Setores</span>
               </div>
@@ -145,23 +129,23 @@ function scrollToPricing() {
               </div>
             </div>
 
-            <!-- Mockup Main -->
-            <div class="mockup_main">
+            <!-- Mockup Main Panel -->
+            <div class="mockup_content">
               <!-- KPI Cards -->
               <div class="mockup_kpis">
                 <div class="kpi_card">
-                  <span class="kpi_label">Arquivos Armazenados</span>
+                  <span class="kpi_label">ARQUIVOS ARMAZENADOS</span>
                   <span class="kpi_val">1.420</span>
                 </div>
                 <div class="kpi_card">
-                  <span class="kpi_label">Armazenamento</span>
+                  <span class="kpi_label">ARMAZENAMENTO</span>
                   <div class="kpi_progress_wrap">
                     <div class="kpi_progress_bar" style="width: 25%"></div>
                   </div>
                   <span class="kpi_sub">24.8 GB de 100 GB</span>
                 </div>
                 <div class="kpi_card">
-                  <span class="kpi_label">Leituras Confirmadas</span>
+                  <span class="kpi_label">LEITURAS CONFIRMADAS</span>
                   <span class="kpi_val kpi_val--accent">98.4%</span>
                 </div>
               </div>
@@ -169,9 +153,9 @@ function scrollToPricing() {
               <!-- Document List Preview -->
               <div class="mockup_table">
                 <div class="table_row table_row--header">
-                  <span>Documento</span>
-                  <span>Setor</span>
-                  <span>Confirmação</span>
+                  <span>DOCUMENTO</span>
+                  <span>SETOR</span>
+                  <span>CONFIRMAÇÃO</span>
                 </div>
                 <div class="table_row">
                   <div class="doc_cell">
@@ -231,22 +215,49 @@ function scrollToPricing() {
   align-items: center;
   padding: 130px 24px 80px;
   box-sizing: border-box;
-  background: radial-gradient(circle at 80% 20%, rgba(255, 0, 255, 0.12) 0%, rgba(33, 33, 33, 1) 70%),
-              #212121;
+  background: radial-gradient(circle at 80% 20%, #1F3A5F, #0B1B2B 70%), #0B1B2B;
   overflow: hidden;
+}
+
+.hero_video_container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hero_video_bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.28;
+  filter: saturate(0.85) contrast(1.1);
+}
+
+.hero_video_overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 80% 20%, rgba(31, 58, 95, 0.75) 0%, rgba(11, 27, 43, 0.92) 60%, #0B1B2B 100%);
 }
 
 .hero_watermark {
   position: absolute;
-  z-index: 0;
+  z-index: 1;
   top: 45%;
   right: -5vw;
   transform: translateY(-50%);
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: clamp(140px, 24vw, 320px);
   font-weight: 800;
   line-height: 0.8;
-  color: #f7f7f7;
+  color: #FFFCFF;
   opacity: 0.03;
   pointer-events: none;
   user-select: none;
@@ -258,13 +269,14 @@ function scrollToPricing() {
   pointer-events: none;
   border-radius: 50%;
   filter: blur(120px);
+  z-index: 1;
 
   &--magenta {
     top: 10%;
     right: 15%;
     width: 450px;
     height: 450px;
-    background: rgba(255, 0, 255, 0.18);
+    background: #1F3A5F59;
   }
 
   &--subtle {
@@ -272,7 +284,7 @@ function scrollToPricing() {
     left: 5%;
     width: 380px;
     height: 380px;
-    background: rgba(255, 255, 255, 0.03);
+    background: #FFFCFF0D;
   }
 }
 
@@ -310,10 +322,10 @@ function scrollToPricing() {
   gap: 8px;
   padding: 8px 18px;
   border-radius: 30px;
-  background: rgba(255, 0, 255, 0.12);
-  border: 1px solid rgba(255, 0, 255, 0.35);
-  color: #ff00ff;
-  font-family: 'Source Code Pro', monospace;
+  background: #1F2933;
+  border: 1px solid #B08D57;
+  color: #FFFCFF;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.8px;
@@ -324,17 +336,17 @@ function scrollToPricing() {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #ff00ff;
-  box-shadow: 0 0 10px #ff00ff;
+  background: #B08D57;
+  box-shadow: 0 0 10px #B08D57;
 }
 
 .hero_title {
   margin: 0 0 16px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: clamp(32px, 3.4vw, 50px);
   font-weight: 800;
   line-height: 1.15;
-  color: #f7f7f7;
+  color: #FFFCFF;
   letter-spacing: -0.5px;
 }
 
@@ -344,7 +356,7 @@ function scrollToPricing() {
   font-size: clamp(17px, 1.3vw, 20px);
   font-weight: 600;
   line-height: 1.5;
-  color: #ffffff;
+  color: #FFFFFF;
   max-width: 580px;
 }
 
@@ -354,7 +366,7 @@ function scrollToPricing() {
   font-size: clamp(15px, 1.1vw, 16px);
   font-weight: 400;
   line-height: 1.6;
-  color: rgba(247, 247, 247, 0.72);
+  color: rgba(255, 252, 255, 0.72);
   max-width: 540px;
 }
 
@@ -363,11 +375,11 @@ function scrollToPricing() {
   align-items: center;
   flex-wrap: wrap;
   gap: 16px;
-  margin-bottom: 40px;
+  margin-bottom: 0;
 }
 
 .hero_btn {
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 15px;
   font-weight: 800;
   letter-spacing: 0.5px;
@@ -382,51 +394,32 @@ function scrollToPricing() {
   text-decoration: none;
 
   &--primary {
-    background: #f7f7f7;
-    color: #212121;
+    background: #B08D57;
+    color: #FFFFFF;
     border: none;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 20px rgba(11, 27, 43, 0.6);
 
     &:hover {
-      background: #ffffff;
-      box-shadow: 0 0 25px rgba(255, 0, 255, 0.5);
+      background: #FFFCFF;
+      color: #0B1B2B;
+      box-shadow: 0 0 25px rgba(176, 141, 87, 0.5);
       transform: translateY(-2px);
     }
   }
 
   &--secondary {
-    background: rgba(121, 121, 121, 0.2);
-    color: #f7f7f7;
-    border: 1px solid rgba(247, 247, 247, 0.25);
+    background: #1F2933;
+    color: #FFFCFF;
+    border: 1px solid rgba(255, 252, 255, 0.25);
     backdrop-filter: blur(10px);
 
     &:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: #ff00ff;
-      color: #ff00ff;
+      background: rgba(255, 252, 255, 0.1);
+      border-color: #B08D57;
+      color: #B08D57;
       transform: translateY(-2px);
     }
   }
-}
-
-.hero_trust {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-
-  @media (max-width: 1024px) {
-    justify-content: center;
-  }
-}
-
-.trust_item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  color: rgba(247, 247, 247, 0.7);
 }
 
 /* Visual UI Showcase Mockup */
@@ -437,21 +430,21 @@ function scrollToPricing() {
 
 .mockup_window {
   width: 100%;
-  background: #252525;
-  border: 1px solid rgba(247, 247, 247, 0.15);
+  background: #1F2933;
+  border: 1px solid rgba(255, 252, 255, 0.15);
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 40px rgba(255, 0, 255, 0.1);
+  box-shadow: 0 24px 60px rgba(11, 27, 43, 0.8), 0 0 40px rgba(31, 58, 95, 0.2);
 }
 
 .mockup_header {
   height: 44px;
-  background: #1e1e1e;
+  background: #0B1B2B;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
-  border-bottom: 1px solid rgba(247, 247, 247, 0.08);
+  border-bottom: 1px solid rgba(255, 252, 255, 0.08);
 }
 
 .mockup_dots {
@@ -464,21 +457,27 @@ function scrollToPricing() {
   height: 10px;
   border-radius: 50%;
 
-  &--red { background: #ff5f56; }
-  &--yellow { background: #ffbd2e; }
-  &--green { background: #27c93f; }
+  &--red {
+    background: #AB052D;
+  }
+  &--yellow {
+    background: #B08D57;
+  }
+  &--green {
+    background: #1F3A5F;
+  }
 }
 
 .mockup_address {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(11, 27, 43, 0.6);
   padding: 4px 14px;
   border-radius: 20px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
-  color: rgba(247, 247, 247, 0.6);
+  color: rgba(255, 252, 255, 0.6);
 }
 
 .mockup_user {
@@ -490,9 +489,9 @@ function scrollToPricing() {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #ff00ff;
-  color: #fff;
-  font-family: 'Source Code Pro', monospace;
+  background: #1F3A5F;
+  color: #FFFCFF;
+  font-family: 'Inter', sans-serif;
   font-size: 10px;
   font-weight: 700;
   display: flex;
@@ -503,22 +502,22 @@ function scrollToPricing() {
 .mockup_body {
   display: grid;
   grid-template-columns: 140px 1fr;
-  min-height: 320px;
+  min-height: 380px;
 
-  @media (max-width: 600px) {
+  @media (max-width: 640px) {
     grid-template-columns: 1fr;
   }
 }
 
 .mockup_sidebar {
-  background: #212121;
-  border-right: 1px solid rgba(247, 247, 247, 0.06);
+  background: #0B1B2B;
+  border-right: 1px solid rgba(255, 252, 255, 0.06);
   padding: 16px 12px;
   display: flex;
   flex-direction: column;
   gap: 8px;
 
-  @media (max-width: 600px) {
+  @media (max-width: 640px) {
     display: none;
   }
 }
@@ -529,29 +528,27 @@ function scrollToPricing() {
   gap: 10px;
   padding: 8px 10px;
   border-radius: 8px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 12px;
-  color: rgba(247, 247, 247, 0.6);
+  color: rgba(255, 252, 255, 0.6);
 
   &--active {
-    background: rgba(255, 0, 255, 0.15);
-    color: #ff00ff;
+    background: rgba(31, 58, 95, 0.3);
+    color: #B08D57;
     font-weight: 700;
   }
 }
 
-.mockup_main {
+.mockup_content {
   padding: 20px;
-  background: #252525;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  background: #1F2933;
 }
 
 .mockup_kpis {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
+  margin-bottom: 20px;
 
   @media (max-width: 480px) {
     grid-template-columns: 1fr;
@@ -559,80 +556,81 @@ function scrollToPricing() {
 }
 
 .kpi_card {
-  background: rgba(121, 121, 121, 0.2);
-  border-radius: 12px;
-  padding: 12px 14px;
-  border: 1px solid rgba(247, 247, 247, 0.08);
+  background: #0B1B2B;
+  border: 1px solid rgba(255, 252, 255, 0.08);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .kpi_label {
-  display: block;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: rgba(247, 247, 247, 0.6);
+  color: rgba(255, 252, 255, 0.5);
   margin-bottom: 6px;
+  letter-spacing: 0.3px;
 }
 
 .kpi_val {
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 18px;
-  font-weight: 700;
-  color: #f7f7f7;
+  font-weight: 800;
+  color: #FFFCFF;
 
   &--accent {
-    color: #ff00ff;
+    color: #B08D57;
   }
 }
 
 .kpi_progress_wrap {
-  width: 100%;
   height: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  margin: 4px 0 6px;
+  background: rgba(255, 252, 255, 0.1);
+  border-radius: 2px;
   overflow: hidden;
+  margin-top: 6px;
 }
 
 .kpi_progress_bar {
   height: 100%;
-  background: #ff00ff;
-  border-radius: 4px;
+  background: #B08D57;
 }
 
 .kpi_sub {
-  font-family: 'Source Code Pro', monospace;
-  font-size: 9px;
-  color: rgba(247, 247, 247, 0.5);
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: rgba(255, 252, 255, 0.4);
+  margin-top: 4px;
 }
 
 .mockup_table {
-  background: rgba(121, 121, 121, 0.15);
+  background: rgba(11, 27, 43, 0.7);
   border-radius: 12px;
-  border: 1px solid rgba(247, 247, 247, 0.08);
+  border: 1px solid rgba(255, 252, 255, 0.08);
   overflow: hidden;
 }
 
 .table_row {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
-  padding: 10px 14px;
   align-items: center;
-  font-family: 'Source Code Pro', monospace;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255, 252, 255, 0.04);
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
-  border-bottom: 1px solid rgba(247, 247, 247, 0.05);
-
-  &--header {
-    background: rgba(0, 0, 0, 0.2);
-    font-weight: 700;
-    color: rgba(247, 247, 247, 0.5);
-    text-transform: uppercase;
-    font-size: 9px;
-  }
+  color: rgba(255, 252, 255, 0.9);
 
   &:last-child {
     border-bottom: none;
+  }
+
+  &--header {
+    background: rgba(11, 27, 43, 0.9);
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255, 252, 255, 0.45);
+    letter-spacing: 0.5px;
   }
 }
 
@@ -640,54 +638,52 @@ function scrollToPricing() {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #f7f7f7;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+
+  span:last-child {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .doc_icon {
   font-size: 9px;
-  font-weight: 700;
-  background: rgba(255, 0, 255, 0.2);
-  color: #ff00ff;
+  font-weight: 800;
+  background: rgba(171, 5, 45, 0.2);
+  color: #AB052D;
+  border: 1px solid rgba(171, 5, 45, 0.4);
   padding: 2px 4px;
   border-radius: 4px;
 }
 
 .text_muted {
-  color: rgba(247, 247, 247, 0.6);
+  color: rgba(255, 252, 255, 0.5);
 }
 
 .badge {
   display: inline-block;
-  padding: 3px 8px;
-  border-radius: 12px;
-  font-size: 9px;
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
   text-align: center;
   width: fit-content;
 
   &--success {
-    background: rgba(39, 201, 63, 0.15);
-    color: #27c93f;
-    border: 1px solid rgba(39, 201, 63, 0.3);
-  }
-
-  &--warning {
-    background: rgba(255, 189, 46, 0.15);
-    color: #ffbd2e;
-    border: 1px solid rgba(255, 189, 46, 0.3);
+    background: rgba(47, 111, 109, 0.2);
+    color: #2F6F6D;
+    border: 1px solid rgba(47, 111, 109, 0.4);
   }
 
   &--info {
-    background: rgba(0, 180, 255, 0.15);
-    color: #00b4ff;
-    border: 1px solid rgba(0, 180, 255, 0.3);
+    background: rgba(31, 58, 95, 0.3);
+    color: rgba(255, 252, 255, 0.85);
+    border: 1px solid rgba(31, 58, 95, 0.6);
   }
 }
 
-/* Floating Badges */
+/* Floating interactive badges */
 .floating_badge {
   position: absolute;
   z-index: 3;
@@ -695,51 +691,61 @@ function scrollToPricing() {
   align-items: center;
   gap: 12px;
   padding: 12px 18px;
-  background: rgba(33, 33, 33, 0.85);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 0, 255, 0.4);
-  border-radius: 16px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
-  font-family: 'Source Code Pro', monospace;
-  animation: float 4s ease-in-out infinite alternate;
+  background: #1F2933;
+  border: 1px solid rgba(255, 252, 255, 0.15);
+  border-radius: 14px;
+  box-shadow: 0 16px 36px rgba(11, 27, 43, 0.7);
+  backdrop-filter: blur(10px);
+  animation: floatAnim 4s ease-in-out infinite alternate;
 
   strong {
     display: block;
+    font-family: 'Inter', sans-serif;
     font-size: 12px;
-    color: #f7f7f7;
+    font-weight: 700;
+    color: #FFFCFF;
   }
 
   small {
+    font-family: 'Inter', sans-serif;
     font-size: 10px;
-    color: rgba(247, 247, 247, 0.6);
+    color: rgba(255, 252, 255, 0.6);
   }
 
   &--left {
     bottom: -15px;
     left: -20px;
-    animation-delay: 0.5s;
+    border-color: rgba(176, 141, 87, 0.4);
 
-    @media (max-width: 768px) {
-      display: none;
+    @media (max-width: 640px) {
+      left: 10px;
+      bottom: -10px;
     }
   }
 
   &--right {
     top: -15px;
     right: -20px;
+    animation-delay: -2s;
+    border-color: rgba(31, 58, 95, 0.8);
 
-    @media (max-width: 768px) {
-      display: none;
+    @media (max-width: 640px) {
+      right: 10px;
+      top: -10px;
     }
   }
 }
 
 .badge_icon {
-  font-size: 20px;
+  font-size: 18px;
 }
 
-@keyframes float {
-  0% { transform: translateY(0px); }
-  100% { transform: translateY(-8px); }
+@keyframes floatAnim {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-8px);
+  }
 }
 </style>

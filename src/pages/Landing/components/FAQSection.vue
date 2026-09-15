@@ -59,7 +59,7 @@ function toggleFaq(index: number) {
             class="faq_content"
             :hidden="activeIndex !== idx"
           >
-            <p class="faq_answer">{{ faq.answer }}</p>
+            <p class="faq_answer" v-html="faq.answer"></p>
           </div>
         </div>
       </div>
@@ -71,11 +71,12 @@ function toggleFaq(index: number) {
 .faq_section {
   position: relative;
   padding: 100px 24px;
-  background: #252525;
+  background: #0B1B2B;
+  border-top: 1px solid rgba(255, 252, 255, 0.08);
 }
 
 .faq_container {
-  max-width: 900px;
+  max-width: 920px;
   margin: 0 auto;
 }
 
@@ -86,24 +87,24 @@ function toggleFaq(index: number) {
 
 .section_badge {
   display: inline-block;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: #ff00ff;
+  color: #B08D57;
   letter-spacing: 1px;
   padding: 6px 14px;
-  background: rgba(255, 0, 255, 0.1);
-  border: 1px solid rgba(255, 0, 255, 0.25);
+  background: rgba(176, 141, 87, 0.15);
+  border: 1px solid rgba(176, 141, 87, 0.35);
   border-radius: 20px;
   margin-bottom: 16px;
 }
 
 .section_title {
   margin: 0 0 16px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: clamp(26px, 2.5vw, 36px);
   font-weight: 700;
-  color: #f7f7f7;
+  color: #FFFCFF;
   line-height: 1.25;
 }
 
@@ -113,7 +114,7 @@ function toggleFaq(index: number) {
   font-size: 16px;
   font-weight: 400;
   line-height: 1.6;
-  color: rgba(247, 247, 247, 0.7);
+  color: rgba(255, 252, 255, 0.7);
 }
 
 .faq_accordion {
@@ -123,20 +124,20 @@ function toggleFaq(index: number) {
 }
 
 .faq_item {
-  background: rgba(33, 33, 33, 0.7);
-  border: 1px solid rgba(247, 247, 247, 0.08);
-  border-radius: 18px;
+  background: #1F2933;
+  border: 1px solid rgba(255, 252, 255, 0.08);
+  border-radius: 16px;
   overflow: hidden;
   transition: all 0.25s ease;
 
   &--open {
-    border-color: rgba(255, 0, 255, 0.35);
-    background: rgba(33, 33, 33, 0.95);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    border-color: rgba(176, 141, 87, 0.45);
+    background: #1F3A5F33;
+    box-shadow: 0 10px 30px rgba(11, 27, 43, 0.6);
 
     .faq_icon {
       transform: rotate(180deg);
-      color: #ff00ff;
+      color: #B08D57;
     }
   }
 }
@@ -155,15 +156,15 @@ function toggleFaq(index: number) {
 }
 
 .faq_question {
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 16px;
-  font-weight: 700;
-  color: #f7f7f7;
+  font-weight: 600;
+  color: #FFFCFF;
   line-height: 1.4;
 }
 
 .faq_icon {
-  color: rgba(247, 247, 247, 0.6);
+  color: rgba(255, 252, 255, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -181,8 +182,20 @@ function toggleFaq(index: number) {
   font-size: 15px;
   font-weight: 400;
   line-height: 1.65;
-  color: rgba(247, 247, 247, 0.75);
-  border-top: 1px solid rgba(247, 247, 247, 0.06);
+  color: rgba(255, 252, 255, 0.8);
+  border-top: 1px solid rgba(255, 252, 255, 0.08);
   padding-top: 16px;
+
+  :deep(.faq_inline_link) {
+    color: #B08D57;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 600;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #FFFCFF;
+    }
+  }
 }
 </style>

@@ -112,8 +112,8 @@ const portabilityItems = [
 .continuity_section {
   position: relative;
   padding: 100px 24px;
-  background: #212121;
-  border-top: 1px solid rgba(247, 247, 247, 0.05);
+  background: #0B1B2B;
+  border-top: 1px solid rgba(255, 252, 255, 0.08);
 }
 
 .continuity_container {
@@ -129,24 +129,24 @@ const portabilityItems = [
 
 .section_badge {
   display: inline-block;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: #ff00ff;
+  color: #B08D57;
   letter-spacing: 1px;
   padding: 6px 14px;
-  background: rgba(255, 0, 255, 0.1);
-  border: 1px solid rgba(255, 0, 255, 0.25);
+  background: rgba(176, 141, 87, 0.15);
+  border: 1px solid rgba(176, 141, 87, 0.35);
   border-radius: 20px;
   margin-bottom: 16px;
 }
 
 .section_title {
   margin: 0 0 16px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: clamp(26px, 2.5vw, 36px);
   font-weight: 700;
-  color: #f7f7f7;
+  color: #FFFCFF;
   line-height: 1.25;
 }
 
@@ -156,15 +156,14 @@ const portabilityItems = [
   font-size: 16px;
   font-weight: 400;
   line-height: 1.6;
-  color: rgba(247, 247, 247, 0.7);
+  color: rgba(255, 252, 255, 0.7);
 }
 
-/* Metrics Grid */
 .metrics_grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  margin-bottom: 32px;
+  gap: 24px;
+  margin-bottom: 48px;
 
   @media (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
@@ -176,35 +175,36 @@ const portabilityItems = [
 }
 
 .metric_card {
-  background: rgba(121, 121, 121, 0.12);
-  border: 1px solid rgba(247, 247, 247, 0.08);
+  background: #1F2933;
+  border: 1px solid rgba(255, 252, 255, 0.08);
   border-radius: 20px;
   padding: 28px 24px;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 10px 30px rgba(11, 27, 43, 0.4);
   transition: all 0.25s ease;
 
   &:hover {
-    border-color: rgba(255, 0, 255, 0.35);
-    background: rgba(121, 121, 121, 0.18);
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    border-color: rgba(176, 141, 87, 0.45);
+    background: rgba(31, 58, 95, 0.25);
   }
 }
 
 .metric_label {
-  font-family: 'Source Code Pro', monospace;
-  font-size: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
   font-weight: 700;
-  color: #ff00ff;
+  color: rgba(255, 252, 255, 0.6);
   letter-spacing: 0.5px;
   margin-bottom: 12px;
 }
 
 .metric_val {
-  font-family: 'Source Code Pro', monospace;
-  font-size: 32px;
+  font-family: 'Inter', sans-serif;
+  font-size: 36px;
   font-weight: 800;
-  color: #f7f7f7;
+  color: #B08D57;
   line-height: 1.1;
   margin-bottom: 12px;
 }
@@ -213,109 +213,111 @@ const portabilityItems = [
   margin: 0;
   font-family: 'Inter', sans-serif;
   font-size: 13px;
+  font-weight: 400;
   line-height: 1.55;
-  color: rgba(247, 247, 247, 0.65);
+  color: rgba(255, 252, 255, 0.75);
 }
 
-/* SLA Action Bar */
 .sla_action_bar {
-  background: rgba(33, 33, 33, 0.8);
-  border: 1px solid rgba(247, 247, 247, 0.1);
+  background: #1F2933;
+  border: 1px solid rgba(255, 252, 255, 0.1);
   border-radius: 20px;
-  padding: 22px 28px;
+  padding: 24px 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 20px;
-  margin-bottom: 56px;
+  gap: 24px;
+  margin-bottom: 64px;
+  box-shadow: 0 10px 30px rgba(11, 27, 43, 0.5);
+
+  @media (max-width: 800px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .sla_action_text {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 
   strong {
-    font-family: 'Source Code Pro', monospace;
-    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
     font-weight: 700;
-    color: #f7f7f7;
+    color: #FFFCFF;
   }
 
   span {
     font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    color: rgba(247, 247, 247, 0.65);
+    font-size: 13.5px;
+    color: rgba(255, 252, 255, 0.7);
+    line-height: 1.5;
   }
 }
 
 .sla_cta_btn {
-  font-family: 'Source Code Pro', monospace;
+  background: #B08D57;
+  color: #FFFFFF;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
-  font-weight: 800;
-  color: #f7f7f7;
-  background: rgba(255, 0, 255, 0.15);
-  border: 1px solid rgba(255, 0, 255, 0.35);
-  border-radius: 30px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
   padding: 12px 24px;
+  border-radius: 30px;
+  text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  text-decoration: none;
-  transition: all 0.2s ease;
   white-space: nowrap;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 
   &:hover {
-    background: #ff00ff;
-    color: #ffffff;
-    box-shadow: 0 0 20px rgba(255, 0, 255, 0.4);
+    background: #FFFCFF;
+    color: #0B1B2B;
+    box-shadow: 0 0 16px rgba(176, 141, 87, 0.5);
     transform: translateY(-2px);
   }
 }
 
-/* Portability Box */
 .portability_box {
-  background: rgba(33, 33, 33, 0.6);
-  border: 1px solid rgba(247, 247, 247, 0.08);
-  border-radius: 28px;
-  padding: 44px 36px;
-
-  @media (max-width: 768px) {
-    padding: 32px 20px;
-  }
+  background: #1F2933;
+  border: 1px solid rgba(255, 252, 255, 0.08);
+  border-radius: 24px;
+  padding: 40px 36px;
+  box-shadow: 0 12px 36px rgba(11, 27, 43, 0.5);
 }
 
 .portability_header {
-  text-align: center;
-  max-width: 720px;
-  margin: 0 auto 40px;
+  margin-bottom: 32px;
 }
 
 .portability_tag {
   display: inline-block;
-  font-family: 'Source Code Pro', monospace;
-  font-size: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
   font-weight: 700;
-  color: #ff00ff;
-  letter-spacing: 0.8px;
+  color: #B08D57;
+  letter-spacing: 0.5px;
   margin-bottom: 8px;
 }
 
 .portability_title {
-  margin: 0 0 12px;
-  font-family: 'Source Code Pro', monospace;
-  font-size: clamp(22px, 2.2vw, 28px);
-  font-weight: 800;
-  color: #f7f7f7;
+  margin: 0 0 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #FFFCFF;
 }
 
 .portability_sub {
   margin: 0;
   font-family: 'Inter', sans-serif;
-  font-size: 15px;
-  line-height: 1.6;
-  color: rgba(247, 247, 247, 0.7);
+  font-size: 14px;
+  color: rgba(255, 252, 255, 0.7);
+  line-height: 1.55;
+  max-width: 680px;
 }
 
 .portability_grid {
@@ -333,38 +335,38 @@ const portabilityItems = [
 }
 
 .portability_card {
-  background: rgba(121, 121, 121, 0.1);
-  border: 1px solid rgba(247, 247, 247, 0.06);
-  border-radius: 20px;
-  padding: 26px 22px;
-  display: flex;
-  flex-direction: column;
+  background: rgba(11, 27, 43, 0.6);
+  border: 1px solid rgba(255, 252, 255, 0.08);
+  border-radius: 16px;
+  padding: 24px 20px;
 }
 
 .portability_step {
-  font-family: 'Source Code Pro', monospace;
-  font-size: 24px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
   font-weight: 800;
-  color: #ff00ff;
-  line-height: 1;
+  color: #B08D57;
+  display: inline-block;
+  background: rgba(176, 141, 87, 0.15);
+  border: 1px solid rgba(176, 141, 87, 0.3);
+  padding: 4px 10px;
+  border-radius: 12px;
   margin-bottom: 14px;
 }
 
 .portability_item_title {
-  margin: 0 0 10px;
-  font-family: 'Source Code Pro', monospace;
+  margin: 0 0 8px;
+  font-family: 'Inter', sans-serif;
   font-size: 15px;
   font-weight: 700;
-  color: #f7f7f7;
-  line-height: 1.3;
+  color: #FFFCFF;
 }
 
 .portability_item_desc {
   margin: 0;
   font-family: 'Inter', sans-serif;
   font-size: 13px;
-  font-weight: 400;
-  line-height: 1.6;
-  color: rgba(247, 247, 247, 0.65);
+  line-height: 1.55;
+  color: rgba(255, 252, 255, 0.7);
 }
 </style>

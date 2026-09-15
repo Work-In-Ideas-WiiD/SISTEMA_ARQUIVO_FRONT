@@ -105,8 +105,8 @@ const benefits = [
 .benefits_section {
   position: relative;
   padding: 100px 24px;
-  background: #212121;
-  border-top: 1px solid rgba(247, 247, 247, 0.05);
+  background: #0B1B2B;
+  border-top: 1px solid rgba(255, 252, 255, 0.08);
 }
 
 .benefits_container {
@@ -122,24 +122,24 @@ const benefits = [
 
 .section_badge {
   display: inline-block;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: #ff00ff;
+  color: #B08D57;
   letter-spacing: 1px;
   padding: 6px 14px;
-  background: rgba(255, 0, 255, 0.1);
-  border: 1px solid rgba(255, 0, 255, 0.25);
+  background: rgba(176, 141, 87, 0.15);
+  border: 1px solid rgba(176, 141, 87, 0.35);
   border-radius: 20px;
   margin-bottom: 16px;
 }
 
 .section_title {
   margin: 0 0 16px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: clamp(26px, 2.5vw, 36px);
   font-weight: 700;
-  color: #f7f7f7;
+  color: #FFFCFF;
   line-height: 1.25;
 }
 
@@ -149,7 +149,7 @@ const benefits = [
   font-size: 16px;
   font-weight: 400;
   line-height: 1.6;
-  color: rgba(247, 247, 247, 0.7);
+  color: rgba(255, 252, 255, 0.7);
 }
 
 .benefits_grid {
@@ -157,7 +157,7 @@ const benefits = [
   grid-template-columns: repeat(3, 1fr);
   gap: 28px;
 
-  @media (max-width: 960px) {
+  @media (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -167,39 +167,42 @@ const benefits = [
 }
 
 .benefit_card {
-  background: rgba(121, 121, 121, 0.12);
-  border: 1px solid rgba(247, 247, 247, 0.08);
-  border-radius: 24px;
+  background: #1F2933;
+  border: 1px solid rgba(255, 252, 255, 0.08);
+  border-radius: 20px;
   padding: 32px 28px;
-  transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(11, 27, 43, 0.4);
+  transition: all 0.25s ease;
 
   &:hover {
+    border-color: rgba(176, 141, 87, 0.45);
+    background: rgba(31, 58, 95, 0.25);
     transform: translateY(-4px);
-    background: rgba(121, 121, 121, 0.2);
-    border-color: rgba(255, 0, 255, 0.4);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 16px 36px rgba(11, 27, 43, 0.7);
   }
 }
 
 .card_icon_wrap {
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
-  background: rgba(255, 0, 255, 0.12);
-  border: 1px solid rgba(255, 0, 255, 0.25);
-  color: #ff00ff;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(176, 141, 87, 0.15);
+  border: 1px solid rgba(176, 141, 87, 0.3);
+  color: #B08D57;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 22px;
+  margin-bottom: 20px;
 }
 
 .benefit_title {
   margin: 0 0 12px;
-  font-family: 'Source Code Pro', monospace;
-  font-size: 18px;
+  font-family: 'Inter', sans-serif;
+  font-size: 19px;
   font-weight: 700;
-  color: #f7f7f7;
+  color: #FFFCFF;
   line-height: 1.3;
 }
 
@@ -208,7 +211,7 @@ const benefits = [
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 400;
-  line-height: 1.6;
-  color: rgba(247, 247, 247, 0.65);
+  line-height: 1.65;
+  color: rgba(255, 252, 255, 0.75);
 }
 </style>

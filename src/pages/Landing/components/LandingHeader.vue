@@ -64,19 +64,19 @@ function onStartClick(local: string = 'header') {
           Benefícios
         </button>
         <button type="button" class="nav_link" @click="handleNavClick('#funcionalidades')">
-          Funcionalidades
+          Recursos
         </button>
         <button type="button" class="nav_link" @click="handleNavClick('#como-funciona')">
-          Como Funciona
+          Passo a Passo
+        </button>
+        <button type="button" class="nav_link" @click="handleNavClick('#planos')">
+          Planos
         </button>
         <button type="button" class="nav_link" @click="handleNavClick('#diferenciais')">
           Diferenciais
         </button>
         <button type="button" class="nav_link" @click="handleNavClick('#seguranca')">
-          Segurança & LGPD
-        </button>
-        <button type="button" class="nav_link" @click="handleNavClick('#planos')">
-          Planos
+          Segurança
         </button>
         <button type="button" class="nav_link" @click="handleNavClick('#faq')">
           FAQ
@@ -108,45 +108,28 @@ function onStartClick(local: string = 'header') {
     </div>
 
     <!-- Mobile Drawer -->
-    <transition name="mobile-menu-fade">
-      <div v-if="mobileMenuOpen" class="mobile_drawer" role="dialog" aria-modal="true">
+    <Transition name="mobile-menu-fade">
+      <div v-if="mobileMenuOpen" class="mobile_drawer" role="dialog" aria-modal="true" aria-label="Menu móvel">
         <nav class="mobile_drawer__nav">
-          <button type="button" class="mobile_nav_link" @click="handleNavClick('#beneficios')">
-            Benefícios
-          </button>
-          <button type="button" class="mobile_nav_link" @click="handleNavClick('#funcionalidades')">
-            Funcionalidades
-          </button>
-          <button type="button" class="mobile_nav_link" @click="handleNavClick('#como-funciona')">
-            Como Funciona
-          </button>
-          <button type="button" class="mobile_nav_link" @click="handleNavClick('#diferenciais')">
-            Diferenciais
-          </button>
-          <button type="button" class="mobile_nav_link" @click="handleNavClick('#seguranca')">
-            Segurança & LGPD
-          </button>
-          <button type="button" class="mobile_nav_link" @click="handleNavClick('#planos')">
-            Planos & Preços
-          </button>
-          <button type="button" class="mobile_nav_link" @click="handleNavClick('#faq')">
-            Perguntas Frequentes
-          </button>
-          <RouterLink to="/sobre" class="mobile_nav_link" @click="closeMobileMenu">
-            Sobre Nós
-          </RouterLink>
-
-          <div class="mobile_drawer__actions">
-            <RouterLink to="/login" class="mobile_btn mobile_btn--outline" @click="onLoginClick('mobile_menu')">
-              LOGIN
-            </RouterLink>
-            <RouterLink to="/cadastro" class="mobile_btn mobile_btn--primary" @click="onStartClick('mobile_menu')">
-              TESTAR GRÁTIS
-            </RouterLink>
-          </div>
+          <button type="button" class="mobile_nav_link" @click="handleNavClick('#beneficios')">Benefícios</button>
+          <button type="button" class="mobile_nav_link" @click="handleNavClick('#funcionalidades')">Recursos</button>
+          <button type="button" class="mobile_nav_link" @click="handleNavClick('#como-funciona')">Passo a Passo</button>
+          <button type="button" class="mobile_nav_link" @click="handleNavClick('#planos')">Planos & Preços</button>
+          <button type="button" class="mobile_nav_link" @click="handleNavClick('#diferenciais')">Diferenciais</button>
+          <button type="button" class="mobile_nav_link" @click="handleNavClick('#seguranca')">Segurança</button>
+          <button type="button" class="mobile_nav_link" @click="handleNavClick('#faq')">FAQ</button>
         </nav>
+
+        <div class="mobile_drawer__actions">
+          <RouterLink to="/login" class="mobile_btn mobile_btn--outline" @click="onLoginClick('mobile_drawer')">
+            LOGIN
+          </RouterLink>
+          <RouterLink to="/cadastro" class="mobile_btn mobile_btn--primary" @click="onStartClick('mobile_drawer')">
+            TESTAR GRÁTIS POR 8 DIAS
+          </RouterLink>
+        </div>
       </div>
-    </transition>
+    </Transition>
   </header>
 </template>
 
@@ -158,16 +141,16 @@ function onStartClick(local: string = 'header') {
   right: 0;
   z-index: 1000;
   height: 80px;
-  background: rgba(33, 33, 33, 0.7);
+  background: #0B1B2B;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(247, 247, 247, 0.08);
+  border-bottom: 1px solid rgba(255, 252, 255, 0.08);
   transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 
   &--scrolled {
-    background: rgba(25, 25, 25, 0.92);
-    border-bottom-color: rgba(255, 0, 255, 0.2);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    background: rgba(11, 27, 43, 0.95);
+    border-bottom-color: #B08D57;
+    box-shadow: 0 10px 30px rgba(11, 27, 43, 0.8);
   }
 
   &__container {
@@ -244,7 +227,7 @@ function onStartClick(local: string = 'header') {
 .header_nav_divider {
   width: 1px;
   height: 22px;
-  background: rgba(247, 247, 247, 0.15);
+  background: rgba(255, 252, 255, 0.15);
   margin-right: clamp(16px, 2vw, 28px);
   flex-shrink: 0;
 
@@ -256,7 +239,7 @@ function onStartClick(local: string = 'header') {
 .hamburger_line {
   width: 24px;
   height: 2px;
-  background-color: #f7f7f7;
+  background-color: #FFFCFF;
   border-radius: 2px;
   transition: transform 0.25s ease, opacity 0.25s ease;
 
@@ -276,26 +259,24 @@ function onStartClick(local: string = 'header') {
 .nav_link {
   background: transparent;
   border: none;
-  font-family: 'Source Code Pro', monospace;
-  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13.5px;
   font-weight: 500;
-  color: #f7f7f7;
-  opacity: 0.8;
+  color: rgba(255, 252, 255, 0.75);
   cursor: pointer;
   padding: 6px 0;
-  transition: opacity 0.2s ease, color 0.2s ease;
+  transition: color 0.2s ease;
   text-decoration: none;
   white-space: nowrap;
   flex-shrink: 0;
 
   &:hover {
-    opacity: 1;
-    color: #ff00ff;
+    color: #B08D57;
   }
 }
 
 .header_btn {
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 12.5px;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -311,24 +292,25 @@ function onStartClick(local: string = 'header') {
 
   &--outline {
     background: transparent;
-    color: #f7f7f7;
-    border: 1px solid rgba(247, 247, 247, 0.35);
+    color: #FFFCFF;
+    border: 1px solid rgba(255, 252, 255, 0.35);
 
     &:hover {
-      border-color: #ff00ff;
-      color: #ff00ff;
-      background: rgba(255, 0, 255, 0.08);
+      border-color: #B08D57;
+      color: #B08D57;
+      background: rgba(176, 141, 87, 0.08);
     }
   }
 
   &--primary {
-    background: #f7f7f7;
-    color: #212121;
+    background: #B08D57;
+    color: #FFFFFF;
     border: 1px solid transparent;
 
     &:hover {
-      background: #ffffff;
-      box-shadow: 0 0 16px rgba(255, 0, 255, 0.45);
+      background: #FFFCFF;
+      color: #0B1B2B;
+      box-shadow: 0 0 16px rgba(176, 141, 87, 0.5);
       transform: translateY(-1px);
     }
   }
@@ -342,7 +324,7 @@ function onStartClick(local: string = 'header') {
   right: 0;
   bottom: 0;
   height: calc(100dvh - 80px);
-  background: rgba(25, 25, 25, 0.98);
+  background: rgba(11, 27, 43, 0.98);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   z-index: 999;
@@ -370,22 +352,22 @@ function onStartClick(local: string = 'header') {
   background: transparent;
   border: none;
   text-align: left;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 18px;
   font-weight: 600;
-  color: #f7f7f7;
+  color: #FFFCFF;
   padding: 12px 0;
-  border-bottom: 1px solid rgba(247, 247, 247, 0.08);
+  border-bottom: 1px solid rgba(255, 252, 255, 0.08);
   cursor: pointer;
   text-decoration: none;
 
   &:hover {
-    color: #ff00ff;
+    color: #B08D57;
   }
 }
 
 .mobile_btn {
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 15px;
   font-weight: 700;
   text-decoration: none;
@@ -397,13 +379,13 @@ function onStartClick(local: string = 'header') {
   text-align: center;
 
   &--outline {
-    border: 1px solid rgba(247, 247, 247, 0.4);
-    color: #f7f7f7;
+    border: 1px solid rgba(255, 252, 255, 0.4);
+    color: #FFFCFF;
   }
 
   &--primary {
-    background: #f7f7f7;
-    color: #212121;
+    background: #B08D57;
+    color: #FFFFFF;
     border: none;
   }
 }

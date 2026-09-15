@@ -70,7 +70,7 @@ const features = [
 
           <ul class="feature_highlights">
             <li v-for="(hl, hIdx) in feat.highlights" :key="hIdx">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff00ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B08D57" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
               <span>{{ hl }}</span>
@@ -86,7 +86,8 @@ const features = [
 .features_section {
   position: relative;
   padding: 100px 24px;
-  background: #252525;
+  background: #0B1B2B;
+  border-top: 1px solid rgba(255, 252, 255, 0.08);
 }
 
 .features_container {
@@ -102,24 +103,24 @@ const features = [
 
 .section_badge {
   display: inline-block;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: #ff00ff;
+  color: #B08D57;
   letter-spacing: 1px;
   padding: 6px 14px;
-  background: rgba(255, 0, 255, 0.1);
-  border: 1px solid rgba(255, 0, 255, 0.25);
+  background: rgba(176, 141, 87, 0.15);
+  border: 1px solid rgba(176, 141, 87, 0.35);
   border-radius: 20px;
   margin-bottom: 16px;
 }
 
 .section_title {
   margin: 0 0 16px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: clamp(26px, 2.5vw, 36px);
   font-weight: 700;
-  color: #f7f7f7;
+  color: #FFFCFF;
   line-height: 1.25;
 }
 
@@ -129,7 +130,7 @@ const features = [
   font-size: 16px;
   font-weight: 400;
   line-height: 1.6;
-  color: rgba(247, 247, 247, 0.7);
+  color: rgba(255, 252, 255, 0.7);
 }
 
 .features_grid {
@@ -147,19 +148,20 @@ const features = [
 }
 
 .feature_card {
-  background: rgba(33, 33, 33, 0.7);
-  border: 1px solid rgba(247, 247, 247, 0.08);
-  border-radius: 24px;
+  background: #1F2933;
+  border: 1px solid rgba(255, 252, 255, 0.08);
+  border-radius: 20px;
   padding: 32px 28px;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 10px 30px rgba(11, 27, 43, 0.4);
   transition: all 0.25s ease;
 
   &:hover {
-    border-color: rgba(255, 0, 255, 0.35);
-    background: rgba(33, 33, 33, 0.95);
+    border-color: rgba(176, 141, 87, 0.45);
+    background: rgba(31, 58, 95, 0.25);
     transform: translateY(-4px);
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 16px 36px rgba(11, 27, 43, 0.7);
   }
 }
 
@@ -171,21 +173,22 @@ const features = [
 }
 
 .feature_cat {
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: #ff00ff;
+  color: #B08D57;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .feature_benefit_badge {
   display: inline-block;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 600;
-  color: rgba(247, 247, 247, 0.85);
-  background: rgba(121, 121, 121, 0.2);
+  color: #FFFCFF;
+  background: rgba(47, 111, 109, 0.25);
+  border: 1px solid rgba(47, 111, 109, 0.45);
   padding: 4px 10px;
   border-radius: 8px;
   width: fit-content;
@@ -193,10 +196,10 @@ const features = [
 
 .feature_name {
   margin: 0 0 12px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 19px;
   font-weight: 700;
-  color: #f7f7f7;
+  color: #FFFCFF;
   line-height: 1.3;
 }
 
@@ -206,7 +209,7 @@ const features = [
   font-size: 14px;
   font-weight: 400;
   line-height: 1.6;
-  color: rgba(247, 247, 247, 0.65);
+  color: rgba(255, 252, 255, 0.75);
   flex-grow: 1;
 }
 
@@ -217,7 +220,7 @@ const features = [
   display: flex;
   flex-direction: column;
   gap: 10px;
-  border-top: 1px solid rgba(247, 247, 247, 0.08);
+  border-top: 1px solid rgba(255, 252, 255, 0.08);
   padding-top: 18px;
 
   li {
@@ -226,7 +229,7 @@ const features = [
     gap: 8px;
     font-family: 'Inter', sans-serif;
     font-size: 13px;
-    color: rgba(247, 247, 247, 0.8);
+    color: rgba(255, 252, 255, 0.85);
   }
 }
 </style>

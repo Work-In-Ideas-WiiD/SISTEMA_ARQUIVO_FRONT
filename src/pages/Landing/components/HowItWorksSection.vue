@@ -54,8 +54,8 @@ const steps = [
 .how_it_works_section {
   position: relative;
   padding: 100px 24px;
-  background: #212121;
-  border-top: 1px solid rgba(247, 247, 247, 0.05);
+  background: #0B1B2B;
+  border-top: 1px solid rgba(255, 252, 255, 0.08);
 }
 
 .how_container {
@@ -71,24 +71,24 @@ const steps = [
 
 .section_badge {
   display: inline-block;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: #ff00ff;
+  color: #B08D57;
   letter-spacing: 1px;
   padding: 6px 14px;
-  background: rgba(255, 0, 255, 0.1);
-  border: 1px solid rgba(255, 0, 255, 0.25);
+  background: rgba(176, 141, 87, 0.15);
+  border: 1px solid rgba(176, 141, 87, 0.35);
   border-radius: 20px;
   margin-bottom: 16px;
 }
 
 .section_title {
   margin: 0 0 16px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: clamp(26px, 2.5vw, 36px);
   font-weight: 700;
-  color: #f7f7f7;
+  color: #FFFCFF;
   line-height: 1.25;
 }
 
@@ -98,7 +98,7 @@ const steps = [
   font-size: 16px;
   font-weight: 400;
   line-height: 1.6;
-  color: rgba(247, 247, 247, 0.7);
+  color: rgba(255, 252, 255, 0.7);
 }
 
 .steps_grid {
@@ -118,61 +118,72 @@ const steps = [
 }
 
 .step_card {
-  background: rgba(121, 121, 121, 0.12);
-  border: 1px solid rgba(247, 247, 247, 0.08);
-  border-radius: 24px;
+  background: #1F2933;
+  border: 1px solid rgba(255, 252, 255, 0.08);
+  border-radius: 20px;
   padding: 36px 30px;
   display: flex;
   flex-direction: column;
   position: relative;
   transition: transform 0.25s ease, border-color 0.25s ease;
+  box-shadow: 0 10px 30px rgba(11, 27, 43, 0.4);
 
   &:hover {
     transform: translateY(-4px);
-    border-color: rgba(255, 0, 255, 0.35);
+    border-color: rgba(176, 141, 87, 0.45);
+    background: rgba(31, 58, 95, 0.25);
+    box-shadow: 0 16px 36px rgba(11, 27, 43, 0.7);
   }
 }
 
 .step_number_wrap {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 16px;
   margin-bottom: 24px;
 }
 
 .step_number {
-  font-family: 'Source Code Pro', monospace;
-  font-size: 32px;
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
   font-weight: 800;
-  color: #ff00ff;
-  line-height: 1;
+  color: #B08D57;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(176, 141, 87, 0.15);
+  border: 1px solid rgba(176, 141, 87, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .step_connector {
   flex-grow: 1;
-  height: 2px;
-  background: linear-gradient(90deg, rgba(255, 0, 255, 0.5) 0%, rgba(247, 247, 247, 0.05) 100%);
-  margin-left: 20px;
+  height: 1px;
+  background: rgba(176, 141, 87, 0.25);
 
-  @media (max-width: 900px) {
+  @media (max-width: 1100px) {
     display: none;
   }
 }
 
 .step_title {
   margin: 0 0 12px;
-  font-family: 'Source Code Pro', monospace;
-  font-size: 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 19px;
   font-weight: 700;
-  color: #f7f7f7;
+  color: #FFFCFF;
+  line-height: 1.3;
 }
 
 .step_description {
   margin: 0;
   font-family: 'Inter', sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 400;
-  line-height: 1.6;
-  color: rgba(247, 247, 247, 0.65);
+  line-height: 1.65;
+  color: rgba(255, 252, 255, 0.75);
 }
 </style>

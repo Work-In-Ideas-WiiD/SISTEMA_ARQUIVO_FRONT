@@ -55,7 +55,8 @@ const differentials = [
 .differentials_section {
   position: relative;
   padding: 100px 24px;
-  background: #252525;
+  background: #0B1B2B;
+  border-top: 1px solid rgba(255, 252, 255, 0.08);
 }
 
 .diff_container {
@@ -65,30 +66,30 @@ const differentials = [
 
 .section_header {
   text-align: center;
-  max-width: 720px;
+  max-width: 760px;
   margin: 0 auto 64px;
 }
 
 .section_badge {
   display: inline-block;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: #ff00ff;
+  color: #B08D57;
   letter-spacing: 1px;
   padding: 6px 14px;
-  background: rgba(255, 0, 255, 0.1);
-  border: 1px solid rgba(255, 0, 255, 0.25);
+  background: rgba(176, 141, 87, 0.15);
+  border: 1px solid rgba(176, 141, 87, 0.35);
   border-radius: 20px;
   margin-bottom: 16px;
 }
 
 .section_title {
   margin: 0 0 16px;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: clamp(26px, 2.5vw, 36px);
   font-weight: 700;
-  color: #f7f7f7;
+  color: #FFFCFF;
   line-height: 1.25;
 }
 
@@ -98,7 +99,7 @@ const differentials = [
   font-size: 16px;
   font-weight: 400;
   line-height: 1.6;
-  color: rgba(247, 247, 247, 0.75);
+  color: rgba(255, 252, 255, 0.75);
 }
 
 .section_highlight {
@@ -107,7 +108,7 @@ const differentials = [
   font-size: 17px;
   font-weight: 600;
   line-height: 1.5;
-  color: #ff00ff;
+  color: #B08D57;
 }
 
 .diff_grid {
@@ -122,61 +123,68 @@ const differentials = [
 
 .diff_card {
   position: relative;
-  background: rgba(33, 33, 33, 0.85);
-  border: 1px solid rgba(247, 247, 247, 0.08);
-  border-radius: 24px;
+  background: #1F2933;
+  border: 1px solid rgba(255, 252, 255, 0.08);
+  border-radius: 20px;
   padding: 36px 32px;
   overflow: hidden;
   transition: all 0.25s ease;
+  box-shadow: 0 10px 30px rgba(11, 27, 43, 0.4);
 
   &:hover {
-    border-color: rgba(255, 0, 255, 0.35);
+    border-color: rgba(176, 141, 87, 0.45);
+    background: rgba(31, 58, 95, 0.25);
     transform: translateY(-3px);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 16px 40px rgba(11, 27, 43, 0.7);
 
     .diff_glow {
-      opacity: 0.2;
+      opacity: 0.3;
     }
   }
 }
 
 .diff_glow {
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 160px;
-  height: 160px;
-  background: radial-gradient(circle, #ff00ff 0%, transparent 70%);
-  opacity: 0.05;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(176, 141, 87, 0.4) 0%, transparent 70%);
+  opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
 }
 
 .diff_tag {
   display: inline-block;
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: #ff00ff;
-  letter-spacing: 0.5px;
-  margin-bottom: 12px;
+  color: #B08D57;
+  letter-spacing: 0.6px;
+  background: rgba(176, 141, 87, 0.12);
+  border: 1px solid rgba(176, 141, 87, 0.25);
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-bottom: 16px;
 }
 
 .diff_card_title {
-  margin: 0 0 14px;
-  font-family: 'Source Code Pro', monospace;
-  font-size: 21px;
+  margin: 0 0 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
   font-weight: 700;
-  color: #f7f7f7;
+  color: #FFFCFF;
   line-height: 1.3;
 }
 
 .diff_card_text {
   margin: 0;
   font-family: 'Inter', sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 400;
   line-height: 1.65;
-  color: rgba(247, 247, 247, 0.7);
+  color: rgba(255, 252, 255, 0.75);
 }
 </style>

@@ -5,16 +5,15 @@ import HeroSection from './components/HeroSection.vue'
 import BenefitsSection from './components/BenefitsSection.vue'
 import FeaturesSection from './components/FeaturesSection.vue'
 import HowItWorksSection from './components/HowItWorksSection.vue'
+import PricingSection from './components/PricingSection.vue'
 import DifferentialsSection from './components/DifferentialsSection.vue'
 import SecuritySection from './components/SecuritySection.vue'
 import ContinuitySection from './components/ContinuitySection.vue'
-import PricingSection from './components/PricingSection.vue'
-import FreeTrialHighlight from './components/FreeTrialHighlight.vue'
 import FAQSection from './components/FAQSection.vue'
-import { faqs } from './components/faqData'
-import AboutSection from './components/AboutSection.vue'
-import FinalCTASection from './components/FinalCTASection.vue'
+import FreeTrialHighlight from './components/FreeTrialHighlight.vue'
+import PlatformCompatibilitySection from './components/PlatformCompatibilitySection.vue'
 import LandingFooter from './components/LandingFooter.vue'
+import { faqs } from './components/faqData'
 import { setPageSeo } from '@/utils/seo'
 import { initUtmTracking } from '@/utils/tracking'
 
@@ -52,7 +51,7 @@ onMounted(() => {
           name: f.question,
           acceptedAnswer: {
             '@type': 'Answer',
-            text: f.answer
+            text: f.answer.replace(/<[^>]*>/g, '')
           }
         }))
       },
@@ -76,7 +75,7 @@ onMounted(() => {
           {
             '@type': 'ContactPoint',
             contactType: 'customer service',
-            email: 'contato@wi-id.com',
+            email: 'suporte@akidocs.com.br',
             telephone: '+55-62-98339-8612'
           },
           {
@@ -106,18 +105,38 @@ onMounted(() => {
     <LandingHeader />
 
     <main class="landing_main_content">
+      <!-- 1. Abertura -->
       <HeroSection />
+
+      <!-- 2. Vantagens Competitivas -->
       <BenefitsSection />
+
+      <!-- 3. Recursos Nativos -->
       <FeaturesSection />
+
+      <!-- 4. Passo a Passo -->
       <HowItWorksSection />
-      <DifferentialsSection />
-      <SecuritySection />
-      <ContinuitySection />
+
+      <!-- 5. Planos e Investimento (Antecipada) -->
       <PricingSection />
-      <FreeTrialHighlight />
+
+      <!-- 6. Diferenciais Exclusivos -->
+      <DifferentialsSection />
+
+      <!-- 7. Segurança e Privacidade -->
+      <SecuritySection />
+
+      <!-- 8. Resiliência e Governança -->
+      <ContinuitySection />
+
+      <!-- 9. FAQ -->
       <FAQSection />
-      <AboutSection />
-      <FinalCTASection />
+
+      <!-- 10. Teste o AkiDocs grátis por 8 dias -->
+      <FreeTrialHighlight />
+
+      <!-- 11. Nova sessão de Compatibilidade & Integrações -->
+      <PlatformCompatibilitySection />
     </main>
 
     <LandingFooter />
@@ -126,8 +145,8 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .landing_page_wrapper {
-  background-color: #212121;
-  color: #f7f7f7;
+  background-color: #0B1B2B;
+  color: #FFFCFF;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
