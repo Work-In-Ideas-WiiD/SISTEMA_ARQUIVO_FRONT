@@ -60,6 +60,9 @@ onMounted(async () => {
     if (isAdmin.value) {
       const { data } = await getAllEmpresas()
       empresas.value = data.data
+    } else if (authStore.userRole === 'empresa' && authStore.me.id) {
+      // Conta empresa: não escolhe empresa — usa o próprio usuário (type=empresa).
+      empresaId.value = authStore.me.id
     }
   } catch (error) {
     console.error(error)
@@ -170,6 +173,11 @@ async function handleSubmit() {
 
   if (isAdmin.value && !empresaId.value) {
     toast.error('Selecione uma empresa')
+    return
+  }
+
+  if (!isAdmin.value && !empresaId.value) {
+    toast.error('Não foi possível identificar a empresa da conta')
     return
   }
 
