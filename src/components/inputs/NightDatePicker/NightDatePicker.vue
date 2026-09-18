@@ -19,13 +19,20 @@ const emit = defineEmits<{
   (e: 'change', value: string): void
 }>()
 
+type PanelMode = 'days' | 'months' | 'years'
+
 const open = ref(false)
+const panelMode = ref<PanelMode>('days')
 const rootRef = ref<HTMLElement | null>(null)
-const triggerRef = ref<HTMLButtonElement | null>(null)
+const triggerRef = ref<HTMLElement | null>(null)
 const panelRef = ref<HTMLElement | null>(null)
 const panelStyle = ref<Record<string, string>>({})
 const viewYear = ref(new Date().getFullYear())
 const viewMonth = ref(new Date().getMonth())
+/** Início da página de anos (grade 12). */
+const yearPageStart = ref(Math.floor(new Date().getFullYear() / 12) * 12)
+/** Texto digitável no formato dd/mm/aaaa. */
+const inputText = ref(props.modelValue ? formatDisplay(props.modelValue) : '')
 
 const monthNames = [
   'Janeiro',
@@ -42,11 +49,34 @@ const monthNames = [
   'Dezembro'
 ]
 
+const monthShortNames = [
+  'Jan',
+  'Fev',
+  'Mar',
+  'Abr',
+  'Mai',
+  'Jun',
+  'Jul',
+  'Ago',
+  'Set',
+  'Out',
+  'Nov',
+  'Dez'
+]
+
 const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']
+
+const yearOptions = computed(() =>
+  Array.from({ length: 12 }, (_, i) => yearPageStart.value + i)
+)
 
 watch(
   () => props.modelValue,
   (value) => {
+    const next = value ? formatDisplay(value) : ''
+    if (inputText.value !== next) {
+      inputText.value = next
+    }
     if (!value || !open.value) return
     const d = new Date(`${value}T00:00:00`)
     if (Number.isNaN(d.getTime())) return
@@ -55,12 +85,7 @@ watch(
   }
 )
 
-const displayLabel = computed(() => {
-  if (!props.modelValue) return props.placeholder
-  return formatDisplay(props.modelValue)
-})
-
-const hasValue = computed(() => Boolean(props.modelValue))
+const hasValue = computed(() => Boolean(props.modelValue) || Boolean(inputText.value))
 
 const calendarDays = computed(() => {
   const first = new Date(viewYear.value, viewMonth.value, 1)
@@ -114,6 +139,40 @@ function formatDisplay(iso: string) {
   return `${d}/${m}/${y}`
 }
 
+/** Máscara dd/mm/aaaa a partir de dígitos. */
+function maskDateDigits(raw: string) {
+  const digits = raw.replace(/\D/g, '').slice(0, 8)
+  if (digits.length <= 2) return digits
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`
+}
+
+/** Converte dd/mm/aaaa em yyyy-mm-dd se for data real. */
+function parseDisplayToIso(display: string): string | null {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(display)
+  if (!match) return null
+
+  const day = Number(match[1])
+  const month = Number(match[2])
+  const year = Number(match[3])
+  if (month < 1 || month > 12 || day < 1 || year < 1000) return null
+
+  const d = new Date(year, month - 1, day)
+  if (
+    d.getFullYear() !== year ||
+    d.getMonth() !== month - 1 ||
+    d.getDate() !== day
+  ) {
+    return null
+  }
+
+  return toIso(year, month - 1, day)
+}
+
+function syncYearPage() {
+  yearPageStart.value = Math.floor(viewYear.value / 12) * 12
+}
+
 function updatePanelPosition() {
   if (!triggerRef.value) return
 
@@ -144,6 +203,7 @@ function onDocumentClick(event: MouseEvent) {
   const insidePanel = panelRef.value?.contains(target)
   if (!insideRoot && !insidePanel) {
     open.value = false
+    panelMode.value = 'days'
   }
 }
 
@@ -163,9 +223,54 @@ onUnmounted(() => {
   window.removeEventListener('scroll', onWindowChange, true)
 })
 
-async function toggle() {
-  open.value = !open.value
-  if (!open.value) return
+function onInput(event: Event) {
+  const target = event.target as HTMLInputElement
+  const masked = maskDateDigits(target.value)
+  inputText.value = masked
+  target.value = masked
+
+  if (!masked) {
+    if (props.modelValue) {
+      emit('update:modelValue', '')
+      emit('change', '')
+    }
+    return
+  }
+
+  const iso = parseDisplayToIso(masked)
+  if (!iso) return
+
+  if (iso !== props.modelValue) {
+    emit('update:modelValue', iso)
+    emit('change', iso)
+  }
+
+  const d = new Date(`${iso}T00:00:00`)
+  viewYear.value = d.getFullYear()
+  viewMonth.value = d.getMonth()
+}
+
+function onInputBlur() {
+  if (!inputText.value) {
+    if (props.modelValue) {
+      emit('update:modelValue', '')
+      emit('change', '')
+    }
+    return
+  }
+
+  const iso = parseDisplayToIso(inputText.value)
+  if (iso) {
+    inputText.value = formatDisplay(iso)
+    return
+  }
+
+  // Digitação incompleta/inválida: volta pro valor confirmado.
+  inputText.value = props.modelValue ? formatDisplay(props.modelValue) : ''
+}
+
+async function openCalendar() {
+  open.value = true
 
   const base = props.modelValue || todayIso()
   const d = new Date(`${base}T00:00:00`)
@@ -173,33 +278,85 @@ async function toggle() {
     viewYear.value = d.getFullYear()
     viewMonth.value = d.getMonth()
   }
+  panelMode.value = 'days'
+  syncYearPage()
 
   await nextTick()
   updatePanelPosition()
 }
 
-function prevMonth() {
-  if (viewMonth.value === 0) {
-    viewMonth.value = 11
-    viewYear.value -= 1
-  } else {
-    viewMonth.value -= 1
+async function toggleCalendar() {
+  if (open.value) {
+    open.value = false
+    panelMode.value = 'days'
+    return
   }
+  await openCalendar()
 }
 
-function nextMonth() {
-  if (viewMonth.value === 11) {
-    viewMonth.value = 0
-    viewYear.value += 1
-  } else {
-    viewMonth.value += 1
+function prevNav() {
+  if (panelMode.value === 'days') {
+    if (viewMonth.value === 0) {
+      viewMonth.value = 11
+      viewYear.value -= 1
+    } else {
+      viewMonth.value -= 1
+    }
+    return
   }
+  if (panelMode.value === 'months') {
+    viewYear.value -= 1
+    return
+  }
+  yearPageStart.value -= 12
+}
+
+function nextNav() {
+  if (panelMode.value === 'days') {
+    if (viewMonth.value === 11) {
+      viewMonth.value = 0
+      viewYear.value += 1
+    } else {
+      viewMonth.value += 1
+    }
+    return
+  }
+  if (panelMode.value === 'months') {
+    viewYear.value += 1
+    return
+  }
+  yearPageStart.value += 12
+}
+
+function showMonths() {
+  panelMode.value = 'months'
+  nextTick().then(updatePanelPosition)
+}
+
+function showYears() {
+  syncYearPage()
+  panelMode.value = 'years'
+  nextTick().then(updatePanelPosition)
+}
+
+function selectMonth(month: number) {
+  viewMonth.value = month
+  panelMode.value = 'days'
+  nextTick().then(updatePanelPosition)
+}
+
+function selectYear(year: number) {
+  viewYear.value = year
+  panelMode.value = 'months'
+  nextTick().then(updatePanelPosition)
 }
 
 function commit(next: string) {
+  inputText.value = next ? formatDisplay(next) : ''
   emit('update:modelValue', next)
   emit('change', next)
   open.value = false
+  panelMode.value = 'days'
 }
 
 function selectDay(date: string) {
@@ -221,24 +378,41 @@ function clearDate() {
 
 <template>
   <div ref="rootRef" class="night-date">
-    <button
-      :id="id"
+    <div
       ref="triggerRef"
-      type="button"
       class="night-date__trigger"
       :class="{ 'is-placeholder': !hasValue, 'is-open': open }"
-      @click.stop="toggle"
     >
-      <span>{{ displayLabel }}</span>
-      <img
-        class="night-date__chevron"
-        :class="{ 'night-date__chevron--open': open }"
-        :src="iconChevronDown"
-        width="16"
-        height="9"
-        alt=""
+      <input
+        :id="id"
+        :value="inputText"
+        type="text"
+        class="night-date__input"
+        :placeholder="placeholder"
+        inputmode="numeric"
+        autocomplete="off"
+        maxlength="10"
+        @input="onInput"
+        @blur="onInputBlur"
+        @keydown.enter.prevent="onInputBlur"
       />
-    </button>
+      <button
+        type="button"
+        class="night-date__calendar-btn"
+        aria-label="Abrir calendário"
+        :aria-expanded="open"
+        @click.stop="toggleCalendar"
+      >
+        <img
+          class="night-date__chevron"
+          :class="{ 'night-date__chevron--open': open }"
+          :src="iconChevronDown"
+          width="16"
+          height="9"
+          alt=""
+        />
+      </button>
+    </div>
 
     <Teleport to="body">
       <div
@@ -249,33 +423,93 @@ function clearDate() {
         @click.stop
       >
         <div class="night-date-panel__header">
-          <button type="button" class="night-date-panel__nav" aria-label="Mês anterior" @click="prevMonth">
+          <button
+            type="button"
+            class="night-date-panel__nav"
+            :aria-label="panelMode === 'years' ? 'Anos anteriores' : panelMode === 'months' ? 'Ano anterior' : 'Mês anterior'"
+            @click="prevNav"
+          >
             ‹
           </button>
-          <span class="night-date-panel__month">{{ monthNames[viewMonth] }} {{ viewYear }}</span>
-          <button type="button" class="night-date-panel__nav" aria-label="Próximo mês" @click="nextMonth">
+
+          <div class="night-date-panel__title">
+            <template v-if="panelMode === 'days'">
+              <button type="button" class="night-date-panel__title-btn" @click="showMonths">
+                {{ monthNames[viewMonth] }}
+              </button>
+              <button type="button" class="night-date-panel__title-btn" @click="showYears">
+                {{ viewYear }}
+              </button>
+            </template>
+            <button
+              v-else-if="panelMode === 'months'"
+              type="button"
+              class="night-date-panel__title-btn"
+              @click="showYears"
+            >
+              {{ viewYear }}
+            </button>
+            <span v-else class="night-date-panel__month">
+              {{ yearPageStart }} – {{ yearPageStart + 11 }}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            class="night-date-panel__nav"
+            :aria-label="panelMode === 'years' ? 'Próximos anos' : panelMode === 'months' ? 'Próximo ano' : 'Próximo mês'"
+            @click="nextNav"
+          >
             ›
           </button>
         </div>
 
-        <div class="night-date-panel__week">
-          <span v-for="(day, index) in weekDays" :key="`${day}-${index}`">{{ day }}</span>
+        <template v-if="panelMode === 'days'">
+          <div class="night-date-panel__week">
+            <span v-for="(day, index) in weekDays" :key="`${day}-${index}`">{{ day }}</span>
+          </div>
+
+          <div class="night-date-panel__grid">
+            <button
+              v-for="cell in calendarDays"
+              :key="cell.key"
+              type="button"
+              class="night-date-panel__day"
+              :class="{
+                'is-outside': cell.outside,
+                'is-selected': cell.date === modelValue,
+                'is-today': cell.date === todayIso() && cell.date !== modelValue
+              }"
+              @click="selectDay(cell.date)"
+            >
+              {{ cell.day }}
+            </button>
+          </div>
+        </template>
+
+        <div v-else-if="panelMode === 'months'" class="night-date-panel__picker-grid">
+          <button
+            v-for="(name, index) in monthShortNames"
+            :key="name"
+            type="button"
+            class="night-date-panel__picker-item"
+            :class="{ 'is-selected': index === viewMonth }"
+            @click="selectMonth(index)"
+          >
+            {{ name }}
+          </button>
         </div>
 
-        <div class="night-date-panel__grid">
+        <div v-else class="night-date-panel__picker-grid">
           <button
-            v-for="cell in calendarDays"
-            :key="cell.key"
+            v-for="year in yearOptions"
+            :key="year"
             type="button"
-            class="night-date-panel__day"
-            :class="{
-              'is-outside': cell.outside,
-              'is-selected': cell.date === modelValue,
-              'is-today': cell.date === todayIso() && cell.date !== modelValue
-            }"
-            @click="selectDay(cell.date)"
+            class="night-date-panel__picker-item"
+            :class="{ 'is-selected': year === viewYear }"
+            @click="selectYear(year)"
           >
-            {{ cell.day }}
+            {{ year }}
           </button>
         </div>
 
@@ -298,36 +532,54 @@ function clearDate() {
   &__trigger {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+    gap: 8px;
     width: 100%;
     height: 49px;
-    padding: 0 20px;
+    padding: 0 12px 0 20px;
     border: none;
     border-radius: 30px;
     background: rgba(121, 121, 121, 0.3);
+    box-sizing: border-box;
+
+    &:hover,
+    &.is-open {
+      background: rgba(121, 121, 121, 0.4);
+    }
+  }
+
+  &__input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
     color: #ffffff;
     font-family: 'Inter', sans-serif;
     font-size: 14px;
     font-weight: 300;
     line-height: 1;
-    cursor: pointer;
-    text-align: left;
-    box-sizing: border-box;
 
-    span {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    &.is-placeholder {
+    &::placeholder {
       color: rgba(247, 247, 247, 0.7);
     }
+  }
 
-    &:hover,
-    &.is-open {
-      background: rgba(121, 121, 121, 0.4);
+  &__calendar-btn {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
     }
   }
 
@@ -357,6 +609,33 @@ function clearDate() {
     align-items: center;
     justify-content: space-between;
     margin-bottom: 10px;
+    gap: 6px;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  &__title-btn {
+    border: none;
+    background: transparent;
+    padding: 4px 6px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #f7f7f7;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(121, 121, 121, 0.35);
+      color: #fff;
+    }
   }
 
   &__month {
@@ -376,6 +655,7 @@ function clearDate() {
     font-size: 18px;
     line-height: 1;
     cursor: pointer;
+    flex-shrink: 0;
 
     &:hover {
       background: rgba(121, 121, 121, 0.45);
@@ -401,6 +681,34 @@ function clearDate() {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 2px;
+  }
+
+  &__picker-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    min-height: 196px;
+  }
+
+  &__picker-item {
+    height: 40px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(121, 121, 121, 0.22);
+    color: #f7f7f7;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(121, 121, 121, 0.4);
+    }
+
+    &.is-selected {
+      background: #B08D57;
+      color: #fff;
+    }
   }
 
   &__day {
