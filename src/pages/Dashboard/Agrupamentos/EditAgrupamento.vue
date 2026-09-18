@@ -5,10 +5,14 @@ import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import iconChevronDown from '@/assets/imgs/administradores/icon-chevron-down.svg'
-import iconRadio from '@/assets/imgs/agrupamentos/icon-radio.svg'
-import iconRadioSelected from '@/assets/imgs/agrupamentos/icon-radio-selected.svg'
-import { getAgrupamento, patchAgrupamento, type IPostAgrupamentoModel } from '@/services/http/agrupamentos'
+import iconSearch from '@/assets/imgs/administradores/icon-search.svg'
+import {
+  getAgrupamento,
+  patchAgrupamento,
+  type IPostAgrupamentoModel
+} from '@/services/http/agrupamentos'
 import { getAllSetores, type ISetor } from '@/services/http/setores'
+import { getAllFuncoes, type IFuncao } from '@/services/http/funcoes'
 import { getAllFuncionarios, type IFuncionario } from '@/services/http/funcionarios'
 import { getAllEmpresas } from '@/services/http/empresas'
 
@@ -18,30 +22,59 @@ const toast = useToast()
 const authStore = useAuthStore()
 
 const loading = ref(false)
-const fetching = ref(true)
+const loadingData = ref(true)
 const readyEmpresaWatch = ref(false)
 const empresas = ref<{ id: string; nome: string }[]>([])
 const setoresDisponiveis = ref<ISetor[]>([])
+const funcoesDisponiveis = ref<IFuncao[]>([])
 const funcionariosDisponiveis = ref<IFuncionario[]>([])
+const filtrosSetores = ref<string[]>([])
+const filtrosFuncoes = ref<string[]>([])
+const buscaFuncionario = ref('')
 const empresaOpen = ref(false)
 const empresaFilterRef = ref<HTMLElement | null>(null)
 
 const form = ref({
   nome: '',
   descricao: '',
-  tipo: 'individual' as 'individual' | 'setor',
   funcionarios: [] as string[],
-  setores: [] as string[],
   empresa_id: ''
 })
 
 const isAdmin = computed(() => authStore.userRole === 'administrador')
-const showFuncionarios = computed(() => form.value.tipo === 'individual')
-const showSetores = computed(() => form.value.tipo === 'setor')
 
 const empresaLabel = computed(() => {
   if (!form.value.empresa_id) return 'Selecione uma empresa'
   return empresas.value.find((e) => e.id === form.value.empresa_id)?.nome ?? 'Selecione uma empresa'
+})
+
+const temFiltro = computed(
+  () => filtrosSetores.value.length > 0 || filtrosFuncoes.value.length > 0
+)
+
+/** Funcionários que batem com setores/funções selecionados no filtro. */
+const funcionariosFiltrados = computed(() => {
+  if (!temFiltro.value) return []
+
+  return funcionariosDisponiveis.value.filter((funcionario) => {
+    const setorIds = funcionario.setores?.map((s) => s.id) ?? []
+    const funcaoIds = funcionario.funcoes?.map((f) => f.id) ?? []
+
+    const matchSetor = filtrosSetores.value.some((id) => setorIds.includes(id))
+    const matchFuncao = filtrosFuncoes.value.some((id) => funcaoIds.includes(id))
+    return matchSetor || matchFuncao
+  })
+})
+
+const funcionariosBusca = computed(() => {
+  const term = buscaFuncionario.value.trim().toLowerCase()
+  if (!term) return funcionariosDisponiveis.value
+
+  return funcionariosDisponiveis.value.filter((funcionario) => {
+    const nome = funcionario.nome?.toLowerCase() ?? ''
+    const email = funcionario.email?.toLowerCase() ?? ''
+    return nome.includes(term) || email.includes(term)
+  })
 })
 
 function onDocumentClick(event: MouseEvent) {
@@ -50,17 +83,15 @@ function onDocumentClick(event: MouseEvent) {
   }
 }
 
-async function loadSetoresFuncionarios(empresaId?: string) {
-  try {
-    const [setoresRes, funcionariosRes] = await Promise.all([
-      getAllSetores(empresaId),
-      getAllFuncionarios(empresaId)
-    ])
-    setoresDisponiveis.value = setoresRes.data
-    funcionariosDisponiveis.value = funcionariosRes.data
-  } catch (error) {
-    console.error(error)
-  }
+async function loadDadosEmpresa(empresaId?: string) {
+  const [setoresRes, funcoesRes, funcionariosRes] = await Promise.all([
+    getAllSetores(empresaId),
+    getAllFuncoes(empresaId),
+    getAllFuncionarios(empresaId)
+  ])
+  setoresDisponiveis.value = setoresRes.data
+  funcoesDisponiveis.value = funcoesRes.data
+  funcionariosDisponiveis.value = funcionariosRes.data
 }
 
 watch(
@@ -69,12 +100,20 @@ watch(
     if (!readyEmpresaWatch.value) return
 
     form.value.funcionarios = []
-    form.value.setores = []
+    filtrosSetores.value = []
+    filtrosFuncoes.value = []
+    buscaFuncionario.value = ''
     setoresDisponiveis.value = []
+    funcoesDisponiveis.value = []
     funcionariosDisponiveis.value = []
 
     if (isAdmin.value && empresaId) {
-      await loadSetoresFuncionarios(empresaId)
+      try {
+        await loadDadosEmpresa(empresaId)
+      } catch (error) {
+        console.error(error)
+        toast.error('Erro ao carregar dados da empresa')
+      }
     }
   }
 )
@@ -93,18 +132,28 @@ onMounted(async () => {
 
     form.value.nome = agrupamento.nome
     form.value.descricao = agrupamento.descricao || ''
-    form.value.tipo = agrupamento.tipo
     form.value.empresa_id = empresaId
-    form.value.funcionarios = agrupamento.funcionarios?.map((f: IFuncionario) => f.id) || []
-    form.value.setores = agrupamento.setores?.map((s: ISetor) => s.id) || []
 
-    await loadSetoresFuncionarios(isAdmin.value ? empresaId || undefined : undefined)
+    await loadDadosEmpresa(isAdmin.value ? empresaId || undefined : undefined)
+
+    if (agrupamento.tipo === 'setor') {
+      filtrosSetores.value = agrupamento.setores?.map((s) => s.id) || []
+      form.value.funcionarios =
+        agrupamento.todos_funcionarios?.map((f) => f.id) ||
+        funcionariosDisponiveis.value
+          .filter((f) =>
+            (f.setores ?? []).some((s) => filtrosSetores.value.includes(s.id))
+          )
+          .map((f) => f.id)
+    } else {
+      form.value.funcionarios = agrupamento.funcionarios?.map((f) => f.id) || []
+    }
   } catch (error) {
     console.error(error)
     toast.error('Erro ao carregar agrupamento')
     router.push('/dashboard/agrupamentos')
   } finally {
-    fetching.value = false
+    loadingData.value = false
     readyEmpresaWatch.value = true
   }
 })
@@ -122,29 +171,26 @@ function selectEmpresa(id: string) {
   empresaOpen.value = false
 }
 
-function selectTipo(tipo: 'individual' | 'setor') {
-  if (form.value.tipo === tipo) return
-  form.value.tipo = tipo
-  form.value.funcionarios = []
-  form.value.setores = []
+function toggleFiltroSetor(id: string) {
+  const index = filtrosSetores.value.indexOf(id)
+  if (index > -1) filtrosSetores.value.splice(index, 1)
+  else filtrosSetores.value.push(id)
+}
+
+function toggleFiltroFuncao(id: string) {
+  const index = filtrosFuncoes.value.indexOf(id)
+  if (index > -1) filtrosFuncoes.value.splice(index, 1)
+  else filtrosFuncoes.value.push(id)
 }
 
 function toggleFuncionario(id: string) {
   const index = form.value.funcionarios.indexOf(id)
-  if (index > -1) {
-    form.value.funcionarios.splice(index, 1)
-  } else {
-    form.value.funcionarios.push(id)
-  }
+  if (index > -1) form.value.funcionarios.splice(index, 1)
+  else form.value.funcionarios.push(id)
 }
 
-function toggleSetor(id: string) {
-  const index = form.value.setores.indexOf(id)
-  if (index > -1) {
-    form.value.setores.splice(index, 1)
-  } else {
-    form.value.setores.push(id)
-  }
+function isSelected(id: string) {
+  return form.value.funcionarios.includes(id)
 }
 
 async function handleSubmit() {
@@ -160,13 +206,8 @@ async function handleSubmit() {
     return
   }
 
-  if (form.value.tipo === 'individual' && form.value.funcionarios.length === 0) {
+  if (form.value.funcionarios.length === 0) {
     toast.error('Selecione pelo menos um funcionário')
-    return
-  }
-
-  if (form.value.tipo === 'setor' && form.value.setores.length === 0) {
-    toast.error('Selecione pelo menos um setor')
     return
   }
 
@@ -175,9 +216,9 @@ async function handleSubmit() {
     const payload: Partial<IPostAgrupamentoModel> = {
       nome: form.value.nome.trim(),
       descricao: form.value.descricao.trim() || undefined,
-      tipo: form.value.tipo,
-      ...(form.value.tipo === 'individual' ? { funcionarios: [...form.value.funcionarios] } : {}),
-      ...(form.value.tipo === 'setor' ? { setores: [...form.value.setores] } : {}),
+      tipo: 'individual',
+      funcionarios: [...form.value.funcionarios],
+      setores: [],
       ...(isAdmin.value ? { empresa_id: form.value.empresa_id } : {})
     }
 
@@ -211,7 +252,7 @@ function goBack() {
       <h2 class="novo-agrupamento__title dashboard_title">EDITAR AGRUPAMENTO</h2>
     </div>
 
-    <div v-if="fetching" class="novo-agrupamento__loading">
+    <div v-if="loadingData" class="novo-agrupamento__loading">
       <p>Carregando…</p>
     </div>
 
@@ -298,57 +339,109 @@ function goBack() {
         </div>
 
         <div class="novo-agrupamento__field">
-          <span class="novo-agrupamento__label night-field-label">TIPO DE AGRUPAMENTO</span>
-          <div class="novo-agrupamento__radios" role="radiogroup" aria-label="Tipo de agrupamento">
-            <button
-              type="button"
-              class="novo-agrupamento__radio"
-              :class="{ 'is-selected': form.tipo === 'individual' }"
-              role="radio"
-              :aria-checked="form.tipo === 'individual'"
-              @click="selectTipo('individual')"
-            >
-              <span class="novo-agrupamento__radio-text">
-                Individual (selecionar funcionário um a um)
-              </span>
-              <img
-                :src="form.tipo === 'individual' ? iconRadioSelected : iconRadio"
-                width="24"
-                height="24"
-                alt=""
-              />
-            </button>
-
-            <button
-              type="button"
-              class="novo-agrupamento__radio"
-              :class="{ 'is-selected': form.tipo === 'setor' }"
-              role="radio"
-              :aria-checked="form.tipo === 'setor'"
-              @click="selectTipo('setor')"
-            >
-              <span class="novo-agrupamento__radio-text">
-                Por setor (incluir todos de um ou mais setores)
-              </span>
-              <img
-                :src="form.tipo === 'setor' ? iconRadioSelected : iconRadio"
-                width="24"
-                height="24"
-                alt=""
-              />
-            </button>
-          </div>
-        </div>
-
-        <div v-if="showFuncionarios" class="novo-agrupamento__field">
-          <span class="novo-agrupamento__label night-field-label">FUNCIONÁRIOS*</span>
+          <span class="novo-agrupamento__label night-field-label">FILTRAR</span>
           <div
             class="novo-agrupamento__checks"
             :class="{
               'novo-agrupamento__checks--empty':
-                (isAdmin && !form.empresa_id) || funcionariosDisponiveis.length === 0
+                (isAdmin && !form.empresa_id) ||
+                (setoresDisponiveis.length === 0 && funcoesDisponiveis.length === 0)
             }"
           >
+            <p v-if="isAdmin && !form.empresa_id" class="novo-agrupamento__checks-empty">
+              Selecione uma empresa primeiro
+            </p>
+            <template v-else-if="setoresDisponiveis.length === 0 && funcoesDisponiveis.length === 0">
+              <p class="novo-agrupamento__checks-empty">Nenhum setor ou função cadastrado</p>
+            </template>
+            <template v-else>
+              <label
+                v-for="setor in setoresDisponiveis"
+                :key="`setor-${setor.id}`"
+                class="novo-agrupamento__check"
+              >
+                <input
+                  type="checkbox"
+                  :checked="filtrosSetores.includes(setor.id)"
+                  @change="toggleFiltroSetor(setor.id)"
+                />
+                <span>{{ setor.nome }} <em class="novo-agrupamento__check-tag">setor</em></span>
+              </label>
+              <label
+                v-for="funcao in funcoesDisponiveis"
+                :key="`funcao-${funcao.id}`"
+                class="novo-agrupamento__check"
+              >
+                <input
+                  type="checkbox"
+                  :checked="filtrosFuncoes.includes(funcao.id)"
+                  @change="toggleFiltroFuncao(funcao.id)"
+                />
+                <span>{{ funcao.nome }} <em class="novo-agrupamento__check-tag">função</em></span>
+              </label>
+            </template>
+          </div>
+          <small class="novo-agrupamento__helper">
+            Selecione setores e/ou funções para listar os funcionários abaixo
+          </small>
+        </div>
+
+        <div class="novo-agrupamento__field">
+          <span class="novo-agrupamento__label night-field-label">FUNCIONÁRIOS</span>
+          <div
+            class="novo-agrupamento__checks"
+            :class="{
+              'novo-agrupamento__checks--empty':
+                !temFiltro || funcionariosFiltrados.length === 0
+            }"
+          >
+            <p v-if="!temFiltro" class="novo-agrupamento__checks-empty">
+              Selecione um setor ou função
+            </p>
+            <p
+              v-else-if="funcionariosFiltrados.length === 0"
+              class="novo-agrupamento__checks-empty"
+            >
+              Nenhum funcionário encontrado para o filtro
+            </p>
+            <label
+              v-for="funcionario in funcionariosFiltrados"
+              :key="`filtrado-${funcionario.id}`"
+              class="novo-agrupamento__check"
+            >
+              <input
+                type="checkbox"
+                :checked="isSelected(funcionario.id)"
+                @change="toggleFuncionario(funcionario.id)"
+              />
+              <span>{{ funcionario.nome }}</span>
+            </label>
+          </div>
+          <small v-if="temFiltro" class="novo-agrupamento__helper">
+            {{ funcionariosFiltrados.length }} funcionário(s) no filtro ·
+            {{ form.funcionarios.length }} selecionado(s)
+          </small>
+        </div>
+
+        <div class="novo-agrupamento__field">
+          <span class="novo-agrupamento__label night-field-label">TODOS OS FUNCIONÁRIOS*</span>
+          <div class="novo-agrupamento__stack">
+            <div class="novo-agrupamento__search">
+              <img :src="iconSearch" width="16" height="16" alt="" />
+              <input
+                v-model="buscaFuncionario"
+                type="text"
+                placeholder="Buscar por nome ou e-mail…"
+                :disabled="isAdmin && !form.empresa_id"
+              />
+            </div>
+            <div
+              class="novo-agrupamento__list"
+              :class="{
+                'novo-agrupamento__list--empty':
+                  (isAdmin && !form.empresa_id) || funcionariosBusca.length === 0
+              }"
+            >
             <p v-if="isAdmin && !form.empresa_id" class="novo-agrupamento__checks-empty">
               Selecione uma empresa primeiro
             </p>
@@ -358,54 +451,29 @@ function goBack() {
             >
               Nenhum funcionário cadastrado
             </p>
-            <label
-              v-for="funcionario in funcionariosDisponiveis"
-              :key="funcionario.id"
-              class="novo-agrupamento__check"
+            <p
+              v-else-if="funcionariosBusca.length === 0"
+              class="novo-agrupamento__checks-empty"
             >
-              <input
-                type="checkbox"
-                :checked="form.funcionarios.includes(funcionario.id)"
-                @change="toggleFuncionario(funcionario.id)"
-              />
-              <span>{{ funcionario.nome }}</span>
-            </label>
+              Nenhum resultado para a busca
+            </p>
+              <button
+                v-for="funcionario in funcionariosBusca"
+                :key="`busca-${funcionario.id}`"
+                type="button"
+                class="novo-agrupamento__list-item"
+                :class="{ 'is-selected': isSelected(funcionario.id) }"
+                @click="toggleFuncionario(funcionario.id)"
+              >
+                <span class="novo-agrupamento__list-name">{{ funcionario.nome }}</span>
+                <span v-if="funcionario.email" class="novo-agrupamento__list-email">
+                  {{ funcionario.email }}
+                </span>
+              </button>
+            </div>
           </div>
           <small class="novo-agrupamento__helper">
-            {{ funcionariosDisponiveis.length }} funcionário(s) cadastrado(s)
-          </small>
-        </div>
-
-        <div v-if="showSetores" class="novo-agrupamento__field">
-          <span class="novo-agrupamento__label night-field-label">SETORES*</span>
-          <div
-            class="novo-agrupamento__checks"
-            :class="{
-              'novo-agrupamento__checks--empty':
-                (isAdmin && !form.empresa_id) || setoresDisponiveis.length === 0
-            }"
-          >
-            <p v-if="isAdmin && !form.empresa_id" class="novo-agrupamento__checks-empty">
-              Selecione uma empresa primeiro
-            </p>
-            <p v-else-if="setoresDisponiveis.length === 0" class="novo-agrupamento__checks-empty">
-              Nenhum setor cadastrado
-            </p>
-            <label
-              v-for="setor in setoresDisponiveis"
-              :key="setor.id"
-              class="novo-agrupamento__check"
-            >
-              <input
-                type="checkbox"
-                :checked="form.setores.includes(setor.id)"
-                @change="toggleSetor(setor.id)"
-              />
-              <span>{{ setor.nome }}</span>
-            </label>
-          </div>
-          <small class="novo-agrupamento__helper">
-            {{ setoresDisponiveis.length }} setor(es) cadastrado(s)
+            Clique para selecionar ou remover · {{ form.funcionarios.length }} selecionado(s)
           </small>
         </div>
 
@@ -414,7 +482,7 @@ function goBack() {
             CANCELAR
           </button>
           <button type="submit" class="novo-agrupamento__submit" :disabled="loading">
-            {{ loading ? 'Salvando…' : 'SALVAR' }}
+            {{ loading ? 'Salvando…' : 'SALVAR ALTERAÇÕES' }}
           </button>
         </div>
       </form>
@@ -658,67 +726,162 @@ function goBack() {
     }
   }
 
-  &__radios {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  &__radio {
-    width: 100%;
-    min-height: 49px;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 12px 20px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 30px;
-    background: rgba(255, 255, 255, 0.04);
-    cursor: pointer;
-    text-align: left;
-    transition: all 0.2s ease;
-
-    &.is-selected {
-      background: rgba(176, 141, 87, 0.15);
-      border-color: #B08D57;
-    }
-
-    &:hover:not(.is-selected) {
-      background: rgba(255, 255, 255, 0.08);
-    }
-
-    img {
-      flex-shrink: 0;
-    }
-  }
-
-  &__radio-text {
-    font-family: var(--night-font, 'Inter', sans-serif);
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1;
-    color: #f7f7f7;
-  }
-
   &__checks {
     width: 100%;
     box-sizing: border-box;
     display: flex;
     flex-wrap: wrap;
+    align-content: flex-start;
     align-items: center;
     gap: 10px;
     padding: 14px 20px;
     min-height: 49px;
+    height: auto;
+    max-height: 180px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     border-radius: 30px;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    max-height: 200px;
-    overflow-y: auto;
 
     &--empty {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      align-content: center;
+      height: auto;
+      min-height: 49px;
+      max-height: none;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.03);
+      overflow: hidden;
+    }
+  }
+
+  &__checks-empty {
+    margin: 0;
+    width: 100%;
+    font-family: var(--night-font, 'Inter', sans-serif);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: 0;
+    color: #f7f7f7;
+    opacity: 0.6;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__check {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+
+    input {
+      width: 16px;
+      height: 16px;
+      accent-color: #B08D57;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    span {
+      font-family: var(--night-font, 'Inter', sans-serif);
+      font-size: 13px;
+      font-weight: 400;
+      color: #f7f7f7;
+      line-height: 1.2;
+    }
+  }
+
+  &__check-tag {
+    font-style: normal;
+    opacity: 0.45;
+    font-size: 11px;
+    text-transform: uppercase;
+    margin-left: 2px;
+  }
+
+  &__helper {
+    padding-left: 20px;
+    font-family: var(--night-font, 'Inter', sans-serif);
+    font-size: 12px;
+    color: #f7f7f7;
+    opacity: 0.5;
+  }
+
+  &__stack {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__search {
+    width: 100%;
+    height: 49px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 20px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.06);
+
+    img {
+      flex-shrink: 0;
+      opacity: 0.65;
+    }
+
+    input {
+      flex: 1;
+      min-width: 0;
+      height: 100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: #ffffff;
+      font-family: var(--night-font, 'Inter', sans-serif);
+      font-size: 14px;
+
+      &::placeholder {
+        color: #f7f7f7;
+        opacity: 0.55;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  &__list {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px;
+    min-height: 0;
+    height: auto;
+    max-height: 240px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
+
+    &--empty {
+      justify-content: center;
+      align-items: center;
       height: 49px;
       min-height: 49px;
       max-height: 49px;
@@ -728,83 +891,52 @@ function goBack() {
     }
   }
 
-  &__checks-empty {
-    margin: 0;
-    font-family: var(--night-font, 'Inter', sans-serif);
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1;
-    letter-spacing: 0;
-    color: #f7f7f7;
-    opacity: 0.6;
-  }
-
-  &__check {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.06);
+  &__list-item {
+    width: 100%;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 12px;
+    background: transparent;
+    text-align: left;
     cursor: pointer;
-    font-family: var(--night-font, 'Inter', sans-serif);
-    font-size: 13px;
-    font-weight: 400;
-    color: #f7f7f7;
     transition: all 0.2s ease;
 
     &:hover {
-      background: rgba(176, 141, 87, 0.15);
+      background: rgba(255, 255, 255, 0.08);
     }
 
-    input[type='checkbox'] {
-      appearance: none;
-      -webkit-appearance: none;
-      flex-shrink: 0;
-      width: 16px;
-      height: 16px;
-      margin: 0;
-      box-sizing: border-box;
-      border: 1.5px solid rgba(247, 247, 247, 0.55);
-      border-radius: 4px;
-      background: transparent;
-      cursor: pointer;
-      transition: background 0.15s ease, border-color 0.15s ease;
-
-      &:checked {
-        border-color: #B08D57;
-        background-color: #B08D57;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M2.5 6.2l2.4 2.4 4.6-4.8'/%3E%3C/svg%3E");
-        background-size: 12px 12px;
-        background-position: center;
-        background-repeat: no-repeat;
-      }
-
-      &:focus-visible {
-        outline: 2px solid rgba(176, 141, 87, 0.45);
-        outline-offset: 2px;
-      }
+    &.is-selected {
+      background: rgba(176, 141, 87, 0.22);
+      box-shadow: inset 0 0 0 1px #B08D57;
     }
   }
 
-  &__helper {
-    display: block;
-    margin: 0;
-    padding-left: 20px;
+  &__list-name {
     font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 14px;
-    font-weight: 400;
-    line-height: 1;
-    letter-spacing: 0;
-    color: rgba(255, 255, 255, 0.5);
+    font-weight: 600;
+    color: #f7f7f7;
+  }
+
+  &__list-email {
+    font-family: var(--night-font, 'Inter', sans-serif);
+    font-size: 12px;
+    color: #f7f7f7;
+    opacity: 0.55;
   }
 
   &__actions {
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
-    gap: 12px;
-    margin-top: 8px;
+    gap: 16px;
+    margin-top: 12px;
+    flex-wrap: wrap;
   }
 
   &__cancel,
@@ -812,28 +944,25 @@ function goBack() {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 140px;
+    min-width: 160px;
     height: 46px;
     padding: 0 28px;
     border-radius: 30px;
     font-family: var(--night-font, 'Inter', sans-serif);
     font-size: 16px;
     font-weight: 700;
-    line-height: 1;
-    letter-spacing: 0;
     text-transform: uppercase;
-    white-space: nowrap;
     cursor: pointer;
     transition: all 0.2s ease;
   }
 
   &__cancel {
-    border: 1px solid rgba(247, 247, 247, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     background: transparent;
-    color: #ffffff;
+    color: #f7f7f7;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.06);
     }
   }
 
@@ -855,73 +984,19 @@ function goBack() {
 
   @media (max-width: 900px) {
     &__panel {
-      width: 100%;
-      padding: 32px 24px;
+      padding: 28px 16px 28px;
     }
 
     &__form {
       width: 100%;
-    }
-  }
-
-  @media (max-width: 768px) {
-    &__heading {
-      margin-bottom: 24px;
-    }
-
-    &__panel {
-      padding: 28px 20px 32px;
-    }
-
-    &__actions {
-      flex-direction: column-reverse;
-    }
-
-    &__cancel,
-    &__submit {
-      width: 100%;
-    }
-  }
-
-  @media (max-width: 480px) {
-    &__heading {
-      margin-bottom: 16px;
-    }
-
-    &__panel {
-      padding: 24px 16px 28px;
-      border-radius: 20px;
-    }
-
-    &__form {
-      gap: 18px;
     }
 
     &__label {
-      font-size: 12px;
+      padding-left: 12px;
     }
 
-    &__input,
-    &__select-trigger,
-    &__radio {
-      min-height: 44px;
-      font-size: 13px;
-    }
-
-    &__radio-text {
-      font-size: 12px;
-      line-height: 1.3;
-    }
-
-    &__textarea {
-      min-height: 100px;
-      font-size: 13px;
-    }
-
-    &__cancel,
-    &__submit {
-      height: 44px;
-      font-size: 14px;
+    &__helper {
+      padding-left: 12px;
     }
   }
 }
