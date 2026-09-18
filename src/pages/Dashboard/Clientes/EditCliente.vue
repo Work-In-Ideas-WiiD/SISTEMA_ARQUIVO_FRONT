@@ -2,8 +2,8 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
-import CustomButton from '@/components/CustomButton/CustomButton.vue'
 import { getCliente, patchCliente } from '@/services/http/clientes'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const router = useRouter()
 const route = useRoute()
@@ -86,7 +86,7 @@ async function handleSubmit() {
       router.push('/dashboard/clientes')
     }, 2000)
   } catch (error) {
-    toast.error('Erro ao atualizar cliente')
+    toast.error(getApiErrorMessage(error, 'Erro ao atualizar cliente'))
   } finally {
     fetching.value = false
   }
@@ -183,12 +183,9 @@ function goBack() {
         </div>
 
         <div class="btn_container">
-          <CustomButton
-            title="Salvar alterações"
-            variation="2"
-            :loading="fetching"
-            @click="handleSubmit"
-          />
+          <button type="submit" class="btn_salvar" :disabled="fetching">
+            {{ fetching ? 'Salvando…' : 'SALVAR ALTERAÇÕES' }}
+          </button>
         </div>
       </form>
     </div>
@@ -313,6 +310,38 @@ function goBack() {
       margin-top: 20px;
       display: flex;
       justify-content: center;
+    }
+
+    .btn_salvar {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: auto;
+      min-width: 295px;
+      max-width: 100%;
+      height: 46px;
+      padding: 0 28px;
+      border: none;
+      border-radius: 30px;
+      background: var(--night-gold, #B08D57);
+      color: #ffffff;
+      font-family: var(--night-font, 'Inter', sans-serif);
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover:not(:disabled) {
+        background: #C29F68;
+        box-shadow: 0 4px 12px rgba(176, 141, 87, 0.3);
+      }
+
+      &:disabled {
+        opacity: 0.7;
+        cursor: wait;
+      }
     }
   }
 }
