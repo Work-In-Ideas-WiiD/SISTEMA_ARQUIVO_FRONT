@@ -12,6 +12,7 @@ import iconSearch from '@/assets/imgs/administradores/icon-search.svg'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import iconNewFolder from '@/assets/imgs/administradores/icon-new-folder.svg'
 import iconView from '@/assets/imgs/clientes/icon-view.svg'
+import iconEdit from '@/assets/imgs/administradores/icon-edit.svg'
 
 const router = useRouter()
 const toast = useToast()
@@ -78,6 +79,10 @@ function goToNovo() {
 
 function goToVisualizar(id: string) {
   router.push(`/dashboard/clientes/visualizar/${id}`)
+}
+
+function goToEditar(id: string) {
+  router.push(`/dashboard/clientes/editar/${id}`)
 }
 
 function getDocumentId(item: IGetClientesDataRes): string {
@@ -153,6 +158,14 @@ function getContato(item: IGetClientesDataRes): string {
                     @click="goToVisualizar(item.id)"
                   >
                     <img :src="iconView" width="24" height="24" alt="" />
+                  </button>
+                  <button
+                    type="button"
+                    class="clientes-action"
+                    aria-label="Editar cliente"
+                    @click="goToEditar(item.id)"
+                  >
+                    <img :src="iconEdit" width="24" height="24" alt="" />
                   </button>
                 </div>
               </td>
@@ -460,6 +473,7 @@ function getContato(item: IGetClientesDataRes): string {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
 }
 
 .clientes-action {
