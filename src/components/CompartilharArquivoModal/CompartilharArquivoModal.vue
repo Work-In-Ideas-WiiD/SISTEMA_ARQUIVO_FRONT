@@ -52,14 +52,15 @@ watch(
   }
 )
 
-async function loadShares() {
+async function loadShares(opts?: { silent?: boolean }) {
   if (!props.arquivoId) return
+  const silent = opts?.silent === true
   try {
-    loadingList.value = true
+    if (!silent) loadingList.value = true
     const { data } = await getCompartilhamentosArquivo(props.arquivoId)
     shares.value = Array.isArray(data) ? data : []
   } catch {
-    shares.value = []
+    if (!silent) shares.value = []
   } finally {
     loadingList.value = false
   }
@@ -80,7 +81,7 @@ async function handleSubmit() {
     email.value = ''
     toast.success('Link enviado para o e-mail informado')
     emit('shared', data.link)
-    await loadShares()
+    await loadShares({ silent: true })
   } catch (error) {
     toast.error(getApiErrorMessage(error, 'Erro ao compartilhar arquivo'))
   } finally {
@@ -116,7 +117,7 @@ async function askRevogar(share: ICompartilhamentoRes) {
     if (linkGerado.value === share.link) {
       linkGerado.value = ''
     }
-    await loadShares()
+    await loadShares({ silent: true })
   } catch (error) {
     toast.error(getApiErrorMessage(error, 'Erro ao revogar'))
   } finally {
@@ -140,12 +141,13 @@ function formatDate(value?: string | null) {
     month: '2-digit',
     year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
+    timeZone: 'America/Sao_Paulo'
   })
 }
 
 function close() {
-  if (loading.value || revokingId.value) return
+  if (loading.value || revokingId.value || confirmOpen.value) return
   emit('close')
 }
 
@@ -159,7 +161,7 @@ function novoCompartilhamento() {
     <div
       v-if="open"
       class="night-confirm"
-      @click.self="close"
+      @click.self="!confirmOpen && close()"
     >
       <div class="night-confirm__modal" role="dialog" aria-modal="true">
         <h3>Compartilhar arquivo</h3>
@@ -233,14 +235,14 @@ function novoCompartilhamento() {
         <div class="night-confirm__list">
           <h4>Compartilhamentos</h4>
 
-          <div v-if="loadingList" class="night-confirm__list-empty">
+          <div v-if="loadingList && !shares.length" class="night-confirm__list-empty">
             <LoadingSpinner theme="night" />
           </div>
           <p v-else-if="!shares.length" class="night-confirm__list-empty">
             Nenhum compartilhamento neste arquivo.
           </p>
 
-          <ul v-else class="night-confirm__shares">
+          <ul v-else class="night-confirm__shares" :class="{ 'night-confirm__shares--busy': revokingId }">
             <li v-for="share in shares" :key="share.id" class="night-confirm__share">
               <div class="night-confirm__share-info">
                 <strong>{{ share.email }}</strong>
