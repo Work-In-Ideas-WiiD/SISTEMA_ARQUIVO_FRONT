@@ -66,6 +66,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/Assinatura/AssinaturaPage.vue')
   },
   {
+    path: '/compartilhar/:token',
+    name: 'compartilhar-arquivo',
+    component: () => import('@/pages/Compartilhamento/CompartilharPublicoPage.vue')
+  },
+  {
     path: '/primeiroacesso',
     name: 'first-access',
     component: () => import('@/pages/FirstAccess/FirstAccessPage.vue')

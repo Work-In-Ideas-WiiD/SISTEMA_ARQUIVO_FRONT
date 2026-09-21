@@ -74,3 +74,86 @@ export async function deleteArquivo(id: string): Promise<AxiosResponse<any>> {
   const res = await api.delete(`/arquivo/${id}`)
   return res
 }
+
+export interface ICompartilhamentoRes {
+  id: string
+  email: string
+  status: string
+  link: string
+  created_at?: string
+  expires_at?: string | null
+  arquivo?: { id: string; nome?: string | null }
+}
+
+export async function postCompartilharArquivo(
+  arquivoId: string,
+  email: string,
+  expiresAt?: string
+): Promise<AxiosResponse<ICompartilhamentoRes>> {
+  const res = await api.post(`/arquivo/${arquivoId}/compartilhar`, {
+    email,
+    ...(expiresAt ? { expires_at: expiresAt } : {})
+  })
+  return res
+}
+
+export async function getCompartilhamentosArquivo(
+  arquivoId: string
+): Promise<AxiosResponse<ICompartilhamentoRes[]>> {
+  const res = await api.get(`/arquivo/${arquivoId}/compartilhamentos`)
+  return res
+}
+
+export async function revogarCompartilhamento(id: string): Promise<AxiosResponse<any>> {
+  const res = await api.post(`/compartilhamentos/${id}/revogar`)
+  return res
+}
+
+export interface ICompartilhamentoAcessoRes {
+  id: string
+  email: string
+  status: string
+  motivo_falha?: string | null
+  ip?: string | null
+  user_agent?: string | null
+  tentado_em: string
+  autorizado_em?: string | null
+  created_at?: string
+}
+
+export async function getCompartilhamentoAcessos(
+  id: string
+): Promise<AxiosResponse<ICompartilhamentoAcessoRes[]>> {
+  const res = await api.get(`/compartilhamentos/${id}/acessos`)
+  return res
+}
+
+export async function getCompartilhamentoPublico(publicToken: string): Promise<AxiosResponse<{
+  status: string
+  arquivo_nome: string
+  email_hint: string
+  requires_token: boolean
+}>> {
+  const res = await api.get(`/compartilhar/${publicToken}`)
+  return res
+}
+
+export async function solicitarTokenCompartilhamento(publicToken: string): Promise<AxiosResponse<{
+  message: string
+  email_hint: string
+  expires_in_minutes: number
+}>> {
+  const res = await api.post(`/compartilhar/${publicToken}/solicitar-token`)
+  return res
+}
+
+export async function validarTokenCompartilhamento(
+  publicToken: string,
+  token: string
+): Promise<AxiosResponse<{
+  message: string
+  arquivo: { id: string; nome: string; url: string; expires_in_minutes: number }
+}>> {
+  const res = await api.post(`/compartilhar/${publicToken}/validar-token`, { token })
+  return res
+}

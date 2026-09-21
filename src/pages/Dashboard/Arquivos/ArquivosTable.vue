@@ -13,6 +13,7 @@ import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg
 import iconNewFolder from '@/assets/imgs/administradores/icon-new-folder.svg'
 import iconDownload from '@/assets/imgs/arquivos/download.svg'
 import iconDelete from '@/assets/imgs/agrupamentos/delete.svg'
+import iconShare from '@/assets/imgs/arquivos/share.svg'
 import iconGrid from '@/assets/imgs/arquivos/icon-grid.svg'
 import iconList from '@/assets/imgs/arquivos/icon-list.svg'
 import iconFolder from '@/assets/imgs/arquivos/folder.svg'
@@ -20,7 +21,9 @@ import iconOptions from '@/assets/imgs/arquivos/Opções.svg'
 import iconUpload from '@/assets/imgs/arquivos/Upload.svg'
 import iconDownloadBlack from '@/assets/imgs/arquivos/download-black.svg'
 import iconDeleteBlack from '@/assets/imgs/arquivos/delete-black.svg'
+import iconShareBlack from '@/assets/imgs/arquivos/share-black.svg'
 import NightConfirmModal from '@/components/NightConfirmModal/NightConfirmModal.vue'
+import CompartilharArquivoModal from '@/components/CompartilharArquivoModal/CompartilharArquivoModal.vue'
 import { useNightConfirm } from '@/composables/useNightConfirm'
 
 type ViewMode = 'list' | 'grid'
@@ -43,6 +46,9 @@ const search = ref('')
 const viewMode = ref<ViewMode>('list')
 const selectedId = ref<string | null>(null)
 const openMenuId = ref<string | null>(null)
+const shareOpen = ref(false)
+const shareArquivoId = ref('')
+const shareArquivoNome = ref('')
 const isMobile = ref(
   typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches
 )
@@ -206,6 +212,13 @@ function closeTileMenu() {
 function downloadArquivo(item: IGetArquivosDataRes) {
   closeTileMenu()
   openFile(item.url)
+}
+
+function shareArquivo(item: IGetArquivosDataRes) {
+  closeTileMenu()
+  shareArquivoId.value = item.id
+  shareArquivoNome.value = item.descricao
+  shareOpen.value = true
 }
 
 function deleteFromMenu(item: IGetArquivosDataRes) {
@@ -408,6 +421,15 @@ watch(viewMode, () => {
                   <button
                     type="button"
                     class="arquivos-action"
+                    aria-label="Compartilhar arquivo"
+                    title="Compartilhar"
+                    @click="shareArquivo(item)"
+                  >
+                    <img :src="iconShare" width="24" height="24" alt="" />
+                  </button>
+                  <button
+                    type="button"
+                    class="arquivos-action"
                     aria-label="Excluir arquivo"
                     @click="removeArquivo(item.id)"
                   >
@@ -456,6 +478,14 @@ watch(viewMode, () => {
               >
                 <img :src="iconDownloadBlack" width="24" height="24" alt="" />
                 <span>Baixar</span>
+              </button>
+              <button
+                type="button"
+                class="arquivos-tile__menu-item"
+                @click="shareArquivo(item)"
+              >
+                <img :src="iconShareBlack" width="24" height="24" alt="" />
+                <span>Compartilhar</span>
               </button>
               <button
                 type="button"
@@ -520,6 +550,13 @@ watch(viewMode, () => {
       :danger="confirmOptions.danger"
       @confirm="onConfirm"
       @cancel="onCancel"
+    />
+
+    <CompartilharArquivoModal
+      :open="shareOpen"
+      :arquivo-id="shareArquivoId"
+      :arquivo-nome="shareArquivoNome"
+      @close="shareOpen = false"
     />
   </section>
 </template>
@@ -1237,6 +1274,7 @@ watch(viewMode, () => {
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
+  color: #ffffff;
 
   &:hover {
     opacity: 0.85;
