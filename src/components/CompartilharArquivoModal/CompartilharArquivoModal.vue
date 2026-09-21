@@ -165,8 +165,8 @@ function novoCompartilhamento() {
         <h3>Compartilhar arquivo</h3>
         <p v-if="arquivoNome" class="night-confirm__file">{{ arquivoNome }}</p>
         <p>
-          A pessoa receberá um link por e-mail. Ao abrir, um código de acesso será
-          enviado para validar a identidade — sem cadastro na plataforma.
+          Enviaremos um link por e-mail. Ao abrir, a pessoa recebe um código para
+          acessar o arquivo — sem precisar criar conta.
         </p>
 
         <form

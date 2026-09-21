@@ -114,8 +114,8 @@ function onOtpInput(event: Event) {
       <template v-else>
         <p class="share_form__file">{{ arquivoNome }}</p>
         <p class="share_form__subtitle">
-          Acesso vinculado ao e-mail <strong>{{ emailHint }}</strong>.
-          Sem cadastro na plataforma.
+          Enviamos o acesso para <strong>{{ emailHint }}</strong>.
+          Não é preciso criar conta.
         </p>
 
         <div v-if="step === 'info'" class="share_form__actions">
