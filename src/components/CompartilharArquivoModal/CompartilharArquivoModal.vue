@@ -5,12 +5,16 @@ import {
   postCompartilharArquivo,
   getCompartilhamentosArquivo,
   revogarCompartilhamento,
-  type ICompartilhamentoRes
+  getCompartilhamentoAcessos,
+  type ICompartilhamentoRes,
+  type ICompartilhamentoAcessoRes
 } from '@/services/http/arquivos'
 import { getApiErrorMessage } from '@/utils/apiError'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import NightConfirmModal from '@/components/NightConfirmModal/NightConfirmModal.vue'
 import { useNightConfirm } from '@/composables/useNightConfirm'
+
+type ExpirePreset = '' | '24h' | '7d' | '30d'
 
 const props = defineProps<{
   open: boolean
@@ -33,37 +37,63 @@ const {
 } = useNightConfirm()
 
 const email = ref('')
+const expirePreset = ref<ExpirePreset>('')
 const loading = ref(false)
 const loadingList = ref(false)
 const revokingId = ref('')
 const linkGerado = ref('')
 const shares = ref<ICompartilhamentoRes[]>([])
+const historyOpenId = ref('')
+const historyLoadingId = ref('')
+const historyByShare = ref<Record<string, ICompartilhamentoAcessoRes[]>>({})
+let loadSeq = 0
+
+function resetFormState() {
+  email.value = ''
+  expirePreset.value = ''
+  linkGerado.value = ''
+  loading.value = false
+  revokingId.value = ''
+  historyOpenId.value = ''
+  historyByShare.value = {}
+  shares.value = []
+}
 
 watch(
-  () => props.open,
-  (isOpen) => {
-    if (isOpen) {
-      email.value = ''
-      linkGerado.value = ''
-      loading.value = false
-      revokingId.value = ''
-      void loadShares()
-    }
+  () => [props.open, props.arquivoId] as const,
+  ([isOpen]) => {
+    if (!isOpen) return
+    resetFormState()
+    void loadShares()
   }
 )
 
 async function loadShares(opts?: { silent?: boolean }) {
   if (!props.arquivoId) return
   const silent = opts?.silent === true
+  const seq = ++loadSeq
+  const arquivoId = props.arquivoId
   try {
     if (!silent) loadingList.value = true
-    const { data } = await getCompartilhamentosArquivo(props.arquivoId)
+    const { data } = await getCompartilhamentosArquivo(arquivoId)
+    // Ignora resposta atrasada de outro arquivo / abertura anterior
+    if (seq !== loadSeq || props.arquivoId !== arquivoId) return
     shares.value = Array.isArray(data) ? data : []
   } catch {
+    if (seq !== loadSeq || props.arquivoId !== arquivoId) return
     if (!silent) shares.value = []
   } finally {
-    loadingList.value = false
+    if (seq === loadSeq) loadingList.value = false
   }
+}
+
+function resolveExpiresAt(preset: ExpirePreset): string | undefined {
+  if (!preset) return undefined
+  const d = new Date()
+  if (preset === '24h') d.setHours(d.getHours() + 24)
+  else if (preset === '7d') d.setDate(d.getDate() + 7)
+  else if (preset === '30d') d.setDate(d.getDate() + 30)
+  return d.toISOString()
 }
 
 async function handleSubmit() {
@@ -76,9 +106,14 @@ async function handleSubmit() {
 
   try {
     loading.value = true
-    const { data } = await postCompartilharArquivo(props.arquivoId, value)
+    const { data } = await postCompartilharArquivo(
+      props.arquivoId,
+      value,
+      resolveExpiresAt(expirePreset.value)
+    )
     linkGerado.value = data.link
     email.value = ''
+    expirePreset.value = ''
     toast.success('Link enviado para o e-mail informado')
     emit('shared', data.link)
     await loadShares({ silent: true })
@@ -117,6 +152,9 @@ async function askRevogar(share: ICompartilhamentoRes) {
     if (linkGerado.value === share.link) {
       linkGerado.value = ''
     }
+    if (historyOpenId.value === share.id) {
+      historyOpenId.value = ''
+    }
     await loadShares({ silent: true })
   } catch (error) {
     toast.error(getApiErrorMessage(error, 'Erro ao revogar'))
@@ -125,11 +163,46 @@ async function askRevogar(share: ICompartilhamentoRes) {
   }
 }
 
+async function toggleHistorico(share: ICompartilhamentoRes) {
+  if (historyOpenId.value === share.id) {
+    historyOpenId.value = ''
+    return
+  }
+  historyOpenId.value = share.id
+  if (historyByShare.value[share.id]) return
+
+  try {
+    historyLoadingId.value = share.id
+    const { data } = await getCompartilhamentoAcessos(share.id)
+    historyByShare.value = {
+      ...historyByShare.value,
+      [share.id]: Array.isArray(data) ? data : []
+    }
+  } catch (error) {
+    toast.error(getApiErrorMessage(error, 'Erro ao carregar acessos'))
+    historyOpenId.value = ''
+  } finally {
+    historyLoadingId.value = ''
+  }
+}
+
 function statusLabel(status: string) {
   if (status === 'ativo') return 'Ativo'
   if (status === 'revogado') return 'Revogado'
   if (status === 'expirado') return 'Expirado'
   return status
+}
+
+function acessoStatusLabel(status: string) {
+  const map: Record<string, string> = {
+    token_enviado: 'Código enviado',
+    autorizado: 'Autorizado',
+    negado: 'Negado',
+    expirado: 'Expirado',
+    revogado: 'Revogado',
+    link_invalido: 'Link inválido'
+  }
+  return map[status] || status
 }
 
 function formatDate(value?: string | null) {
@@ -188,6 +261,48 @@ function novoCompartilhamento() {
             />
           </label>
 
+          <div class="night-confirm__expire">
+            <span class="night-confirm__expire-label">Validade do link</span>
+            <div class="night-confirm__expire-options" role="group" aria-label="Validade do link">
+              <button
+                type="button"
+                class="night-confirm__chip"
+                :class="{ 'night-confirm__chip--active': expirePreset === '' }"
+                :disabled="loading"
+                @click="expirePreset = ''"
+              >
+                Sem prazo
+              </button>
+              <button
+                type="button"
+                class="night-confirm__chip"
+                :class="{ 'night-confirm__chip--active': expirePreset === '24h' }"
+                :disabled="loading"
+                @click="expirePreset = '24h'"
+              >
+                24 horas
+              </button>
+              <button
+                type="button"
+                class="night-confirm__chip"
+                :class="{ 'night-confirm__chip--active': expirePreset === '7d' }"
+                :disabled="loading"
+                @click="expirePreset = '7d'"
+              >
+                7 dias
+              </button>
+              <button
+                type="button"
+                class="night-confirm__chip"
+                :class="{ 'night-confirm__chip--active': expirePreset === '30d' }"
+                :disabled="loading"
+                @click="expirePreset = '30d'"
+              >
+                30 dias
+              </button>
+            </div>
+          </div>
+
           <div class="night-confirm__actions">
             <button
               type="button"
@@ -243,40 +358,89 @@ function novoCompartilhamento() {
           </p>
 
           <ul v-else class="night-confirm__shares" :class="{ 'night-confirm__shares--busy': revokingId }">
-            <li v-for="share in shares" :key="share.id" class="night-confirm__share">
-              <div class="night-confirm__share-info">
-                <strong>{{ share.email }}</strong>
-                <span
-                  class="night-confirm__badge"
-                  :class="`night-confirm__badge--${share.status}`"
-                >
-                  {{ statusLabel(share.status) }}
-                </span>
-                <small>Criado em {{ formatDate(share.created_at) }}</small>
-                <small v-if="share.expires_at">
-                  Expira em {{ formatDate(share.expires_at) }}
-                </small>
+            <li v-for="share in shares" :key="share.id" class="night-confirm__share-block">
+              <div class="night-confirm__share">
+                <div class="night-confirm__share-info">
+                  <strong>{{ share.email }}</strong>
+                  <span
+                    class="night-confirm__badge"
+                    :class="`night-confirm__badge--${share.status}`"
+                  >
+                    {{ statusLabel(share.status) }}
+                  </span>
+                  <small>Criado em {{ formatDate(share.created_at) }}</small>
+                  <small v-if="share.expires_at">
+                    Expira em {{ formatDate(share.expires_at) }}
+                  </small>
+                  <small v-else-if="share.status === 'ativo'">Sem prazo de expiração</small>
+                </div>
+                <div class="night-confirm__share-actions">
+                  <button
+                    type="button"
+                    class="night-confirm__mini night-confirm__mini--ghost"
+                    title="Ver acessos"
+                    @click="toggleHistorico(share)"
+                  >
+                    {{ historyOpenId === share.id ? 'OCULTAR' : 'ACESSOS' }}
+                  </button>
+                  <button
+                    v-if="share.status === 'ativo'"
+                    type="button"
+                    class="night-confirm__mini night-confirm__mini--ghost"
+                    title="Copiar link"
+                    @click="copyLink(share.link)"
+                  >
+                    COPIAR
+                  </button>
+                  <button
+                    v-if="share.status === 'ativo'"
+                    type="button"
+                    class="night-confirm__mini night-confirm__mini--danger"
+                    :disabled="revokingId === share.id"
+                    @click="askRevogar(share)"
+                  >
+                    <LoadingSpinner v-if="revokingId === share.id" theme="night" size="sm" />
+                    <span v-else>REVOGAR</span>
+                  </button>
+                </div>
               </div>
-              <div class="night-confirm__share-actions">
-                <button
-                  v-if="share.status === 'ativo'"
-                  type="button"
-                  class="night-confirm__mini night-confirm__mini--ghost"
-                  title="Copiar link"
-                  @click="copyLink(share.link)"
+
+              <div v-if="historyOpenId === share.id" class="night-confirm__history">
+                <div v-if="historyLoadingId === share.id" class="night-confirm__list-empty">
+                  <LoadingSpinner theme="night" size="sm" />
+                </div>
+                <p
+                  v-else-if="!(historyByShare[share.id] || []).length"
+                  class="night-confirm__list-empty"
                 >
-                  COPIAR
-                </button>
-                <button
-                  v-if="share.status === 'ativo'"
-                  type="button"
-                  class="night-confirm__mini night-confirm__mini--danger"
-                  :disabled="revokingId === share.id"
-                  @click="askRevogar(share)"
-                >
-                  <LoadingSpinner v-if="revokingId === share.id" theme="night" size="sm" />
-                  <span v-else>REVOGAR</span>
-                </button>
+                  Nenhum acesso registrado ainda.
+                </p>
+                <ul v-else class="night-confirm__history-list">
+                  <li
+                    v-for="acesso in historyByShare[share.id]"
+                    :key="acesso.id"
+                    class="night-confirm__history-item"
+                  >
+                    <div class="night-confirm__history-row">
+                      <span
+                        class="night-confirm__badge"
+                        :class="{
+                          'night-confirm__badge--ativo': acesso.status === 'autorizado' || acesso.status === 'token_enviado',
+                          'night-confirm__badge--revogado': acesso.status === 'negado' || acesso.status === 'revogado',
+                          'night-confirm__badge--expirado': acesso.status === 'expirado' || acesso.status === 'link_invalido'
+                        }"
+                      >
+                        {{ acessoStatusLabel(acesso.status) }}
+                      </span>
+                      <small>{{ formatDate(acesso.tentado_em) }}</small>
+                    </div>
+                    <small v-if="acesso.autorizado_em">
+                      Autorizado em {{ formatDate(acesso.autorizado_em) }}
+                    </small>
+                    <small v-if="acesso.motivo_falha">{{ acesso.motivo_falha }}</small>
+                    <small v-if="acesso.ip">IP {{ acesso.ip }}</small>
+                  </li>
+                </ul>
               </div>
             </li>
           </ul>
@@ -424,6 +588,57 @@ function novoCompartilhamento() {
     }
   }
 
+  &__expire {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__expire-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: rgba(255, 252, 255, 0.55);
+  }
+
+  &__expire-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  &__chip {
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 252, 255, 0.25);
+    background: transparent;
+    color: rgba(255, 252, 255, 0.85);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      border-color: rgba(255, 252, 255, 0.5);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    &--active {
+      border-color: #B08D57;
+      background: rgba(176, 141, 87, 0.2);
+      color: #B08D57;
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+  }
+
   &__list {
     margin-top: 28px;
     padding-top: 20px;
@@ -458,15 +673,22 @@ function novoCompartilhamento() {
     gap: 10px;
   }
 
+  &__share-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    overflow: hidden;
+  }
+
   &__share {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
     padding: 12px 14px;
-    border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.04);
   }
 
   &__share-info {
@@ -522,6 +744,50 @@ function novoCompartilhamento() {
     flex-direction: column;
     gap: 6px;
     flex-shrink: 0;
+  }
+
+  &__history {
+    padding: 0 14px 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  &__history-list {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 220px;
+    overflow: auto;
+  }
+
+  &__history-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.2);
+
+    small {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      color: rgba(255, 252, 255, 0.55);
+      word-break: break-word;
+    }
+  }
+
+  &__history-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+
+    small {
+      color: rgba(255, 252, 255, 0.7);
+    }
   }
 
   &__mini {
@@ -637,6 +903,7 @@ function novoCompartilhamento() {
 
     &__share-actions {
       flex-direction: row;
+      flex-wrap: wrap;
       width: 100%;
 
       .night-confirm__mini {
