@@ -196,7 +196,8 @@ function statusLabel(status: string) {
 function acessoStatusLabel(status: string) {
   const map: Record<string, string> = {
     token_enviado: 'Código enviado',
-    autorizado: 'Autorizado',
+    autorizado: 'Código validado',
+    download: 'Arquivo aberto',
     negado: 'Negado',
     expirado: 'Expirado',
     revogado: 'Revogado',
@@ -425,18 +426,20 @@ function novoCompartilhamento() {
                       <span
                         class="night-confirm__badge"
                         :class="{
-                          'night-confirm__badge--ativo': acesso.status === 'autorizado' || acesso.status === 'token_enviado',
-                          'night-confirm__badge--revogado': acesso.status === 'negado' || acesso.status === 'revogado',
-                          'night-confirm__badge--expirado': acesso.status === 'expirado' || acesso.status === 'link_invalido'
+                          'night-confirm__badge--ativo':
+                            acesso.status === 'autorizado' ||
+                            acesso.status === 'token_enviado' ||
+                            acesso.status === 'download',
+                          'night-confirm__badge--revogado':
+                            acesso.status === 'negado' || acesso.status === 'revogado',
+                          'night-confirm__badge--expirado':
+                            acesso.status === 'expirado' || acesso.status === 'link_invalido'
                         }"
                       >
                         {{ acessoStatusLabel(acesso.status) }}
                       </span>
                       <small>{{ formatDate(acesso.tentado_em) }}</small>
                     </div>
-                    <small v-if="acesso.autorizado_em">
-                      Autorizado em {{ formatDate(acesso.autorizado_em) }}
-                    </small>
                     <small v-if="acesso.motivo_falha">{{ acesso.motivo_falha }}</small>
                     <small v-if="acesso.ip">IP {{ acesso.ip }}</small>
                   </li>
