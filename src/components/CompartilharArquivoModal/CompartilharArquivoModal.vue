@@ -208,6 +208,15 @@ function acessoStatusLabel(status: string) {
 
 function formatDate(value?: string | null) {
   if (!value) return '—'
+  // API já manda horário de Brasília com offset (-03:00).
+  // Usa o relógio da string para não converter de novo (-3h).
+  const matched = String(value).match(
+    /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/
+  )
+  if (matched) {
+    const [, year, month, day, hour, minute] = matched
+    return `${day}/${month}/${year}, ${hour}:${minute}`
+  }
   const d = new Date(value)
   if (Number.isNaN(d.getTime())) return '—'
   return d.toLocaleString('pt-BR', {
