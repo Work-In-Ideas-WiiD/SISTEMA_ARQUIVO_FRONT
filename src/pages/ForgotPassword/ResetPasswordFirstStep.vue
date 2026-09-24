@@ -16,7 +16,7 @@ const email = ref('')
 const loading = ref(false)
 const target = route.params.target as string
 
-const loginPath = computed(() => (target === 'cliente' ? '/cliente' : '/'))
+const loginPath = computed(() => (target === 'cliente' ? '/cliente' : '/login'))
 
 async function handleSubmit() {
   try {

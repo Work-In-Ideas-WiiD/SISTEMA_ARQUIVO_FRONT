@@ -25,7 +25,7 @@ async function handleSubmit() {
     loading.value = true
     await postResetPassword(token, id, password.value, confirmPassword.value)
     toast.success('Senha alterada com sucesso!')
-    router.push('/')
+    router.push('/login')
   } catch (error) {
     console.error(error)
     toast.error(getApiErrorMessage(error, 'Ocorreu um erro ao alterar a senha.'))
@@ -54,7 +54,7 @@ async function handleSubmit() {
     <button type="submit" :disabled="loading">
       {{ loading ? 'Salvando...' : 'Salvar' }}
     </button>
-    <RouterLink to="/">Voltar para login</RouterLink>
+    <RouterLink to="/login">Voltar para login</RouterLink>
   </form>
 </template>
 
