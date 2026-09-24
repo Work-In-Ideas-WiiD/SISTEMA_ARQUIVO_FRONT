@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { postResetPassword } from '@/services/http/auth'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const route = useRoute()
 const router = useRouter()
@@ -27,7 +28,7 @@ async function handleSubmit() {
     router.push('/')
   } catch (error) {
     console.error(error)
-    toast.error('Ocorreu um erro ao alterar a senha.')
+    toast.error(getApiErrorMessage(error, 'Ocorreu um erro ao alterar a senha.'))
   } finally {
     loading.value = false
   }

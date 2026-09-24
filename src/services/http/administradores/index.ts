@@ -27,6 +27,8 @@ export interface IPostAdministradorModel {
   cpf: string
   nome: string
   contato: string
+  password?: string
+  password_confirmation?: string
 }
 
 export interface IPostAdministradorRes {
@@ -72,6 +74,13 @@ export async function patchAdministrador(
   id: string
 ): Promise<AxiosResponse<IPostAdministradorRes>> {
   const res = await api.patch(`/user/${id}`, model)
+  return res
+}
+
+export async function postEnviarRecuperacaoSenha(
+  id: string
+): Promise<AxiosResponse<{ message: string }>> {
+  const res = await api.post(`/user/${id}/enviar-recuperacao-senha`)
   return res
 }
 

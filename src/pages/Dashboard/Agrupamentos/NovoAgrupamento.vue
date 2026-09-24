@@ -11,6 +11,7 @@ import { getAllSetores, type ISetor } from '@/services/http/setores'
 import { getAllFuncoes, type IFuncao } from '@/services/http/funcoes'
 import { getAllFuncionarios, type IFuncionario } from '@/services/http/funcionarios'
 import { getAllEmpresas } from '@/services/http/empresas'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const router = useRouter()
 const toast = useToast()
@@ -104,7 +105,7 @@ watch(
         await loadDadosEmpresa(empresaId)
       } catch (error) {
         console.error(error)
-        toast.error('Erro ao carregar dados da empresa')
+        toast.error(getApiErrorMessage(error, 'Erro ao carregar dados da empresa'))
       }
     }
   }
@@ -122,7 +123,7 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error(error)
-    toast.error('Erro ao carregar dados')
+    toast.error(getApiErrorMessage(error, 'Erro ao carregar dados'))
   } finally {
     loadingData.value = false
   }
@@ -196,7 +197,7 @@ async function handleSubmit() {
     router.push('/dashboard/agrupamentos')
   } catch (error) {
     console.error(error)
-    toast.error('Erro ao criar agrupamento')
+    toast.error(getApiErrorMessage(error, 'Erro ao criar agrupamento'))
   } finally {
     loading.value = false
   }

@@ -38,6 +38,8 @@ export interface IPostEmpresaModel {
   contato: string
   cnpj?: null | string
   nome_empresa?: null | string
+  password?: string
+  password_confirmation?: string
   endereco?: {
     cep: string
     rua: string
@@ -75,6 +77,13 @@ export async function postEmpresa(data: IPostEmpresaModel): Promise<AxiosRespons
 
 export async function patchEmpresa(data: IPostEmpresaModel, id: string): Promise<AxiosResponse<any>> {
   const res = await api.patch(`/user/${id}`, data)
+  return res
+}
+
+export async function postEnviarRecuperacaoSenhaEmpresa(
+  id: string
+): Promise<AxiosResponse<{ message: string }>> {
+  const res = await api.post(`/user/${id}/enviar-recuperacao-senha`)
   return res
 }
 

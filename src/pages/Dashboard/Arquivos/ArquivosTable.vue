@@ -25,6 +25,7 @@ import iconShareBlack from '@/assets/imgs/arquivos/share-black.svg'
 import NightConfirmModal from '@/components/NightConfirmModal/NightConfirmModal.vue'
 import CompartilharArquivoModal from '@/components/CompartilharArquivoModal/CompartilharArquivoModal.vue'
 import { useNightConfirm } from '@/composables/useNightConfirm'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 type ViewMode = 'list' | 'grid'
 
@@ -106,7 +107,7 @@ async function getData(pageParam: number, likeParam: string = '') {
     noContent.value = data.data.length === 0
   } catch (error) {
     console.error(error)
-    toast.error('Erro ao carregar arquivos')
+    toast.error(getApiErrorMessage(error, 'Erro ao carregar arquivos'))
   }
 }
 
@@ -147,7 +148,7 @@ async function removeArquivo(id: string) {
     if (selectedId.value === id) selectedId.value = null
     getData(page.value, search.value)
   } catch (error) {
-    toast.error('Erro ao deletar arquivo.')
+    toast.error(getApiErrorMessage(error, 'Erro ao deletar arquivo.'))
   }
 }
 

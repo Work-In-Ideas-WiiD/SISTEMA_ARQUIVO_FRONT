@@ -22,7 +22,7 @@ export function postLogout() {
 }
 
 export function postFirstAccess(email: string) {
-  return api.post('/auth/first-access', { email })
+  return api.post('/auth/first/access', { email })
 }
 
 export function postResetPassword(token: string, id: string, password: string, passwordConfirmation: string) {
@@ -35,7 +35,7 @@ export function postResetPassword(token: string, id: string, password: string, p
 }
 
 export function postForgotPassword(email: string, target: string) {
-  return api.post('/auth/forgot-password', { email, target })
+  return api.post('/auth/reset-password', { email, target })
 }
 
 export function postVerifyToken(token: string) {

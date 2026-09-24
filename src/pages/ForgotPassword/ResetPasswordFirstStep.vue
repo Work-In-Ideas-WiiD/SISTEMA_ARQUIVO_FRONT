@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { postForgotPassword } from '@/services/http/auth'
+import { getApiErrorMessage } from '@/utils/apiError'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import iconPerson from '@/assets/imgs/login/icon-person.svg'
 import iconBackCircle from '@/assets/imgs/login/icon-back-circle.svg'
@@ -24,7 +25,7 @@ async function handleSubmit() {
     toast.success('Um e-mail foi enviado com instruções para recuperar sua senha.')
   } catch (error) {
     console.error(error)
-    toast.error('Ocorreu um erro. Verifique o e-mail informado.')
+    toast.error(getApiErrorMessage(error, 'Ocorreu um erro. Verifique o e-mail informado.'))
   } finally {
     loading.value = false
   }

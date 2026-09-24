@@ -14,6 +14,7 @@ import iconEdit from '@/assets/imgs/administradores/icon-edit.svg'
 import iconDelete from '@/assets/imgs/agrupamentos/delete.svg'
 import NightConfirmModal from '@/components/NightConfirmModal/NightConfirmModal.vue'
 import { useNightConfirm } from '@/composables/useNightConfirm'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const router = useRouter()
 const toast = useToast()
@@ -59,7 +60,7 @@ async function getData(pageParam: number, likeParam: string = '') {
     noContent.value = data.data.length === 0
   } catch (error) {
     console.error(error)
-    toast.error('Erro ao carregar empresas')
+    toast.error(getApiErrorMessage(error, 'Erro ao carregar empresas'))
   }
 }
 
@@ -104,7 +105,7 @@ async function removeEmpresa(id: string) {
     getData(page.value, search.value)
   } catch (error) {
     console.error(error)
-    toast.error('Erro ao deletar empresa.')
+    toast.error(getApiErrorMessage(error, 'Erro ao deletar empresa.'))
   }
 }
 

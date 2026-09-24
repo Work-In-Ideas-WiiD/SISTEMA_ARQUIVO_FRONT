@@ -7,6 +7,7 @@ import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg
 import iconChevronDown from '@/assets/imgs/administradores/icon-chevron-down.svg'
 import { postFuncao, type IPostFuncaoModel } from '@/services/http/funcoes'
 import { getAllEmpresas } from '@/services/http/empresas'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const router = useRouter()
 const toast = useToast()
@@ -87,7 +88,7 @@ async function handleSubmit() {
     router.push('/dashboard/funcoes')
   } catch (error) {
     console.error(error)
-    toast.error('Erro ao criar função')
+    toast.error(getApiErrorMessage(error, 'Erro ao criar função'))
   } finally {
     loading.value = false
   }

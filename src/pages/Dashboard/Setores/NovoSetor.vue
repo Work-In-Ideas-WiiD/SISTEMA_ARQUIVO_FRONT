@@ -7,6 +7,7 @@ import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg
 import iconChevronDown from '@/assets/imgs/administradores/icon-chevron-down.svg'
 import { postSetor, type IPostSetorModel } from '@/services/http/setores'
 import { getAllEmpresas } from '@/services/http/empresas'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const router = useRouter()
 const toast = useToast()
@@ -87,7 +88,7 @@ async function handleSubmit() {
     router.push('/dashboard/setores')
   } catch (error) {
     console.error(error)
-    toast.error('Erro ao criar setor')
+    toast.error(getApiErrorMessage(error, 'Erro ao criar setor'))
   } finally {
     loading.value = false
   }

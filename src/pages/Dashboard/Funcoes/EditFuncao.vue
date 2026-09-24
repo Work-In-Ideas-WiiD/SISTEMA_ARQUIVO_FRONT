@@ -7,6 +7,7 @@ import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg
 import iconChevronDown from '@/assets/imgs/administradores/icon-chevron-down.svg'
 import { getFuncao, patchFuncao, type IPostFuncaoModel } from '@/services/http/funcoes'
 import { getAllEmpresas } from '@/services/http/empresas'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const router = useRouter()
 const route = useRoute()
@@ -52,7 +53,7 @@ onMounted(async () => {
     form.value.empresa_id = data.empresa_id || ''
   } catch (error) {
     console.error(error)
-    toast.error('Erro ao carregar função')
+    toast.error(getApiErrorMessage(error, 'Erro ao carregar função'))
     router.push('/dashboard/funcoes')
   } finally {
     fetching.value = false
@@ -98,7 +99,7 @@ async function handleSubmit() {
     router.push('/dashboard/funcoes')
   } catch (error) {
     console.error(error)
-    toast.error('Erro ao atualizar função')
+    toast.error(getApiErrorMessage(error, 'Erro ao atualizar função'))
   } finally {
     loading.value = false
   }

@@ -12,6 +12,7 @@ import { getAllEmpresas } from '@/services/http/empresas'
 import { isValidOptionalCpf, maskCpf } from '@/utils/formatCpfCnpj'
 import { maskPhone, stripDigits } from '@/utils/formatPhone'
 import NightDatePicker from '@/components/inputs/NightDatePicker/NightDatePicker.vue'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const router = useRouter()
 const toast = useToast()
@@ -88,7 +89,7 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error(error)
-    toast.error('Erro ao carregar dados')
+    toast.error(getApiErrorMessage(error, 'Erro ao carregar dados'))
   } finally {
     loadingData.value = false
   }
@@ -175,7 +176,7 @@ async function handleSubmit() {
     router.push('/dashboard/funcionarios')
   } catch (error) {
     console.error(error)
-    toast.error('Erro ao criar funcionário')
+    toast.error(getApiErrorMessage(error, 'Erro ao criar funcionário'))
   } finally {
     loading.value = false
   }

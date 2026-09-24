@@ -12,6 +12,7 @@ import {
   maskCpf
 } from '@/utils/formatCpfCnpj'
 import { maskPhone, stripDigits } from '@/utils/formatPhone'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const router = useRouter()
 const toast = useToast()
@@ -103,7 +104,7 @@ async function handleSubmit() {
     toast.success('Perfil atualizado')
     setTimeout(() => router.push('/dashboard/home'), 1500)
   } catch (error) {
-    toast.error('Erro ao editar perfil')
+    toast.error(getApiErrorMessage(error, 'Erro ao editar perfil'))
     console.error(error)
   } finally {
     fetching.value = false

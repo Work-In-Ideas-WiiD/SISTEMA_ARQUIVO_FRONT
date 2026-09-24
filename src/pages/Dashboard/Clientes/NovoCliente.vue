@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import { postCliente } from '@/services/http/clientes'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const router = useRouter()
 const toast = useToast()
@@ -55,7 +56,7 @@ async function handleSubmit() {
       router.push('/dashboard/clientes')
     }, 2000)
   } catch (error) {
-    toast.error('Erro ao cadastrar cliente')
+    toast.error(getApiErrorMessage(error, 'Erro ao cadastrar cliente'))
     console.error(error)
   } finally {
     fetching.value = false

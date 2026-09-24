@@ -6,6 +6,7 @@ import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg
 import { postAdministrador } from '@/services/http/administradores'
 import { maskCpf } from '@/utils/formatCpfCnpj'
 import { maskPhone, stripDigits } from '@/utils/formatPhone'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const router = useRouter()
 const toast = useToast()
@@ -58,7 +59,7 @@ async function handleSubmit() {
       router.push('/dashboard/admins')
     }, 2000)
   } catch (error) {
-    toast.error('Erro ao cadastrar administrador')
+    toast.error(getApiErrorMessage(error, 'Erro ao cadastrar administrador'))
     console.error(error)
   } finally {
     fetching.value = false

@@ -12,6 +12,7 @@ import { getAllEmpresas } from '@/services/http/empresas'
 import { isValidOptionalCpf, maskCpf } from '@/utils/formatCpfCnpj'
 import { maskPhone, stripDigits } from '@/utils/formatPhone'
 import NightDatePicker from '@/components/inputs/NightDatePicker/NightDatePicker.vue'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const router = useRouter()
 const route = useRoute()
@@ -109,7 +110,7 @@ onMounted(async () => {
     await loadSetoresFuncoes(isAdmin.value ? empresaId || undefined : undefined)
   } catch (error) {
     console.error(error)
-    toast.error('Erro ao carregar funcionário')
+    toast.error(getApiErrorMessage(error, 'Erro ao carregar funcionário'))
     router.push('/dashboard/funcionarios')
   } finally {
     fetching.value = false
@@ -201,7 +202,7 @@ async function handleSubmit() {
     router.push('/dashboard/funcionarios')
   } catch (error) {
     console.error(error)
-    toast.error('Erro ao atualizar funcionário')
+    toast.error(getApiErrorMessage(error, 'Erro ao atualizar funcionário'))
   } finally {
     loading.value = false
   }

@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
-import { getEmpresa, patchEmpresa } from '@/services/http/empresas'
+import { getEmpresa, patchEmpresa, postEnviarRecuperacaoSenhaEmpresa } from '@/services/http/empresas'
 import {
   isValidOptionalCnpj,
   isValidOptionalCpf,
@@ -11,6 +11,7 @@ import {
   maskCpf
 } from '@/utils/formatCpfCnpj'
 import { maskPhone, stripDigits } from '@/utils/formatPhone'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const router = useRouter()
 const route = useRoute()
@@ -29,7 +30,10 @@ const cidade = ref('')
 const estado = ref('')
 const complemento = ref('')
 const cep = ref('')
+const password = ref('')
+const passwordConfirmation = ref('')
 const fetching = ref(false)
+const sendingRecovery = ref(false)
 const loading = ref(true)
 
 const empresaId = route.params.id as string
@@ -54,7 +58,7 @@ onMounted(async () => {
       cep.value = data.endereco.cep || ''
     }
   } catch (error) {
-    toast.error('Erro ao carregar empresa')
+    toast.error(getApiErrorMessage(error, 'Erro ao carregar empresa'))
     router.push('/dashboard/empresas')
   } finally {
     loading.value = false
@@ -71,6 +75,19 @@ function onCnpjInput(event: Event) {
 
 function onContatoInput(event: Event) {
   contato.value = maskPhone((event.target as HTMLInputElement).value)
+}
+
+async function handleSendRecovery() {
+  if (sendingRecovery.value) return
+  try {
+    sendingRecovery.value = true
+    const { data } = await postEnviarRecuperacaoSenhaEmpresa(empresaId)
+    toast.success(data.message || 'E-mail de recuperação enviado')
+  } catch (error) {
+    toast.error(getApiErrorMessage(error, 'Erro ao enviar recuperação de senha'))
+  } finally {
+    sendingRecovery.value = false
+  }
 }
 
 async function handleSubmit() {
@@ -100,35 +117,50 @@ async function handleSubmit() {
     return
   }
 
+  if (password.value || passwordConfirmation.value) {
+    if (password.value.length < 8) {
+      toast.error('A senha deve ter no mínimo 8 caracteres')
+      return
+    }
+    if (password.value !== passwordConfirmation.value) {
+      toast.error('A confirmação da nova senha não confere')
+      return
+    }
+  }
+
   try {
     fetching.value = true
-    await patchEmpresa(
-      {
-        type: 'empresa',
-        nome: nome.value.trim(),
-        nome_empresa: nome_empresa.value.trim() || undefined,
-        cpf: cpfDigits || undefined,
-        cnpj: cnpjDigits || undefined,
-        email: email.value.trim().toLowerCase(),
-        contato: contatoDigits,
-        endereco: {
-          rua: endereco.value.trim(),
-          numero: numero.value.trim(),
-          bairro: bairro.value.trim(),
-          cidade: cidade.value.trim(),
-          estado: estado.value.trim(),
-          cep: stripDigits(cep.value),
-          complemento: complemento.value.trim() || undefined
-        }
-      },
-      empresaId
-    )
+    const payload: Parameters<typeof patchEmpresa>[0] = {
+      type: 'empresa',
+      nome: nome.value.trim(),
+      nome_empresa: nome_empresa.value.trim() || undefined,
+      cpf: cpfDigits || undefined,
+      cnpj: cnpjDigits || undefined,
+      email: email.value.trim().toLowerCase(),
+      contato: contatoDigits,
+      endereco: {
+        rua: endereco.value.trim(),
+        numero: numero.value.trim(),
+        bairro: bairro.value.trim(),
+        cidade: cidade.value.trim(),
+        estado: estado.value.trim(),
+        cep: stripDigits(cep.value),
+        complemento: complemento.value.trim() || undefined
+      }
+    }
+    if (password.value) {
+      payload.password = password.value
+      payload.password_confirmation = passwordConfirmation.value
+    }
+    await patchEmpresa(payload, empresaId)
     toast.success('Empresa atualizada')
+    password.value = ''
+    passwordConfirmation.value = ''
     setTimeout(() => {
       router.push('/dashboard/empresas')
     }, 2000)
   } catch (error) {
-    toast.error('Erro ao atualizar empresa')
+    toast.error(getApiErrorMessage(error, 'Erro ao atualizar empresa'))
   } finally {
     fetching.value = false
   }
@@ -317,9 +349,46 @@ function goBack() {
           </div>
         </div>
 
-        <button type="submit" class="nova-empresa__submit" :disabled="fetching">
-          {{ fetching ? 'Salvando…' : 'SALVAR ALTERAÇÕES' }}
-        </button>
+        <div class="nova-empresa__row">
+          <div class="nova-empresa__field nova-empresa__field--wide">
+            <label class="nova-empresa__label night-field-label" for="password">NOVA SENHA</label>
+            <input
+              id="password"
+              v-model="password"
+              type="password"
+              class="nova-empresa__input"
+              placeholder="Deixe em branco para manter"
+              autocomplete="new-password"
+            />
+          </div>
+          <div class="nova-empresa__field nova-empresa__field--narrow">
+            <label class="nova-empresa__label night-field-label" for="password_confirmation">
+              CONFIRMAR NOVA SENHA
+            </label>
+            <input
+              id="password_confirmation"
+              v-model="passwordConfirmation"
+              type="password"
+              class="nova-empresa__input"
+              placeholder="Repita a nova senha"
+              autocomplete="new-password"
+            />
+          </div>
+        </div>
+
+        <div class="nova-empresa__actions">
+          <button
+            type="button"
+            class="nova-empresa__secondary"
+            :disabled="sendingRecovery || fetching"
+            @click="handleSendRecovery"
+          >
+            {{ sendingRecovery ? 'Enviando…' : 'ENVIAR RECUPERAÇÃO DE SENHA' }}
+          </button>
+          <button type="submit" class="nova-empresa__submit" :disabled="fetching">
+            {{ fetching ? 'Salvando…' : 'SALVAR ALTERAÇÕES' }}
+          </button>
+        </div>
       </form>
     </div>
   </section>
@@ -492,7 +561,7 @@ function goBack() {
     min-width: 295px;
     max-width: 100%;
     height: 46px;
-    margin: 8px auto 0;
+    margin: 0;
     padding: 0 28px;
     border: none;
     border-radius: 30px;
@@ -510,6 +579,53 @@ function goBack() {
     &:hover:not(:disabled) {
       background: #C29F68;
       box-shadow: 0 4px 12px rgba(176, 141, 87, 0.3);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: wait;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin-top: 8px;
+
+    .nova-empresa__submit,
+    .nova-empresa__secondary {
+      margin: 0;
+    }
+  }
+
+  &__secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    min-width: 295px;
+    max-width: 100%;
+    height: 46px;
+    padding: 0 28px;
+    border: 1px solid rgba(247, 247, 247, 0.7);
+    border-radius: 30px;
+    background: transparent;
+    color: #ffffff;
+    font-family: var(--night-font, 'Inter', sans-serif);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.08);
     }
 
     &:disabled {

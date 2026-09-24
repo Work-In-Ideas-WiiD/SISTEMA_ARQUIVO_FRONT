@@ -47,7 +47,7 @@ onMounted(async () => {
       cep.value = data.endereco.cep || ''
     }
   } catch (error) {
-    toast.error('Erro ao carregar cliente')
+    toast.error(getApiErrorMessage(error, 'Erro ao carregar cliente'))
     router.push('/dashboard/clientes')
   } finally {
     loading.value = false

@@ -11,6 +11,7 @@ import {
   maskCpf
 } from '@/utils/formatCpfCnpj'
 import { maskPhone, stripDigits } from '@/utils/formatPhone'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 const router = useRouter()
 const toast = useToast()
@@ -94,7 +95,7 @@ async function handleSubmit() {
       router.push('/dashboard/empresas')
     }, 2000)
   } catch (error) {
-    toast.error('Erro ao cadastrar empresa')
+    toast.error(getApiErrorMessage(error, 'Erro ao cadastrar empresa'))
     console.error(error)
   } finally {
     fetching.value = false
