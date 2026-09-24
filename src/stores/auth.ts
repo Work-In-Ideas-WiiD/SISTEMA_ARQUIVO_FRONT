@@ -85,7 +85,9 @@ export const useAuthStore = defineStore('auth', () => {
       
       Cookies.set('ana_lucia.token', loginData.access_token, { 
         expires: 1/24, // 1 hora
-        path: '/' 
+        path: '/',
+        sameSite: 'strict',
+        secure: window.location.protocol === 'https:'
       })
       
       handleFetching(false)
@@ -119,7 +121,9 @@ export const useAuthStore = defineStore('auth', () => {
       
       Cookies.set('ana_lucia.token', loginData.access_token, { 
         expires: 1/24, // 1 hora
-        path: '/' 
+        path: '/',
+        sameSite: 'strict',
+        secure: window.location.protocol === 'https:'
       })
       
       handleFetching(false)
@@ -144,7 +148,9 @@ export const useAuthStore = defineStore('auth', () => {
       setAuthToken(data.access_token)
       Cookies.set('ana_lucia.token', data.access_token, {
         expires: 1 / 24,
-        path: '/'
+        path: '/',
+        sameSite: 'strict',
+        secure: window.location.protocol === 'https:'
       })
 
       try {
