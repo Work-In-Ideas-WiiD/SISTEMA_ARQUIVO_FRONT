@@ -22,7 +22,7 @@ async function handleSubmit() {
   try {
     loading.value = true
     await postForgotPassword(email.value, target)
-    toast.success('Um e-mail foi enviado com instruções para recuperar sua senha.')
+    toast.success('Se o e-mail estiver cadastrado, você receberá as instruções para redefinir a senha.')
   } catch (error) {
     console.error(error)
     toast.error(getApiErrorMessage(error, 'Ocorreu um erro. Verifique o e-mail informado.'))
