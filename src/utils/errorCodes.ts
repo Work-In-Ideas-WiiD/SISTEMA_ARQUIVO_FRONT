@@ -16,6 +16,13 @@ export const ERROR_CODE_CATALOG: Record<string, string> = {
   'AKI-AUTH-002': 'Não autenticado (token ausente ou expirado)',
   'AKI-AUTH-003': 'Acesso não autorizado (policy/permissão)',
   'AKI-GEN-404': 'Registro não encontrado',
+  'AKI-AGR-001': 'Falha interna ao criar agrupamento',
+  'AKI-AGR-002': 'Falha interna ao atualizar agrupamento',
+  'AKI-FUN-001': 'Falha interna ao criar funcionário',
+  'AKI-FUN-002': 'Falha interna ao atualizar funcionário',
+  'AKI-PAG-001': 'PagBank recusou/falhou ao criar assinatura (ver log)',
+  'AKI-PAG-002': 'Falha ao sincronizar plano com PagBank',
+  'AKI-PAG-003': 'Falha ao obter chave pública do PagBank',
   'AKI-GEN-500': 'Erro interno não catalogado',
   'AKI-GEN-403': 'Acesso negado não catalogado',
   'AKI-GEN-400': 'Requisição inválida não catalogada'
