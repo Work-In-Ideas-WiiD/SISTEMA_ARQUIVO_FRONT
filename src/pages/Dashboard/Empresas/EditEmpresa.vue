@@ -528,6 +528,9 @@ function goBack() {
     &:focus {
       border-color: #B08D57;
       box-shadow: 0 0 0 2px rgba(176, 141, 87, 0.2);
+      color: #ffffff;
+      -webkit-text-fill-color: #ffffff;
+      caret-color: #ffffff;
     }
 
     &::placeholder {
@@ -545,11 +548,23 @@ function goBack() {
 
     &:-webkit-autofill,
     &:-webkit-autofill:hover,
-    &:-webkit-autofill:focus {
+    &:-webkit-autofill:focus,
+    &:-webkit-autofill:active {
       -webkit-text-fill-color: #ffffff !important;
-      caret-color: #ffffff;
+      color: #ffffff !important;
+      caret-color: #ffffff !important;
       -webkit-box-shadow: 0 0 0 1000px #132438 inset !important;
-      transition: background-color 99999s ease-in-out 0s;
+      box-shadow: 0 0 0 1000px #132438 inset !important;
+      transition: background-color 99999s ease-in-out 0s !important;
+    }
+
+    &:-webkit-autofill:focus {
+      -webkit-box-shadow:
+        0 0 0 1000px #132438 inset,
+        0 0 0 2px rgba(176, 141, 87, 0.2) !important;
+      box-shadow:
+        0 0 0 1000px #132438 inset,
+        0 0 0 2px rgba(176, 141, 87, 0.2) !important;
     }
   }
 
