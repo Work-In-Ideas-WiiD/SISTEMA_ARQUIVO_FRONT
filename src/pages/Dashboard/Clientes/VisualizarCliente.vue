@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import { getCliente } from '@/services/http/clientes'
+import { maskCep, maskNumeroEndereco, maskUf } from '@/utils/formatCep'
+import { maskCpf, maskCnpj } from '@/utils/formatCpfCnpj'
+import { maskPhone } from '@/utils/formatPhone'
 
 const router = useRouter()
 const route = useRoute()
@@ -23,6 +26,31 @@ const estado = ref('')
 const complemento = ref('')
 const cep = ref('')
 const loading = ref(true)
+
+watch(cep, (v) => {
+  const masked = maskCep(v)
+  if (masked !== v) cep.value = masked
+})
+watch(numero, (v) => {
+  const masked = maskNumeroEndereco(v)
+  if (masked !== v) numero.value = masked
+})
+watch(estado, (v) => {
+  const masked = maskUf(v)
+  if (masked !== v) estado.value = masked
+})
+watch(cpf, (v) => {
+  const masked = maskCpf(v)
+  if (masked !== v) cpf.value = masked
+})
+watch(cnpj, (v) => {
+  const masked = maskCnpj(v)
+  if (masked !== v) cnpj.value = masked
+})
+watch(contato, (v) => {
+  const masked = maskPhone(v)
+  if (masked !== v) contato.value = masked
+})
 
 const clienteId = route.params.id as string
 
@@ -81,70 +109,70 @@ function goBack() {
         <div class="visualizar-cliente__row">
           <div class="visualizar-cliente__field visualizar-cliente__field--wide">
             <span class="visualizar-cliente__label night-field-label">NOME</span>
-            <input v-model="nome" type="text" class="visualizar-cliente__input" disabled />
+            <input v-model="nome" maxlength="255" type="text" class="visualizar-cliente__input" disabled />
           </div>
           <div class="visualizar-cliente__field visualizar-cliente__field--narrow">
             <span class="visualizar-cliente__label night-field-label">CPF</span>
-            <input v-model="cpf" type="text" class="visualizar-cliente__input" disabled />
+            <input v-model="cpf" maxlength="14" inputmode="numeric" type="text" class="visualizar-cliente__input" disabled />
           </div>
         </div>
 
         <div class="visualizar-cliente__row">
           <div class="visualizar-cliente__field visualizar-cliente__field--wide">
             <span class="visualizar-cliente__label night-field-label">NOME DA EMPRESA</span>
-            <input v-model="nome_empresa" type="text" class="visualizar-cliente__input" disabled />
+            <input v-model="nome_empresa" maxlength="255" type="text" class="visualizar-cliente__input" disabled />
           </div>
           <div class="visualizar-cliente__field visualizar-cliente__field--narrow">
             <span class="visualizar-cliente__label night-field-label">CNPJ</span>
-            <input v-model="cnpj" type="text" class="visualizar-cliente__input" disabled />
+            <input v-model="cnpj" maxlength="18" inputmode="numeric" type="text" class="visualizar-cliente__input" disabled />
           </div>
         </div>
 
         <div class="visualizar-cliente__row">
           <div class="visualizar-cliente__field visualizar-cliente__field--wide">
             <span class="visualizar-cliente__label night-field-label">E-MAIL</span>
-            <input v-model="email" type="email" class="visualizar-cliente__input" disabled />
+            <input v-model="email" maxlength="255" type="email" class="visualizar-cliente__input" disabled />
           </div>
           <div class="visualizar-cliente__field visualizar-cliente__field--narrow">
             <span class="visualizar-cliente__label night-field-label">CONTATO</span>
-            <input v-model="contato" type="text" class="visualizar-cliente__input" disabled />
+            <input v-model="contato" maxlength="15" inputmode="tel" type="text" class="visualizar-cliente__input" disabled />
           </div>
         </div>
 
         <div class="visualizar-cliente__row">
           <div class="visualizar-cliente__field visualizar-cliente__field--wide">
             <span class="visualizar-cliente__label night-field-label">ENDEREÇO</span>
-            <input v-model="endereco" type="text" class="visualizar-cliente__input" disabled />
+            <input v-model="endereco" maxlength="255" type="text" class="visualizar-cliente__input" disabled />
           </div>
           <div class="visualizar-cliente__field visualizar-cliente__field--narrow">
             <span class="visualizar-cliente__label night-field-label">NÚMERO</span>
-            <input v-model="numero" type="text" class="visualizar-cliente__input" disabled />
+            <input v-model="numero" maxlength="6" inputmode="numeric" type="text" class="visualizar-cliente__input" disabled />
           </div>
         </div>
 
         <div class="visualizar-cliente__row visualizar-cliente__row--thirds">
           <div class="visualizar-cliente__field">
             <span class="visualizar-cliente__label night-field-label">BAIRRO</span>
-            <input v-model="bairro" type="text" class="visualizar-cliente__input" disabled />
+            <input v-model="bairro" maxlength="255" type="text" class="visualizar-cliente__input" disabled />
           </div>
           <div class="visualizar-cliente__field">
             <span class="visualizar-cliente__label night-field-label">CIDADE</span>
-            <input v-model="cidade" type="text" class="visualizar-cliente__input" disabled />
+            <input v-model="cidade" maxlength="255" type="text" class="visualizar-cliente__input" disabled />
           </div>
           <div class="visualizar-cliente__field">
             <span class="visualizar-cliente__label night-field-label">ESTADO</span>
-            <input v-model="estado" type="text" class="visualizar-cliente__input" disabled />
+            <input v-model="estado" maxlength="2" autocomplete="address-level1" type="text" class="visualizar-cliente__input" disabled />
           </div>
         </div>
 
         <div class="visualizar-cliente__row">
           <div class="visualizar-cliente__field visualizar-cliente__field--wide">
             <span class="visualizar-cliente__label night-field-label">COMPLEMENTO</span>
-            <input v-model="complemento" type="text" class="visualizar-cliente__input" disabled />
+            <input v-model="complemento" maxlength="255" type="text" class="visualizar-cliente__input" disabled />
           </div>
           <div class="visualizar-cliente__field visualizar-cliente__field--narrow">
             <span class="visualizar-cliente__label night-field-label">CEP</span>
-            <input v-model="cep" type="text" class="visualizar-cliente__input" disabled />
+            <input v-model="cep" maxlength="9" inputmode="numeric" autocomplete="postal-code" type="text" class="visualizar-cliente__input" disabled />
           </div>
         </div>
       </form>

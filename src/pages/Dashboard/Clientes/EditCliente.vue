@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { getCliente, patchCliente } from '@/services/http/clientes'
 import { getApiErrorMessage } from '@/utils/apiError'
+import { maskCep, maskNumeroEndereco, maskUf, isValidCep } from '@/utils/formatCep'
+import { maskCpf, maskCnpj } from '@/utils/formatCpfCnpj'
+import { maskPhone } from '@/utils/formatPhone'
 
 const router = useRouter()
 const route = useRoute()
@@ -24,6 +27,31 @@ const complemento = ref('')
 const cep = ref('')
 const fetching = ref(false)
 const loading = ref(true)
+
+watch(cep, (v) => {
+  const masked = maskCep(v)
+  if (masked !== v) cep.value = masked
+})
+watch(numero, (v) => {
+  const masked = maskNumeroEndereco(v)
+  if (masked !== v) numero.value = masked
+})
+watch(estado, (v) => {
+  const masked = maskUf(v)
+  if (masked !== v) estado.value = masked
+})
+watch(cpf, (v) => {
+  const masked = maskCpf(v)
+  if (masked !== v) cpf.value = masked
+})
+watch(cnpj, (v) => {
+  const masked = maskCnpj(v)
+  if (masked !== v) cnpj.value = masked
+})
+watch(contato, (v) => {
+  const masked = maskPhone(v)
+  if (masked !== v) contato.value = masked
+})
 
 const clienteId = route.params.id as string
 
@@ -56,6 +84,11 @@ onMounted(async () => {
 
 async function handleSubmit() {
   if (fetching.value) return
+
+  if (cep.value && !isValidCep(cep.value)) {
+    toast.error('CEP inválido. Use o formato 00000-000.')
+    return
+  }
   
   if (!nome.value || !contato.value) {
     toast.error('Preencha os campos obrigatórios')
@@ -117,69 +150,69 @@ function goBack() {
         <div class="input_row">
           <div class="form_group flex_3">
             <label>Nome</label>
-            <input v-model="nome" type="text" />
+            <input v-model="nome" maxlength="255" type="text" />
           </div>
           <div class="form_group flex_1">
             <label>CPF</label>
-            <input v-model="cpf" type="text" placeholder="000.000.000-00" />
+            <input v-model="cpf" maxlength="14" inputmode="numeric" type="text" placeholder="000.000.000-00" />
           </div>
         </div>
 
         <div class="input_row">
           <div class="form_group flex_3">
             <label>Nome da empresa</label>
-            <input v-model="nome_empresa" type="text" />
+            <input v-model="nome_empresa" maxlength="255" type="text" />
           </div>
           <div class="form_group flex_1">
             <label>CNPJ</label>
-            <input v-model="cnpj" type="text" placeholder="00.000.000/0000-00" />
+            <input v-model="cnpj" maxlength="18" inputmode="numeric" type="text" placeholder="00.000.000/0000-00" />
           </div>
         </div>
 
         <div class="input_row">
           <div class="form_group flex_1">
             <label>E-mail</label>
-            <input v-model="email" type="email" />
+            <input v-model="email" maxlength="255" type="email" />
           </div>
           <div class="form_group flex_1">
             <label>Contato</label>
-            <input v-model="contato" type="text" placeholder="(00) 00000-0000" />
+            <input v-model="contato" maxlength="15" inputmode="tel" type="text" placeholder="(00) 00000-0000" />
           </div>
         </div>
 
         <div class="input_row">
           <div class="form_group flex_1">
             <label>CEP</label>
-            <input v-model="cep" type="text" placeholder="00000-000" />
+            <input v-model="cep" maxlength="9" inputmode="numeric" autocomplete="postal-code" type="text" placeholder="00000-000" />
           </div>
           <div class="form_group flex_3">
             <label>Endereço</label>
-            <input v-model="endereco" type="text" />
+            <input v-model="endereco" maxlength="255" type="text" />
           </div>
           <div class="form_group flex_1">
             <label>Número</label>
-            <input v-model="numero" type="text" />
+            <input v-model="numero" maxlength="6" inputmode="numeric" type="text" />
           </div>
         </div>
 
         <div class="input_row">
           <div class="form_group flex_1">
             <label>Bairro</label>
-            <input v-model="bairro" type="text" />
+            <input v-model="bairro" maxlength="255" type="text" />
           </div>
           <div class="form_group flex_1">
             <label>Cidade</label>
-            <input v-model="cidade" type="text" />
+            <input v-model="cidade" maxlength="255" type="text" />
           </div>
           <div class="form_group flex_1">
             <label>Estado</label>
-            <input v-model="estado" type="text" />
+            <input v-model="estado" maxlength="2" autocomplete="address-level1" type="text" />
           </div>
         </div>
 
         <div class="form_group">
           <label>Complemento</label>
-          <input v-model="complemento" type="text" />
+          <input v-model="complemento" maxlength="255" type="text" />
         </div>
 
         <div class="btn_container">

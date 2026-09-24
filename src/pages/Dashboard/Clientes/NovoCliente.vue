@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import { postCliente } from '@/services/http/clientes'
 import { getApiErrorMessage } from '@/utils/apiError'
+import { maskCep, maskNumeroEndereco, maskUf, isValidCep } from '@/utils/formatCep'
+import { maskCpf, maskCnpj } from '@/utils/formatCpfCnpj'
+import { maskPhone } from '@/utils/formatPhone'
 
 const router = useRouter()
 const toast = useToast()
@@ -24,8 +27,38 @@ const complemento = ref('')
 const cep = ref('')
 const fetching = ref(false)
 
+watch(cep, (v) => {
+  const masked = maskCep(v)
+  if (masked !== v) cep.value = masked
+})
+watch(numero, (v) => {
+  const masked = maskNumeroEndereco(v)
+  if (masked !== v) numero.value = masked
+})
+watch(estado, (v) => {
+  const masked = maskUf(v)
+  if (masked !== v) estado.value = masked
+})
+watch(cpf, (v) => {
+  const masked = maskCpf(v)
+  if (masked !== v) cpf.value = masked
+})
+watch(cnpj, (v) => {
+  const masked = maskCnpj(v)
+  if (masked !== v) cnpj.value = masked
+})
+watch(contato, (v) => {
+  const masked = maskPhone(v)
+  if (masked !== v) contato.value = masked
+})
+
 async function handleSubmit() {
   if (fetching.value) return
+
+  if (cep.value && !isValidCep(cep.value)) {
+    toast.error('CEP inválido. Use o formato 00000-000.')
+    return
+  }
 
   if (!nome.value || !email.value || !contato.value) {
     toast.error('Preencha os campos obrigatórios')
@@ -90,6 +123,7 @@ function goBack() {
             <input
               id="nome"
               v-model="nome"
+              maxlength="255"
               type="text"
               class="novo-cliente__input"
               placeholder="Nome completo"
@@ -100,6 +134,8 @@ function goBack() {
             <input
               id="cpf"
               v-model="cpf"
+              maxlength="14"
+              inputmode="numeric"
               type="text"
               class="novo-cliente__input"
               placeholder="000.000.000-00"
@@ -113,6 +149,7 @@ function goBack() {
             <input
               id="nome_empresa"
               v-model="nome_empresa"
+              maxlength="255"
               type="text"
               class="novo-cliente__input"
               placeholder="Nome da empresa"
@@ -123,6 +160,8 @@ function goBack() {
             <input
               id="cnpj"
               v-model="cnpj"
+              maxlength="18"
+              inputmode="numeric"
               type="text"
               class="novo-cliente__input"
               placeholder="00.000.000/0000-00"
@@ -136,6 +175,7 @@ function goBack() {
             <input
               id="email"
               v-model="email"
+              maxlength="255"
               type="email"
               class="novo-cliente__input"
               placeholder="contato@email.com"
@@ -146,6 +186,8 @@ function goBack() {
             <input
               id="contato"
               v-model="contato"
+              maxlength="15"
+              inputmode="tel"
               type="text"
               class="novo-cliente__input"
               placeholder="(00) 00000-0000"
@@ -159,6 +201,7 @@ function goBack() {
             <input
               id="endereco"
               v-model="endereco"
+              maxlength="255"
               type="text"
               class="novo-cliente__input"
               placeholder="Rua, avenida, logradouro"
@@ -169,6 +212,8 @@ function goBack() {
             <input
               id="numero"
               v-model="numero"
+              maxlength="6"
+              inputmode="numeric"
               type="text"
               class="novo-cliente__input"
               placeholder="0000"
@@ -182,6 +227,7 @@ function goBack() {
             <input
               id="bairro"
               v-model="bairro"
+              maxlength="255"
               type="text"
               class="novo-cliente__input"
               placeholder="Bairro"
@@ -192,6 +238,7 @@ function goBack() {
             <input
               id="cidade"
               v-model="cidade"
+              maxlength="255"
               type="text"
               class="novo-cliente__input"
               placeholder="Cidade"
@@ -202,9 +249,11 @@ function goBack() {
             <input
               id="estado"
               v-model="estado"
+              maxlength="2"
+              autocomplete="address-level1"
               type="text"
               class="novo-cliente__input"
-              placeholder="Estado"
+              placeholder="UF"
             />
           </div>
         </div>
@@ -215,6 +264,7 @@ function goBack() {
             <input
               id="complemento"
               v-model="complemento"
+              maxlength="255"
               type="text"
               class="novo-cliente__input"
               placeholder="Complemento"
@@ -225,6 +275,9 @@ function goBack() {
             <input
               id="cep"
               v-model="cep"
+              maxlength="9"
+              inputmode="numeric"
+              autocomplete="postal-code"
               type="text"
               class="novo-cliente__input"
               placeholder="00000-000"

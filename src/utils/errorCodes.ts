@@ -13,6 +13,9 @@ export const ERROR_CODE_CATALOG: Record<string, string> = {
   'AKI-USR-001': 'Erro ao adicionar empresa ao contrato',
   'AKI-USR-002': 'Falha ao criar usuário',
   'AKI-AUTH-001': 'Não autorizado / credenciais inválidas',
+  'AKI-AUTH-002': 'Não autenticado (token ausente ou expirado)',
+  'AKI-AUTH-003': 'Acesso não autorizado (policy/permissão)',
+  'AKI-GEN-404': 'Registro não encontrado',
   'AKI-GEN-500': 'Erro interno não catalogado',
   'AKI-GEN-403': 'Acesso negado não catalogado',
   'AKI-GEN-400': 'Requisição inválida não catalogada'
