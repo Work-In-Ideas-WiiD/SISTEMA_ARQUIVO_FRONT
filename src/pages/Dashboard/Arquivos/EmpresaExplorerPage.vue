@@ -444,6 +444,14 @@ async function savePasta() {
   }
 }
 
+function arquivoExtensao(arquivo: IGetArquivosDataRes): string {
+  const fonte = arquivo.path || arquivo.descricao || ''
+  const nome = fonte.split('/').pop() || ''
+  const partes = nome.split('.')
+  if (partes.length < 2) return ''
+  return partes[partes.length - 1].toUpperCase()
+}
+
 async function uploadSelectedFile(file: File, nome?: string) {
   saving.value = true
   try {
@@ -680,6 +688,10 @@ watch(
           <li v-for="arquivo in arquivos" :key="'a-' + arquivo.id">
             <button type="button" class="empresa-explorer__tile" @click="openArquivo(arquivo)">
               <span class="empresa-explorer__box">
+                <span
+                  v-if="arquivoExtensao(arquivo)"
+                  class="empresa-explorer__ext"
+                >{{ arquivoExtensao(arquivo) }}</span>
                 <img
                   :src="iconFiles"
                   width="28"
@@ -1040,6 +1052,7 @@ watch(
 }
 
 .empresa-explorer__box {
+  position: relative;
   width: 110px;
   height: 94px;
   border-radius: 15px;
@@ -1050,6 +1063,20 @@ watch(
   justify-content: center;
   transition: all 0.2s ease;
   box-sizing: border-box;
+}
+
+.empresa-explorer__ext {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-family: var(--night-font, 'Inter', sans-serif);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: rgba(176, 141, 87, 0.95);
+  text-transform: uppercase;
+  pointer-events: none;
 }
 
 .empresa-explorer__icon {
