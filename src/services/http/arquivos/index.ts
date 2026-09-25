@@ -62,8 +62,8 @@ export async function getArquivos(
 ): Promise<AxiosResponse<IGetArquivosRes>> {
   const res = await api.get('/arquivo', {
     params: {
-      like: like,
       page: page,
+      ...(like ? { like } : {}),
       ...(filters.empresa_id ? { empresa_id: filters.empresa_id } : {}),
       ...(filters.pasta_id ? { pasta_id: filters.pasta_id } : {}),
       ...(filters.setor_id ? { setor_id: filters.setor_id } : {}),

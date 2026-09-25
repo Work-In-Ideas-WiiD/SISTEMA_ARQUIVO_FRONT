@@ -24,8 +24,7 @@ export async function getCategoriasArquivo(
   const res = await api.get('/categoria-arquivo', {
     params: {
       page,
-      like,
-      limit: 15,
+      ...(like ? { like } : {}),
       ...(empresaId ? { empresa_id: empresaId } : {})
     }
   })
