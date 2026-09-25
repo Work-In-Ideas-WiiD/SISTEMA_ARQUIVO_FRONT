@@ -14,8 +14,30 @@ import { getAllEmpresas } from '@/services/http/empresas'
 import { postAddEmpresaToArquivo } from '@/services/http/administradores'
 import { getAllSetores, type ISetor } from '@/services/http/setores'
 import { getAllFuncoes, type IFuncao } from '@/services/http/funcoes'
+import { getAllCategoriasArquivo, type ICategoriaArquivo } from '@/services/http/categorias-arquivo'
 import { getApiErrorMessage } from '@/utils/apiError'
 import { validateUploadFile } from '@/utils/fileUploadValidation'
+
+const MESES = [
+  { value: 1, label: 'Janeiro' },
+  { value: 2, label: 'Fevereiro' },
+  { value: 3, label: 'Março' },
+  { value: 4, label: 'Abril' },
+  { value: 5, label: 'Maio' },
+  { value: 6, label: 'Junho' },
+  { value: 7, label: 'Julho' },
+  { value: 8, label: 'Agosto' },
+  { value: 9, label: 'Setembro' },
+  { value: 10, label: 'Outubro' },
+  { value: 11, label: 'Novembro' },
+  { value: 12, label: 'Dezembro' }
+] as const
+
+function yearOptions(around = new Date().getFullYear()): number[] {
+  const years: number[] = []
+  for (let y = around + 2; y >= around - 30; y -= 1) years.push(y)
+  return years
+}
 
 const router = useRouter()
 const toast = useToast()
@@ -37,10 +59,29 @@ const setoresDisponiveis = ref<ISetor[]>([])
 const funcoesDisponiveis = ref<IFuncao[]>([])
 const setoresSelecionados = ref<string[]>([])
 const funcoesSelecionadas = ref<string[]>([])
+const categorias = ref<ICategoriaArquivo[]>([])
+const categoriaId = ref('')
+const mes = ref(new Date().getMonth() + 1)
+const ano = ref(new Date().getFullYear())
+const anosOpcoes = yearOptions()
 
 const empresaLabel = computed(() => {
   if (!empresaId.value) return 'Selecione uma empresa'
   return empresas.value.find((e) => e.id === empresaId.value)?.nome ?? 'Selecione uma empresa'
+})
+
+const acessoLabel = computed(() => {
+  if (!empresaId.value) return 'Selecione a empresa'
+  const parts = [empresaLabel.value]
+  const setoresNomes = setoresDisponiveis.value
+    .filter((s) => setoresSelecionados.value.includes(s.id))
+    .map((s) => s.nome)
+  const funcoesNomes = funcoesDisponiveis.value
+    .filter((f) => funcoesSelecionadas.value.includes(f.id))
+    .map((f) => f.nome)
+  if (setoresNomes.length) parts.push(setoresNomes.join(', '))
+  if (funcoesNomes.length) parts.push(funcoesNomes.join(', '))
+  return parts.join(' › ')
 })
 
 const { isDragging } = usePageFileDrop((file) => {
@@ -79,9 +120,11 @@ watch(empresaId, async (id) => {
   funcoesSelecionadas.value = []
   setoresDisponiveis.value = []
   funcoesDisponiveis.value = []
+  categorias.value = []
+  categoriaId.value = ''
 
   if (id) {
-    await loadSetoresFuncoes(id)
+    await Promise.all([loadSetoresFuncoes(id), loadCategorias(id)])
   }
 })
 
@@ -108,6 +151,16 @@ async function loadSetoresFuncoes(empresa: string) {
   }
 }
 
+async function loadCategorias(empresa: string) {
+  try {
+    const { data } = await getAllCategoriasArquivo(empresa)
+    categorias.value = data || []
+  } catch (error) {
+    console.error(error)
+    categorias.value = []
+  }
+}
+
 function applySelectedFile(file: File, autoUpload: boolean) {
   const validation = validateUploadFile(file, 'arquivo')
   if (!validation.ok) {
@@ -116,6 +169,12 @@ function applySelectedFile(file: File, autoUpload: boolean) {
   }
 
   arquivo.value = file
+  const d = new Date(file.lastModified || Date.now())
+  mes.value = d.getMonth() + 1
+  ano.value = d.getFullYear()
+  if (!nome.value.trim()) {
+    nome.value = file.name.replace(/\.[^.]+$/, '')
+  }
 
   if (!autoUpload) return
 
@@ -127,6 +186,11 @@ function applySelectedFile(file: File, autoUpload: boolean) {
 
   if (isAdmin.value && !empresaId.value) {
     toast.error('Arquivo anexado. Selecione uma empresa para enviar.')
+    return
+  }
+
+  if (!categoriaId.value) {
+    toast.error('Arquivo anexado. Selecione a categoria para enviar.')
     return
   }
 
@@ -181,6 +245,11 @@ async function handleSubmit() {
     return
   }
 
+  if (!categoriaId.value) {
+    toast.error('Selecione a categoria')
+    return
+  }
+
   const validation = validateUploadFile(arquivo.value, 'arquivo')
   if (!validation.ok) {
     toast.error(validation.message)
@@ -195,6 +264,9 @@ async function handleSubmit() {
     formData.append('descricao', nome.value)
     formData.append('file', arquivo.value)
     formData.append('empresa_id', empresaId.value)
+    formData.append('categoria_id', categoriaId.value)
+    formData.append('mes', String(mes.value))
+    formData.append('ano', String(ano.value))
 
     setoresSelecionados.value.forEach((id) => {
       formData.append('setores[]', id)
@@ -316,6 +388,44 @@ function goBack() {
               </li>
             </ul>
           </div>
+        </div>
+
+        <div class="novo-arquivo__field">
+          <label class="novo-arquivo__label" for="categoria">CATEGORIA*</label>
+          <select
+            id="categoria"
+            v-model="categoriaId"
+            class="novo-arquivo__input"
+            required
+          >
+            <option value="" disabled>Selecione a categoria</option>
+            <option v-for="cat in categorias" :key="cat.id" :value="cat.id">
+              {{ cat.nome }}
+            </option>
+          </select>
+          <p v-if="empresaId && !categorias.length" class="novo-arquivo__checks-empty">
+            Nenhuma categoria. Cadastre em Categorias de arquivo.
+          </p>
+        </div>
+
+        <div class="novo-arquivo__field novo-arquivo__field--row">
+          <div>
+            <label class="novo-arquivo__label" for="mes">MÊS*</label>
+            <select id="mes" v-model.number="mes" class="novo-arquivo__input" required>
+              <option v-for="m in MESES" :key="m.value" :value="m.value">{{ m.label }}</option>
+            </select>
+          </div>
+          <div>
+            <label class="novo-arquivo__label" for="ano">ANO*</label>
+            <select id="ano" v-model.number="ano" class="novo-arquivo__input" required>
+              <option v-for="y in anosOpcoes" :key="y" :value="y">{{ y }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="novo-arquivo__field">
+          <span class="novo-arquivo__label">Acessos</span>
+          <p class="novo-arquivo__acessos">{{ acessoLabel }}</p>
         </div>
 
         <div class="novo-arquivo__field">
@@ -456,6 +566,32 @@ function goBack() {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
+
+    &--row {
+      flex-direction: row;
+      gap: 16px;
+
+      > div {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  }
+
+  &__acessos {
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fffcff;
+    font-family: var(--night-font, 'Inter', sans-serif);
+    font-size: 14px;
   }
 
   &__label {

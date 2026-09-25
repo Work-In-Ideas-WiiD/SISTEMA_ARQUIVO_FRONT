@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { getEmpresa } from '@/services/http/empresas'
@@ -16,6 +16,10 @@ import {
   postArquivo,
   type IGetArquivosDataRes
 } from '@/services/http/arquivos'
+import {
+  getAllCategoriasArquivo,
+  type ICategoriaArquivo
+} from '@/services/http/categorias-arquivo'
 import { postAddEmpresaToArquivo } from '@/services/http/administradores'
 import { useAuthStore } from '@/stores/auth'
 import { getApiErrorMessage } from '@/utils/apiError'
@@ -23,6 +27,9 @@ import { openFile } from '@/utils/openFile'
 import { usePageFileDrop } from '@/composables/usePageFileDrop'
 import UploadDropOverlay from '@/components/UploadDropOverlay/UploadDropOverlay.vue'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
+import iconChevronDown from '@/assets/imgs/administradores/icon-chevron-down.svg'
+import iconNewFolder from '@/assets/imgs/administradores/icon-new-folder.svg'
+import iconUpload from '@/assets/imgs/arquivos/Upload.svg'
 import iconSetores from '@/assets/imgs/dashboard/icon-menu-setores.svg'
 import iconFuncoes from '@/assets/imgs/dashboard/icon-menu-funcoes.svg'
 import iconFuncionarios from '@/assets/imgs/dashboard/icon-menu-funcionarios.svg'
@@ -30,6 +37,32 @@ import iconFolder from '@/assets/imgs/arquivos/folder.svg'
 import iconFiles from '@/assets/imgs/dashboard/icon-menu-files.svg'
 
 type HierarchyLevel = 'empresa' | 'setor' | 'funcao'
+
+const MESES = [
+  { value: 1, label: 'Janeiro' },
+  { value: 2, label: 'Fevereiro' },
+  { value: 3, label: 'Março' },
+  { value: 4, label: 'Abril' },
+  { value: 5, label: 'Maio' },
+  { value: 6, label: 'Junho' },
+  { value: 7, label: 'Julho' },
+  { value: 8, label: 'Agosto' },
+  { value: 9, label: 'Setembro' },
+  { value: 10, label: 'Outubro' },
+  { value: 11, label: 'Novembro' },
+  { value: 12, label: 'Dezembro' }
+] as const
+
+function dateFromFile(file: File): { mes: number; ano: number } {
+  const d = new Date(file.lastModified || Date.now())
+  return { mes: d.getMonth() + 1, ano: d.getFullYear() }
+}
+
+function yearOptions(around = new Date().getFullYear()): number[] {
+  const years: number[] = []
+  for (let y = around + 2; y >= around - 30; y -= 1) years.push(y)
+  return years
+}
 
 const route = useRoute()
 const router = useRouter()
@@ -81,8 +114,107 @@ const funcionarioFormEmail = ref('')
 const pastaNome = ref('')
 const uploadNome = ref('')
 const uploadFile = ref<File | null>(null)
+const uploadFileInputRef = ref<HTMLInputElement | null>(null)
+const uploadCategoriaId = ref('')
+const uploadMes = ref<number>(new Date().getMonth() + 1)
+const uploadAno = ref<number>(new Date().getFullYear())
+const uploadSelectOpen = ref<'categoria' | 'mes' | 'ano' | null>(null)
+const filterSelectOpen = ref<'categoria' | 'mes' | 'ano' | null>(null)
+const categorias = ref<ICategoriaArquivo[]>([])
+const filterCategoriaId = ref('')
+const filterMes = ref<number | ''>('')
+const filterAno = ref<number | ''>('')
+const anosFiltro = yearOptions()
 
 const isInsidePasta = computed(() => Boolean(pastaId.value))
+
+const acessoUploadLabel = computed(() => {
+  const parts = [empresaNome.value]
+  if (setorId.value) parts.push(setorNome.value)
+  if (funcaoId.value) parts.push(funcaoNome.value)
+  return parts.join(' › ')
+})
+
+const uploadCategoriaLabel = computed(() => {
+  if (!uploadCategoriaId.value) return 'Selecione a categoria'
+  return categorias.value.find((c) => c.id === uploadCategoriaId.value)?.nome || 'Selecione a categoria'
+})
+
+const uploadMesLabel = computed(
+  () => MESES.find((m) => m.value === uploadMes.value)?.label || 'Mês'
+)
+
+const filterCategoriaLabel = computed(() => {
+  if (!filterCategoriaId.value) return 'Categoria'
+  return categorias.value.find((c) => c.id === filterCategoriaId.value)?.nome || 'Categoria'
+})
+
+const filterMesLabel = computed(() => {
+  if (!filterMes.value) return 'Mês'
+  return MESES.find((m) => m.value === filterMes.value)?.label || 'Mês'
+})
+
+const filterAnoLabel = computed(() => {
+  if (!filterAno.value) return 'Ano'
+  return String(filterAno.value)
+})
+
+function toggleUploadSelect(key: 'categoria' | 'mes' | 'ano') {
+  filterSelectOpen.value = null
+  uploadSelectOpen.value = uploadSelectOpen.value === key ? null : key
+}
+
+function toggleFilterSelect(key: 'categoria' | 'mes' | 'ano') {
+  uploadSelectOpen.value = null
+  filterSelectOpen.value = filterSelectOpen.value === key ? null : key
+}
+
+function selectUploadCategoria(id: string) {
+  uploadCategoriaId.value = id
+  uploadSelectOpen.value = null
+}
+
+function selectUploadMes(value: number) {
+  uploadMes.value = value
+  uploadSelectOpen.value = null
+}
+
+function selectUploadAno(value: number) {
+  uploadAno.value = value
+  uploadSelectOpen.value = null
+}
+
+function selectFilterCategoria(id: string) {
+  filterCategoriaId.value = filterCategoriaId.value === id ? '' : id
+  filterSelectOpen.value = null
+}
+
+function selectFilterMes(value: number | '') {
+  filterMes.value = filterMes.value === value ? '' : value
+  filterSelectOpen.value = null
+}
+
+function selectFilterAno(value: number | '') {
+  filterAno.value = filterAno.value === value ? '' : value
+  filterSelectOpen.value = null
+}
+
+function onNightSelectDocClick(event: MouseEvent) {
+  const target = event.target as HTMLElement | null
+  if (!target?.closest('.night-select')) {
+    uploadSelectOpen.value = null
+    filterSelectOpen.value = null
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', onNightSelectDocClick)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', onNightSelectDocClick)
+  document.body.style.overflow = ''
+})
 
 const hierarchyTitle = computed(() => {
   if (level.value === 'funcao') return funcaoNome.value
@@ -206,6 +338,15 @@ async function loadPastas() {
   }
 }
 
+async function loadCategorias() {
+  try {
+    const { data } = await getAllCategoriasArquivo(empresaId.value)
+    categorias.value = data || []
+  } catch {
+    categorias.value = []
+  }
+}
+
 async function loadArquivos() {
   try {
     const { data } = await getArquivos(1, '', {
@@ -215,7 +356,10 @@ async function loadArquivos() {
         ? { funcao_id: funcaoId.value }
         : setorId.value
           ? { setor_id: setorId.value }
-          : { somente_livres: true })
+          : { somente_livres: true }),
+      ...(filterCategoriaId.value ? { categoria_id: filterCategoriaId.value } : {}),
+      ...(filterMes.value ? { mes: Number(filterMes.value) } : {}),
+      ...(filterAno.value ? { ano: Number(filterAno.value) } : {})
     })
     arquivos.value = data.data || []
   } catch (error) {
@@ -229,7 +373,12 @@ async function refreshAll() {
   try {
     await loadNames()
     await buildPastaBreadcrumb()
-    await Promise.all([loadHierarchyItems(), loadPastas(), loadArquivos()])
+    await Promise.all([
+      loadHierarchyItems(),
+      loadPastas(),
+      loadCategorias(),
+      loadArquivos()
+    ])
   } finally {
     loading.value = false
   }
@@ -337,17 +486,42 @@ function openPastaModal() {
 function openUploadModal() {
   uploadNome.value = ''
   uploadFile.value = null
+  uploadCategoriaId.value = ''
+  uploadSelectOpen.value = null
+  if (uploadFileInputRef.value) uploadFileInputRef.value.value = ''
+  const now = new Date()
+  uploadMes.value = now.getMonth() + 1
+  uploadAno.value = now.getFullYear()
   uploadModalOpen.value = true
+  void loadCategorias()
+}
+
+function applyFileToUpload(file: File) {
+  const nomeAnteriorDoArquivo = uploadFile.value
+    ? uploadFile.value.name.replace(/\.[^.]+$/, '')
+    : ''
+  uploadFile.value = file
+  // Atualiza o nome se estiver vazio ou ainda for o do arquivo anterior (troca de arquivo).
+  if (!uploadNome.value.trim() || uploadNome.value.trim() === nomeAnteriorDoArquivo) {
+    uploadNome.value = file.name.replace(/\.[^.]+$/, '')
+  }
+  const { mes, ano } = dateFromFile(file)
+  uploadMes.value = mes
+  uploadAno.value = ano
+  uploadSelectOpen.value = null
+  uploadModalOpen.value = true
+  void loadCategorias()
 }
 
 function onPickFile(event: Event) {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
   if (!file) return
-  uploadFile.value = file
-  if (!uploadNome.value) {
-    uploadNome.value = file.name.replace(/\.[^.]+$/, '')
-  }
+  applyFileToUpload(file)
+}
+
+function openFilePicker() {
+  uploadFileInputRef.value?.click()
 }
 
 async function saveSetor() {
@@ -452,18 +626,33 @@ function arquivoExtensao(arquivo: IGetArquivosDataRes): string {
   return partes[partes.length - 1].toUpperCase()
 }
 
-async function uploadSelectedFile(file: File, nome?: string) {
+async function saveUpload() {
+  if (!uploadFile.value) {
+    toast.error('Selecione um arquivo')
+    return
+  }
+  if (!uploadCategoriaId.value) {
+    toast.error('Selecione a categoria')
+    return
+  }
+  if (!uploadMes.value || !uploadAno.value) {
+    toast.error('Selecione mês e ano')
+    return
+  }
+
   saving.value = true
   try {
     const formData = new FormData()
-    formData.append('file', file)
+    formData.append('file', uploadFile.value)
     formData.append(
       'descricao',
-      (nome || file.name.replace(/\.[^.]+$/, '')).trim() || 'Arquivo'
+      (uploadNome.value || uploadFile.value.name.replace(/\.[^.]+$/, '')).trim() || 'Arquivo'
     )
     formData.append('empresa_id', empresaId.value)
+    formData.append('categoria_id', uploadCategoriaId.value)
+    formData.append('mes', String(uploadMes.value))
+    formData.append('ano', String(uploadAno.value))
     if (pastaId.value) formData.append('pasta_id', pastaId.value)
-    // Compartilha com o nível atual (membros da empresa via vínculos).
     if (setorId.value) formData.append('setores[]', setorId.value)
     if (funcaoId.value) formData.append('funcoes[]', funcaoId.value)
 
@@ -486,16 +675,14 @@ async function uploadSelectedFile(file: File, nome?: string) {
   }
 }
 
-async function saveUpload() {
-  if (!uploadFile.value) {
-    toast.error('Selecione um arquivo')
-    return
-  }
-  await uploadSelectedFile(uploadFile.value, uploadNome.value)
-}
-
 const { isDragging } = usePageFileDrop((file) => {
-  void uploadSelectedFile(file)
+  applyFileToUpload(file)
+})
+
+watch(uploadModalOpen, (open) => {
+  if (typeof document === 'undefined') return
+  document.body.style.overflow = open ? 'hidden' : ''
+  if (!open) uploadSelectOpen.value = null
 })
 
 watch(
@@ -508,10 +695,19 @@ watch(
     ] as const,
   async ([empId]) => {
     if (!empId) return
+    filterCategoriaId.value = ''
+    filterMes.value = ''
+    filterAno.value = ''
+    filterSelectOpen.value = null
     await refreshAll()
   },
   { immediate: true }
 )
+
+watch([filterCategoriaId, filterMes, filterAno], () => {
+  if (!empresaId.value || loading.value) return
+  void loadArquivos()
+})
 </script>
 
 <template>
@@ -585,8 +781,9 @@ watch(
             <h3 class="empresa-explorer__panel-title">{{ hierarchyTitle }}</h3>
             <p class="empresa-explorer__panel-sub">{{ hierarchySubtitle }}</p>
           </div>
-          <button type="button" class="empresa-explorer__btn" @click="openNovoHierarchyModal">
-            {{ novoBtnLabel }}
+          <button type="button" class="empresa-explorer__cta" @click="openNovoHierarchyModal">
+            <img :src="iconNewFolder" width="20" height="16" alt="" />
+            <span>{{ novoBtnLabel }}</span>
           </button>
         </div>
 
@@ -663,14 +860,144 @@ watch(
         class="empresa-explorer__panel empresa-explorer__panel--arquivos"
         :class="{ 'empresa-explorer__panel--drop': isDragging }"
       >
-        <div class="empresa-explorer__panel-head">
-          <h3 class="empresa-explorer__panel-title">{{ arquivosTitle }}</h3>
+        <div class="empresa-explorer__panel-head empresa-explorer__panel-head--arquivos">
+          <div class="empresa-explorer__panel-head-left">
+            <h3 class="empresa-explorer__panel-title">{{ arquivosTitle }}</h3>
+            <div class="empresa-explorer__filters">
+              <div
+                class="night-select night-select--filter"
+                :class="{ 'is-open': filterSelectOpen === 'categoria' }"
+                @click.stop
+              >
+                <button
+                  type="button"
+                  class="night-select__trigger"
+                  :class="{
+                    'is-placeholder': !filterCategoriaId,
+                    'is-open': filterSelectOpen === 'categoria'
+                  }"
+                  aria-label="Categoria"
+                  @click="toggleFilterSelect('categoria')"
+                >
+                  <span>{{ filterCategoriaLabel }}</span>
+                  <img
+                    class="night-select__chevron"
+                    :class="{ 'is-open': filterSelectOpen === 'categoria' }"
+                    :src="iconChevronDown"
+                    width="12"
+                    height="12"
+                    alt=""
+                  />
+                </button>
+                <ul
+                  v-if="filterSelectOpen === 'categoria'"
+                  class="night-select__menu"
+                  role="listbox"
+                >
+                  <li v-for="cat in categorias" :key="cat.id">
+                    <button
+                      type="button"
+                      class="night-select__option"
+                      :class="{ 'is-active': filterCategoriaId === cat.id }"
+                      @click="selectFilterCategoria(cat.id)"
+                    >
+                      {{ cat.nome }}
+                    </button>
+                  </li>
+                </ul>
+              </div>
+
+              <div
+                class="night-select night-select--filter"
+                :class="{ 'is-open': filterSelectOpen === 'mes' }"
+                @click.stop
+              >
+                <button
+                  type="button"
+                  class="night-select__trigger"
+                  :class="{
+                    'is-placeholder': !filterMes,
+                    'is-open': filterSelectOpen === 'mes'
+                  }"
+                  aria-label="Mês"
+                  @click="toggleFilterSelect('mes')"
+                >
+                  <span>{{ filterMesLabel }}</span>
+                  <img
+                    class="night-select__chevron"
+                    :class="{ 'is-open': filterSelectOpen === 'mes' }"
+                    :src="iconChevronDown"
+                    width="12"
+                    height="12"
+                    alt=""
+                  />
+                </button>
+                <ul v-if="filterSelectOpen === 'mes'" class="night-select__menu" role="listbox">
+                  <li v-for="m in MESES" :key="m.value">
+                    <button
+                      type="button"
+                      class="night-select__option"
+                      :class="{ 'is-active': filterMes === m.value }"
+                      @click="selectFilterMes(m.value)"
+                    >
+                      {{ m.label }}
+                    </button>
+                  </li>
+                </ul>
+              </div>
+
+              <div
+                class="night-select night-select--filter"
+                :class="{ 'is-open': filterSelectOpen === 'ano' }"
+                @click.stop
+              >
+                <button
+                  type="button"
+                  class="night-select__trigger"
+                  :class="{
+                    'is-placeholder': !filterAno,
+                    'is-open': filterSelectOpen === 'ano'
+                  }"
+                  aria-label="Ano"
+                  @click="toggleFilterSelect('ano')"
+                >
+                  <span>{{ filterAnoLabel }}</span>
+                  <img
+                    class="night-select__chevron"
+                    :class="{ 'is-open': filterSelectOpen === 'ano' }"
+                    :src="iconChevronDown"
+                    width="12"
+                    height="12"
+                    alt=""
+                  />
+                </button>
+                <ul
+                  v-if="filterSelectOpen === 'ano'"
+                  class="night-select__menu night-select__menu--scroll"
+                  role="listbox"
+                >
+                  <li v-for="y in anosFiltro" :key="y">
+                    <button
+                      type="button"
+                      class="night-select__option"
+                      :class="{ 'is-active': filterAno === y }"
+                      @click="selectFilterAno(y)"
+                    >
+                      {{ y }}
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
           <div class="empresa-explorer__actions">
-            <button type="button" class="empresa-explorer__btn" @click="openUploadModal">
-              Upload de Arquivo
+            <button type="button" class="empresa-explorer__upload" @click="openUploadModal">
+              <img :src="iconUpload" width="24" height="24" alt="" />
+              <span>Upload de Arquivo</span>
             </button>
-            <button type="button" class="empresa-explorer__btn" @click="openPastaModal">
-              Nova Pasta
+            <button type="button" class="empresa-explorer__cta" @click="openPastaModal">
+              <img :src="iconNewFolder" width="20" height="16" alt="" />
+              <span>Nova Pasta</span>
             </button>
           </div>
         </div>
@@ -849,17 +1176,165 @@ watch(
 
     <Teleport to="body">
       <div v-if="uploadModalOpen" class="night-confirm" @click.self="uploadModalOpen = false">
-        <div class="night-confirm__modal" role="dialog" aria-modal="true">
-          <h3 class="night-confirm__title">Upload de Arquivo</h3>
+        <div class="night-confirm__modal night-confirm__modal--upload" role="dialog" aria-modal="true">
+          <h3 class="night-confirm__title">
+            {{ uploadFile?.name || 'Upload de Arquivo' }}
+          </h3>
+
           <label class="night-confirm__label">Nome</label>
           <input v-model="uploadNome" class="night-confirm__input" type="text" maxlength="255" />
+
           <label class="night-confirm__label">Arquivo</label>
           <input
-            class="night-confirm__input"
+            ref="uploadFileInputRef"
+            class="night-confirm__file-native"
             type="file"
             accept=".jpeg,.jpg,.png,.pdf,.doc,.docx,.mp4,.mov,.wmv,.mkv,.webm"
             @change="onPickFile"
           />
+          <button
+            type="button"
+            class="night-confirm__file-btn"
+            :class="{ 'has-file': !!uploadFile }"
+            @click="openFilePicker"
+          >
+            <img :src="iconUpload" width="20" height="20" alt="" />
+            <span>{{ uploadFile?.name || 'Escolher arquivo' }}</span>
+          </button>
+
+          <div class="night-confirm__row">
+            <div class="night-confirm__col">
+              <label class="night-confirm__label">Mês</label>
+              <div
+                class="night-select"
+                :class="{ 'is-open': uploadSelectOpen === 'mes' }"
+                @click.stop
+              >
+                <button
+                  type="button"
+                  class="night-select__trigger"
+                  :class="{ 'is-open': uploadSelectOpen === 'mes' }"
+                  @click="toggleUploadSelect('mes')"
+                >
+                  <span>{{ uploadMesLabel }}</span>
+                  <img
+                    class="night-select__chevron"
+                    :class="{ 'is-open': uploadSelectOpen === 'mes' }"
+                    :src="iconChevronDown"
+                    width="14"
+                    height="14"
+                    alt=""
+                  />
+                </button>
+                <ul
+                  v-if="uploadSelectOpen === 'mes'"
+                  class="night-select__menu"
+                  role="listbox"
+                >
+                  <li v-for="m in MESES" :key="m.value">
+                    <button
+                      type="button"
+                      class="night-select__option"
+                      :class="{ 'is-active': uploadMes === m.value }"
+                      role="option"
+                      @click="selectUploadMes(m.value)"
+                    >
+                      {{ m.label }}
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="night-confirm__col">
+              <label class="night-confirm__label">Ano</label>
+              <div
+                class="night-select"
+                :class="{ 'is-open': uploadSelectOpen === 'ano' }"
+                @click.stop
+              >
+                <button
+                  type="button"
+                  class="night-select__trigger"
+                  :class="{ 'is-open': uploadSelectOpen === 'ano' }"
+                  @click="toggleUploadSelect('ano')"
+                >
+                  <span>{{ uploadAno }}</span>
+                  <img
+                    class="night-select__chevron"
+                    :class="{ 'is-open': uploadSelectOpen === 'ano' }"
+                    :src="iconChevronDown"
+                    width="14"
+                    height="14"
+                    alt=""
+                  />
+                </button>
+                <ul
+                  v-if="uploadSelectOpen === 'ano'"
+                  class="night-select__menu night-select__menu--scroll"
+                  role="listbox"
+                >
+                  <li v-for="y in anosFiltro" :key="y">
+                    <button
+                      type="button"
+                      class="night-select__option"
+                      :class="{ 'is-active': uploadAno === y }"
+                      role="option"
+                      @click="selectUploadAno(y)"
+                    >
+                      {{ y }}
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <label class="night-confirm__label">Selecione a categoria</label>
+          <div
+            class="night-select"
+            :class="{ 'is-open': uploadSelectOpen === 'categoria' }"
+            @click.stop
+          >
+            <button
+              type="button"
+              class="night-select__trigger"
+              :class="{ 'is-placeholder': !uploadCategoriaId, 'is-open': uploadSelectOpen === 'categoria' }"
+              @click="toggleUploadSelect('categoria')"
+            >
+              <span>{{ uploadCategoriaLabel }}</span>
+              <img
+                class="night-select__chevron"
+                :class="{ 'is-open': uploadSelectOpen === 'categoria' }"
+                :src="iconChevronDown"
+                width="14"
+                height="14"
+                alt=""
+              />
+            </button>
+            <ul v-if="uploadSelectOpen === 'categoria'" class="night-select__menu" role="listbox">
+              <li v-if="!categorias.length" class="night-select__empty">Nenhuma categoria</li>
+              <li v-for="cat in categorias" :key="cat.id">
+                <button
+                  type="button"
+                  class="night-select__option"
+                  :class="{ 'is-active': uploadCategoriaId === cat.id }"
+                  role="option"
+                  @click="selectUploadCategoria(cat.id)"
+                >
+                  {{ cat.nome }}
+                </button>
+              </li>
+            </ul>
+          </div>
+          <p v-if="!categorias.length" class="night-confirm__hint">
+            Nenhuma categoria cadastrada. Crie em “Categorias de arquivo”.
+          </p>
+
+          <div class="night-confirm__acessos">
+            <p class="night-confirm__acessos-title">Acessos</p>
+            <p class="night-confirm__acessos-value">{{ acessoUploadLabel }}</p>
+          </div>
+
           <div class="night-confirm__actions">
             <button
               type="button"
@@ -874,7 +1349,7 @@ watch(
               :disabled="saving"
               @click="saveUpload"
             >
-              Enviar
+              Upload
             </button>
           </div>
         </div>
@@ -900,25 +1375,28 @@ watch(
 .empresa-explorer__heading {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 1px;
   min-width: 0;
   flex-shrink: 0;
 }
 
 .empresa-explorer__back {
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  opacity: 0.7;
 
   &:hover {
-    background: rgba(176, 141, 87, 0.2);
+    opacity: 1;
+    background: transparent;
   }
 }
 
@@ -974,7 +1452,8 @@ watch(
   display: flex;
   flex-direction: column;
   min-height: 0;
-  overflow: hidden;
+  /* visible para os dropdowns dos filtros não serem cortados */
+  overflow: visible;
 
   &--hierarchy {
     flex: 0 0 auto;
@@ -982,6 +1461,7 @@ watch(
 
   &--arquivos {
     flex: 1 1 auto;
+    min-height: 0;
   }
 
   &--drop {
@@ -993,11 +1473,58 @@ watch(
 .empresa-explorer__panel-head {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 20px;
   flex-shrink: 0;
+  position: relative;
+  z-index: 6;
+
+  &--arquivos {
+    align-items: flex-start;
+  }
+}
+
+.empresa-explorer__panel-head-left {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.empresa-explorer__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  position: relative;
+  z-index: 5;
+}
+
+.night-select--filter {
+  margin-bottom: 0;
+  min-width: 120px;
+  max-width: 180px;
+  flex: 0 1 auto;
+
+  .night-select__trigger {
+    padding: 8px 10px;
+    font-size: 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    &.is-open,
+    &:focus-visible {
+      border-color: rgba(255, 255, 255, 0.55);
+      outline: none;
+    }
+  }
+
+  .night-select__menu {
+    min-width: 100%;
+  }
 }
 
 .empresa-explorer__scroll {
@@ -1049,22 +1576,70 @@ watch(
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  justify-content: flex-end;
 }
 
-.empresa-explorer__btn {
-  border: 0;
-  border-radius: 999px;
-  padding: 10px 18px;
-  background: #b08d57;
-  color: #0b1b2b;
-  font-family: var(--night-font, 'Inter', sans-serif);
-  font-size: 13px;
-  font-weight: 700;
+.empresa-explorer__upload {
+  flex: 0 0 auto;
+  height: 46px;
+  max-width: 100%;
+  padding: 0 18px;
+  border: 2px solid rgba(176, 141, 87, 0.5);
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.06);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   cursor: pointer;
   white-space: nowrap;
+  min-width: 0;
+  transition: all 0.2s ease;
+
+  span {
+    font-family: var(--night-font, 'Inter', sans-serif);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    color: #f7f7f7;
+    text-transform: uppercase;
+  }
+
+  &:hover {
+    border-color: #b08d57;
+    background: rgba(176, 141, 87, 0.15);
+  }
+}
+
+.empresa-explorer__cta {
+  flex: 0 0 auto;
+  height: 46px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 30px;
+  background: #b08d57;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  font-family: var(--night-font, 'Inter', sans-serif);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+
+  span {
+    color: #ffffff;
+  }
 
   &:hover {
     background: #c29f68;
+    box-shadow: 0 4px 12px rgba(176, 141, 87, 0.3);
   }
 }
 
@@ -1157,6 +1732,8 @@ watch(
   align-items: center;
   justify-content: center;
   padding: 20px;
+  overflow: hidden;
+  overscroll-behavior: contain;
 }
 
 .night-confirm__modal {
@@ -1166,6 +1743,153 @@ watch(
   border-radius: 16px;
   padding: 24px;
   box-sizing: border-box;
+
+  &--upload {
+    width: min(460px, 100%);
+    max-height: min(90vh, 720px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+.night-confirm__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  position: relative;
+  /* sobe junto com o select aberto (evita texto vazando por cima do menu) */
+  z-index: 2;
+
+  &:has(.night-select.is-open) {
+    z-index: 50;
+  }
+}
+
+.night-confirm__col {
+  min-width: 0;
+  position: relative;
+}
+
+.night-select {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 14px;
+
+  &.is-open {
+    z-index: 60;
+  }
+}
+
+.night-select__trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #0b1b2b;
+  color: #fffcff;
+  font-family: var(--night-font, 'Inter', sans-serif);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+
+  &.is-placeholder {
+    color: rgba(255, 252, 255, 0.55);
+  }
+
+  &.is-open {
+    border-color: rgba(176, 141, 87, 0.55);
+  }
+}
+
+.night-select__chevron {
+  flex-shrink: 0;
+  opacity: 0.8;
+  transition: transform 0.15s ease;
+  filter: brightness(0) invert(1);
+
+  &.is-open {
+    transform: rotate(180deg);
+  }
+}
+
+.night-select__menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 70;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #0b1b2b;
+  border: 1px solid rgba(176, 141, 87, 0.45);
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65);
+  max-height: 200px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  opacity: 1;
+  isolation: isolate;
+
+  &--scroll {
+    max-height: 160px;
+  }
+}
+
+.night-select__option {
+  width: 100%;
+  border: 0;
+  background: #0b1b2b;
+  color: #fffcff;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font: inherit;
+  cursor: pointer;
+
+  &:hover,
+  &.is-active {
+    background: rgba(176, 141, 87, 0.28);
+    color: #fffcff;
+  }
+}
+
+.night-select__empty {
+  padding: 10px 12px;
+  color: rgba(255, 252, 255, 0.55);
+  font-size: 13px;
+}
+
+.night-confirm__acessos {
+  margin: 4px 0 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.night-confirm__acessos-title {
+  margin: 0 0 6px;
+  color: #b08d57;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.night-confirm__acessos-value {
+  margin: 0;
+  color: #fffcff;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .night-confirm__title {
@@ -1203,6 +1927,54 @@ watch(
   color: #fff;
   font-family: var(--night-font, 'Inter', sans-serif);
   box-sizing: border-box;
+}
+
+.night-confirm__file-native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.night-confirm__file-btn {
+  width: 100%;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px dashed rgba(176, 141, 87, 0.55);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fffcff;
+  font-family: var(--night-font, 'Inter', sans-serif);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+
+  span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &.has-file {
+    border-style: solid;
+    border-color: rgba(176, 141, 87, 0.7);
+    background: rgba(176, 141, 87, 0.12);
+  }
+
+  &:hover {
+    border-color: #b08d57;
+    background: rgba(176, 141, 87, 0.15);
+  }
 }
 
 .night-confirm__actions {

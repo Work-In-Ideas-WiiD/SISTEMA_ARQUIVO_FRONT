@@ -33,6 +33,10 @@ export interface IGetArquivosDataRes {
   }[]
   setores?: IArquivoVinculo[]
   funcoes?: IArquivoVinculo[]
+  categoria?: IArquivoVinculo | null
+  categoria_id?: string | null
+  mes?: number | null
+  ano?: number | null
   path: string
   tamanho_bytes?: number
   status: 'pendente' | 'assinado'
@@ -51,6 +55,9 @@ export async function getArquivos(
     funcao_id?: string | null
     todas_pastas?: boolean
     somente_livres?: boolean
+    categoria_id?: string | null
+    mes?: number | null
+    ano?: number | null
   } = {}
 ): Promise<AxiosResponse<IGetArquivosRes>> {
   const res = await api.get('/arquivo', {
@@ -62,7 +69,10 @@ export async function getArquivos(
       ...(filters.setor_id ? { setor_id: filters.setor_id } : {}),
       ...(filters.funcao_id ? { funcao_id: filters.funcao_id } : {}),
       ...(filters.todas_pastas ? { todas_pastas: 1 } : {}),
-      ...(filters.somente_livres ? { somente_livres: 1 } : {})
+      ...(filters.somente_livres ? { somente_livres: 1 } : {}),
+      ...(filters.categoria_id ? { categoria_id: filters.categoria_id } : {}),
+      ...(filters.mes ? { mes: filters.mes } : {}),
+      ...(filters.ano ? { ano: filters.ano } : {})
     }
   })
   return res

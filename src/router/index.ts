@@ -342,6 +342,19 @@ const routes: RouteRecordRaw[] = [
         ]
       },
       {
+        path: 'categorias-arquivo',
+        name: 'categorias-arquivo',
+        component: () => import('@/pages/Dashboard/CategoriasArquivo/CategoriasArquivoPage.vue'),
+        children: [
+          {
+            path: '',
+            name: 'categorias-arquivo-table',
+            component: () =>
+              import('@/pages/Dashboard/CategoriasArquivo/CategoriasArquivoTable.vue')
+          }
+        ]
+      },
+      {
         path: 'planos',
         name: 'planos',
         component: () => import('@/pages/Dashboard/Planos/PlanosPage.vue'),

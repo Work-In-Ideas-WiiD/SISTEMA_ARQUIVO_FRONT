@@ -33,6 +33,13 @@ const isAdmin = authStore.userRole === 'administrador'
         <RouterLink v-if="isAdmin" to="/dashboard/empresas" @click="isOpen = false">Empresas</RouterLink>
         <RouterLink v-if="isAdmin" to="/dashboard/clientes" @click="isOpen = false">Clientes</RouterLink>
         <RouterLink v-if="!isAdmin" to="/dashboard/clientes" @click="isOpen = false">Empresas</RouterLink>
+        <RouterLink
+          v-if="authStore.userRole === 'administrador' || authStore.userRole === 'empresa'"
+          to="/dashboard/categorias-arquivo"
+          @click="isOpen = false"
+        >
+          Categorias de arquivo
+        </RouterLink>
         <RouterLink v-if="isAdmin" to="/dashboard/planos" @click="isOpen = false">Planos</RouterLink>
         <RouterLink v-if="isAdmin" to="/dashboard/assinaturas-saas" @click="isOpen = false">Assinaturas SaaS</RouterLink>
         <RouterLink to="/dashboard/contratos" @click="isOpen = false">Contratos</RouterLink>

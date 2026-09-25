@@ -74,6 +74,12 @@ const menuItems: IMenuItem[] = [
     roles: ['administrador', 'empresa']
   },
   {
+    title: 'Categorias de arquivo',
+    icon: 'folder',
+    path: '/dashboard/categorias-arquivo',
+    roles: ['administrador', 'empresa']
+  },
+  {
     title: 'Planos',
     icon: 'plans',
     path: '/dashboard/planos',
