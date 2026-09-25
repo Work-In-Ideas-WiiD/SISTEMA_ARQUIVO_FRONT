@@ -20,21 +20,9 @@ const authStore = useAuthStore()
 
 const menuItems: IMenuItem[] = [
   {
-    title: 'Home',
-    icon: 'home',
-    path: '/dashboard/home',
-    roles: ['administrador', 'cliente', 'empresa']
-  },
-  {
     title: 'Administradores',
     icon: 'admin',
     path: '/dashboard/admins',
-    roles: ['administrador']
-  },
-  {
-    title: 'Empresas',
-    icon: 'building',
-    path: '/dashboard/empresas',
     roles: ['administrador']
   },
   {
@@ -44,10 +32,22 @@ const menuItems: IMenuItem[] = [
     roles: ['administrador', 'cliente', 'empresa']
   },
   {
+    title: 'Empresas',
+    icon: 'building',
+    path: '/dashboard/empresas',
+    roles: ['administrador']
+  },
+  {
     title: 'Clientes',
     icon: 'clientes',
     path: '/dashboard/clientes',
-    roles: ['administrador', 'cliente', 'empresa']
+    roles: ['administrador']
+  },
+  {
+    title: 'Empresas',
+    icon: 'building',
+    path: '/dashboard/clientes',
+    roles: ['cliente', 'empresa']
   },
   {
     title: 'Setores',

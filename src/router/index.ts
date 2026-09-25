@@ -101,12 +101,12 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         name: 'dashboard-home',
-        component: () => import('@/pages/Dashboard/Home/HomePage.vue')
+        redirect: '/dashboard/arquivos'
       },
       {
         path: 'home',
         name: 'home',
-        component: () => import('@/pages/Dashboard/Home/HomePage.vue')
+        redirect: '/dashboard/arquivos'
       },
       {
         path: 'empresas',
@@ -177,7 +177,37 @@ const routes: RouteRecordRaw[] = [
           {
             path: '',
             name: 'arquivos-table',
-            component: () => import('@/pages/Dashboard/Arquivos/ArquivosTable.vue')
+            component: () => import('@/pages/Dashboard/Arquivos/ArquivosHome.vue')
+          },
+          {
+            path: 'empresa/:empresaId',
+            name: 'arquivos-empresa',
+            component: () => import('@/pages/Dashboard/Arquivos/EmpresaExplorerPage.vue')
+          },
+          {
+            path: 'empresa/:empresaId/pasta/:pastaId',
+            name: 'arquivos-empresa-pasta',
+            component: () => import('@/pages/Dashboard/Arquivos/EmpresaExplorerPage.vue')
+          },
+          {
+            path: 'empresa/:empresaId/setor/:setorId',
+            name: 'arquivos-empresa-setor',
+            component: () => import('@/pages/Dashboard/Arquivos/EmpresaExplorerPage.vue')
+          },
+          {
+            path: 'empresa/:empresaId/setor/:setorId/pasta/:pastaId',
+            name: 'arquivos-empresa-setor-pasta',
+            component: () => import('@/pages/Dashboard/Arquivos/EmpresaExplorerPage.vue')
+          },
+          {
+            path: 'empresa/:empresaId/setor/:setorId/funcao/:funcaoId',
+            name: 'arquivos-empresa-funcao',
+            component: () => import('@/pages/Dashboard/Arquivos/EmpresaExplorerPage.vue')
+          },
+          {
+            path: 'empresa/:empresaId/setor/:setorId/funcao/:funcaoId/pasta/:pastaId',
+            name: 'arquivos-empresa-funcao-pasta',
+            component: () => import('@/pages/Dashboard/Arquivos/EmpresaExplorerPage.vue')
           },
           {
             path: 'novo',

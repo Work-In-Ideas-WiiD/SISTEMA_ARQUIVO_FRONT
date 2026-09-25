@@ -2,7 +2,6 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import iconFiles from '@/assets/imgs/dashboard/icon-menu-files.svg'
-import iconHome from '@/assets/imgs/dashboard/icon-menu-home.svg'
 import iconProfile from '@/assets/imgs/dashboard/icon-menu-profile.svg'
 
 const route = useRoute()
@@ -34,19 +33,11 @@ const items = [
     icon: iconFiles,
     width: 15,
     height: 19,
-    match: (path: string) => path.startsWith('/dashboard/arquivos'),
-  },
-  {
-    key: 'home',
-    label: 'Home',
-    to: '/dashboard/home',
-    icon: iconHome,
-    width: 22,
-    height: 20,
     match: (path: string) =>
       path === '/dashboard' ||
       path === '/dashboard/' ||
-      path.startsWith('/dashboard/home'),
+      path.startsWith('/dashboard/arquivos') ||
+      path.startsWith('/dashboard/arquivos'),
   },
   {
     key: 'perfil',

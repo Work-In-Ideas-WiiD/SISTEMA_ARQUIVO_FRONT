@@ -192,7 +192,7 @@ function handleBack() {
     setViewMode('list')
     return
   }
-  router.push('/dashboard/home')
+  router.push('/dashboard/arquivos')
 }
 
 function selectArquivo(id: string) {

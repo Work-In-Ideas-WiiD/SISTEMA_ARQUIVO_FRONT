@@ -43,12 +43,26 @@ export interface IGetArquivosDataRes {
 
 export async function getArquivos(
   page: number = 1,
-  like: string = ''
+  like: string = '',
+  filters: {
+    empresa_id?: string
+    pasta_id?: string | null
+    setor_id?: string | null
+    funcao_id?: string | null
+    todas_pastas?: boolean
+    somente_livres?: boolean
+  } = {}
 ): Promise<AxiosResponse<IGetArquivosRes>> {
   const res = await api.get('/arquivo', {
     params: {
       like: like,
-      page: page
+      page: page,
+      ...(filters.empresa_id ? { empresa_id: filters.empresa_id } : {}),
+      ...(filters.pasta_id ? { pasta_id: filters.pasta_id } : {}),
+      ...(filters.setor_id ? { setor_id: filters.setor_id } : {}),
+      ...(filters.funcao_id ? { funcao_id: filters.funcao_id } : {}),
+      ...(filters.todas_pastas ? { todas_pastas: 1 } : {}),
+      ...(filters.somente_livres ? { somente_livres: 1 } : {})
     }
   })
   return res
