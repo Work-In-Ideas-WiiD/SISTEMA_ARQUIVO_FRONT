@@ -96,27 +96,29 @@ onMounted(loadEmpresas)
       <p v-else-if="!empresas.length" class="empresas-explorer__status">
         Nenhuma empresa cadastrada.
       </p>
-      <ul v-else class="empresas-explorer__grid" role="list">
-        <li v-for="empresa in empresas" :key="empresa.id">
-          <button
-            type="button"
-            class="empresas-explorer__tile"
-            :title="empresa.label"
-            @click="openEmpresa(empresa)"
-          >
-            <span class="empresas-explorer__box">
-              <img
-                class="empresas-explorer__icon"
-                :src="iconBuilding"
-                width="40"
-                height="46"
-                alt=""
-              />
-            </span>
-            <span class="empresas-explorer__name">{{ empresa.label }}</span>
-          </button>
-        </li>
-      </ul>
+      <div v-else class="empresas-explorer__scroll">
+        <ul class="empresas-explorer__grid" role="list">
+          <li v-for="empresa in empresas" :key="empresa.id">
+            <button
+              type="button"
+              class="empresas-explorer__tile"
+              :title="empresa.label"
+              @click="openEmpresa(empresa)"
+            >
+              <span class="empresas-explorer__box">
+                <img
+                  class="empresas-explorer__icon"
+                  :src="iconBuilding"
+                  width="40"
+                  height="46"
+                  alt=""
+                />
+              </span>
+              <span class="empresas-explorer__name">{{ empresa.label }}</span>
+            </button>
+          </li>
+        </ul>
+      </div>
     </div>
   </section>
 </template>
@@ -126,11 +128,17 @@ onMounted(loadEmpresas)
   width: 100%;
   max-width: 100%;
   min-width: 0;
+  min-height: 0;
+  height: 100%;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .empresas-explorer__heading {
   margin-bottom: 18px;
+  flex-shrink: 0;
 }
 
 .empresas-explorer__title {
@@ -141,9 +149,29 @@ onMounted(loadEmpresas)
   background: var(--night-surface, #132438);
   border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
   border-radius: var(--night-radius, 20px);
-  min-height: min(62vh, 520px);
   padding: 30px 38px 36px;
   box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* 2 linhas de tiles (box 94 + gap 8 + nome ~3 linhas) + 1 gap entre linhas */
+.empresas-explorer__scroll {
+  --tile-row: calc(94px + 8px + (13px * 1.3 * 3));
+  max-height: calc(var(--tile-row) * 2 + 16px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(176, 141, 87, 0.45) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(176, 141, 87, 0.45);
+    border-radius: 6px;
+  }
 }
 
 .empresas-explorer__status {
@@ -224,11 +252,14 @@ onMounted(loadEmpresas)
 @media (max-width: 768px) {
   .empresas-explorer__panel {
     padding: 20px 16px 28px;
-    min-height: 40vh;
   }
 
   .empresas-explorer__grid {
     gap: 14px;
+  }
+
+  .empresas-explorer__scroll {
+    max-height: calc(var(--tile-row) * 2 + 14px);
   }
 }
 </style>

@@ -576,7 +576,10 @@ watch(
 
     <template v-else>
       <!-- Hierarquia: Setores / Funções / Funcionários -->
-      <div v-if="!isInsidePasta" class="empresa-explorer__panel">
+      <div
+        v-if="!isInsidePasta"
+        class="empresa-explorer__panel empresa-explorer__panel--hierarchy"
+      >
         <div class="empresa-explorer__panel-head">
           <div>
             <h3 class="empresa-explorer__panel-title">{{ hierarchyTitle }}</h3>
@@ -587,77 +590,77 @@ watch(
           </button>
         </div>
 
-        <ul
-          v-if="level === 'empresa' && setores.length"
-          class="empresa-explorer__grid"
-          role="list"
-        >
-          <li v-for="setor in setores" :key="setor.id">
-            <button type="button" class="empresa-explorer__tile" @click="enterSetor(setor)">
-              <span class="empresa-explorer__box">
-                <img
-                  :src="iconSetores"
-                  width="40"
-                  height="38"
-                  alt=""
-                  class="empresa-explorer__icon"
-                />
-              </span>
-              <span class="empresa-explorer__name">{{ setor.nome }}</span>
-            </button>
-          </li>
-        </ul>
+        <div class="empresa-explorer__scroll empresa-explorer__scroll--rows">
+          <ul
+            v-if="level === 'empresa' && setores.length"
+            class="empresa-explorer__grid"
+            role="list"
+          >
+            <li v-for="setor in setores" :key="setor.id">
+              <button type="button" class="empresa-explorer__tile" @click="enterSetor(setor)">
+                <span class="empresa-explorer__box">
+                  <img
+                    :src="iconSetores"
+                    width="40"
+                    height="38"
+                    alt=""
+                    class="empresa-explorer__icon"
+                  />
+                </span>
+                <span class="empresa-explorer__name">{{ setor.nome }}</span>
+              </button>
+            </li>
+          </ul>
 
-        <ul
-          v-else-if="level === 'setor' && funcoes.length"
-          class="empresa-explorer__grid"
-          role="list"
-        >
-          <li v-for="funcao in funcoes" :key="funcao.id">
-            <button type="button" class="empresa-explorer__tile" @click="enterFuncao(funcao)">
-              <span class="empresa-explorer__box">
-                <img
-                  :src="iconFuncoes"
-                  width="28"
-                  height="36"
-                  alt=""
-                  class="empresa-explorer__icon"
-                />
-              </span>
-              <span class="empresa-explorer__name">{{ funcao.nome }}</span>
-            </button>
-          </li>
-        </ul>
+          <ul
+            v-else-if="level === 'setor' && funcoes.length"
+            class="empresa-explorer__grid"
+            role="list"
+          >
+            <li v-for="funcao in funcoes" :key="funcao.id">
+              <button type="button" class="empresa-explorer__tile" @click="enterFuncao(funcao)">
+                <span class="empresa-explorer__box">
+                  <img
+                    :src="iconFuncoes"
+                    width="28"
+                    height="36"
+                    alt=""
+                    class="empresa-explorer__icon"
+                  />
+                </span>
+                <span class="empresa-explorer__name">{{ funcao.nome }}</span>
+              </button>
+            </li>
+          </ul>
 
-        <ul
-          v-else-if="level === 'funcao' && funcionarios.length"
-          class="empresa-explorer__grid"
-          role="list"
-        >
-          <li v-for="func in funcionarios" :key="func.id">
-            <button type="button" class="empresa-explorer__tile" disabled>
-              <span class="empresa-explorer__box">
-                <img
-                  :src="iconFuncionarios"
-                  width="40"
-                  height="28"
-                  alt=""
-                  class="empresa-explorer__icon"
-                />
-              </span>
-              <span class="empresa-explorer__name">{{ func.nome }}</span>
-            </button>
-          </li>
-        </ul>
+          <ul
+            v-else-if="level === 'funcao' && funcionarios.length"
+            class="empresa-explorer__grid"
+            role="list"
+          >
+            <li v-for="func in funcionarios" :key="func.id">
+              <button type="button" class="empresa-explorer__tile" disabled>
+                <span class="empresa-explorer__box">
+                  <img
+                    :src="iconFuncionarios"
+                    width="40"
+                    height="28"
+                    alt=""
+                    class="empresa-explorer__icon"
+                  />
+                </span>
+                <span class="empresa-explorer__name">{{ func.nome }}</span>
+              </button>
+            </li>
+          </ul>
 
-        <p v-else class="empresa-explorer__empty">
-          Nenhum item neste nível.
-        </p>
+          <p v-else class="empresa-explorer__empty">Nenhum item neste nível.</p>
+        </div>
       </div>
 
       <!-- Arquivos (todas as telas) -->
       <div
-        class="empresa-explorer__panel"
+        class="empresa-explorer__panel empresa-explorer__panel--arquivos"
         :class="{ 'empresa-explorer__panel--drop': isDragging }"
       >
         <div class="empresa-explorer__panel-head">
@@ -672,41 +675,43 @@ watch(
           </div>
         </div>
 
-        <ul
-          v-if="pastas.length || arquivos.length"
-          class="empresa-explorer__grid"
-          role="list"
-        >
-          <li v-for="pasta in pastas" :key="'p-' + pasta.id">
-            <button type="button" class="empresa-explorer__tile" @click="enterPasta(pasta)">
-              <span class="empresa-explorer__box">
-                <img :src="iconFolder" width="40" height="40" alt="" />
-              </span>
-              <span class="empresa-explorer__name">{{ pasta.nome }}</span>
-            </button>
-          </li>
-          <li v-for="arquivo in arquivos" :key="'a-' + arquivo.id">
-            <button type="button" class="empresa-explorer__tile" @click="openArquivo(arquivo)">
-              <span class="empresa-explorer__box">
-                <span
-                  v-if="arquivoExtensao(arquivo)"
-                  class="empresa-explorer__ext"
-                >{{ arquivoExtensao(arquivo) }}</span>
-                <img
-                  :src="iconFiles"
-                  width="28"
-                  height="34"
-                  alt=""
-                  class="empresa-explorer__icon"
-                />
-              </span>
-              <span class="empresa-explorer__name">{{ arquivo.descricao }}</span>
-            </button>
-          </li>
-        </ul>
-        <p v-else class="empresa-explorer__empty">
-          Nenhuma pasta ou arquivo. Arraste um arquivo para enviar.
-        </p>
+        <div class="empresa-explorer__scroll empresa-explorer__scroll--fill">
+          <ul
+            v-if="pastas.length || arquivos.length"
+            class="empresa-explorer__grid"
+            role="list"
+          >
+            <li v-for="pasta in pastas" :key="'p-' + pasta.id">
+              <button type="button" class="empresa-explorer__tile" @click="enterPasta(pasta)">
+                <span class="empresa-explorer__box">
+                  <img :src="iconFolder" width="40" height="40" alt="" />
+                </span>
+                <span class="empresa-explorer__name">{{ pasta.nome }}</span>
+              </button>
+            </li>
+            <li v-for="arquivo in arquivos" :key="'a-' + arquivo.id">
+              <button type="button" class="empresa-explorer__tile" @click="openArquivo(arquivo)">
+                <span class="empresa-explorer__box">
+                  <span
+                    v-if="arquivoExtensao(arquivo)"
+                    class="empresa-explorer__ext"
+                  >{{ arquivoExtensao(arquivo) }}</span>
+                  <img
+                    :src="iconFiles"
+                    width="28"
+                    height="34"
+                    alt=""
+                    class="empresa-explorer__icon"
+                  />
+                </span>
+                <span class="empresa-explorer__name">{{ arquivo.descricao }}</span>
+              </button>
+            </li>
+          </ul>
+          <p v-else class="empresa-explorer__empty">
+            Nenhuma pasta ou arquivo. Arraste um arquivo para enviar.
+          </p>
+        </div>
       </div>
     </template>
 
@@ -883,10 +888,13 @@ watch(
   width: 100%;
   max-width: 100%;
   min-width: 0;
+  min-height: 0;
+  height: 100%;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 18px;
+  overflow: hidden;
 }
 
 .empresa-explorer__heading {
@@ -894,6 +902,7 @@ watch(
   align-items: center;
   gap: 12px;
   min-width: 0;
+  flex-shrink: 0;
 }
 
 .empresa-explorer__back {
@@ -962,6 +971,18 @@ watch(
   border-radius: var(--night-radius, 20px);
   padding: 24px 28px 28px;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+
+  &--hierarchy {
+    flex: 0 0 auto;
+  }
+
+  &--arquivos {
+    flex: 1 1 auto;
+  }
 
   &--drop {
     border-color: #b08d57;
@@ -976,6 +997,35 @@ watch(
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 20px;
+  flex-shrink: 0;
+}
+
+.empresa-explorer__scroll {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(176, 141, 87, 0.45) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(176, 141, 87, 0.45);
+    border-radius: 6px;
+  }
+
+  /* 2 linhas de tiles, depois rolagem interna */
+  &--rows {
+    --tile-row: calc(94px + 8px + (13px * 1.3 * 3));
+    max-height: calc(var(--tile-row) * 2 + 16px);
+  }
+
+  &--fill {
+    flex: 1 1 auto;
+  }
 }
 
 .empresa-explorer__panel-title {
@@ -1185,6 +1235,16 @@ watch(
 }
 
 @media (max-width: 768px) {
+  .empresa-explorer {
+    height: auto;
+    overflow: visible;
+  }
+
+  .empresa-explorer__panel--arquivos {
+    flex: 0 0 auto;
+    max-height: min(58dvh, 520px);
+  }
+
   .empresa-explorer__panel {
     padding: 18px 16px 22px;
   }
@@ -1192,6 +1252,10 @@ watch(
   .empresa-explorer__panel-head {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .empresa-explorer__scroll--rows {
+    max-height: calc(var(--tile-row) * 2 + 14px);
   }
 }
 </style>
