@@ -34,7 +34,17 @@ const isExplorer = computed(() => route.name === 'agrupamentos-table')
   }
 }
 
-@media (max-width: 1100px) {
+/* Tablet: o layout já reserva o espaço do menu inferior (padding do container). */
+@media (min-width: 769px) and (max-width: 900px) {
+  .agrup-shell.dashboard_padding {
+    height: auto;
+    flex: 1 1 auto;
+    padding-top: 20px;
+    padding-bottom: 12px;
+  }
+}
+
+@media (max-width: 768px) {
   .agrup-shell {
     height: auto;
     min-height: 100dvh;

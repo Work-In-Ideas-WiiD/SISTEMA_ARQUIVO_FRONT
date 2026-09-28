@@ -29,14 +29,14 @@ const pages = ref(0)
 const funcoes = ref<IFuncao[]>([])
 const noContent = ref(false)
 const search = ref('')
-const searchPlaceholder = ref('Pesquisar por nome…')
+const searchPlaceholder = ref('Pesquisar por nome ou setor…')
 
 let searchPlaceholderMql: MediaQueryList | null = null
 
 function updateSearchPlaceholder() {
   searchPlaceholder.value = window.matchMedia('(max-width: 1200px)').matches
     ? 'Pesquisar…'
-    : 'Pesquisar por nome…'
+    : 'Pesquisar por nome ou setor…'
 }
 
 onMounted(() => {
@@ -147,6 +147,7 @@ async function handleDelete(id: string) {
           <thead>
             <tr>
               <th>Nome</th>
+              <th>Setor</th>
               <th>Descrição</th>
               <th>Ações</th>
             </tr>
@@ -154,6 +155,9 @@ async function handleDelete(id: string) {
           <tbody>
             <tr v-for="item in funcoes" :key="item.id">
               <td :title="item.nome">{{ item.nome }}</td>
+              <td :title="item.setor?.nome || 'Sem setor'" :class="{ 'is-muted': !item.setor }">
+                {{ item.setor?.nome || 'Sem setor' }}
+              </td>
               <td :title="item.descricao || '—'">{{ item.descricao || '—' }}</td>
               <td>
                 <div class="funcoes-actions">
@@ -404,17 +408,27 @@ async function handleDelete(id: string) {
 
   th:nth-child(1),
   td:nth-child(1) {
-    width: 30%;
+    width: 25%;
   }
 
   th:nth-child(2),
   td:nth-child(2) {
-    width: 50%;
+    width: 22%;
   }
 
   th:nth-child(3),
   td:nth-child(3) {
+    width: 33%;
+  }
+
+  th:nth-child(4),
+  td:nth-child(4) {
     width: 20%;
+  }
+
+  td.is-muted {
+    opacity: 0.5;
+    font-style: italic;
   }
 
   tbody tr:nth-child(odd) {

@@ -6,7 +6,7 @@ import TableEmptyMessage from '@/components/TableEmptyMessage/TableEmptyMessage.
 import TablePaginator from '@/components/TablePaginator/TablePaginator.vue'
 import { getArquivos, deleteArquivo, type IGetArquivosDataRes } from '@/services/http/arquivos'
 import { formatCnpjCpf } from '@/utils/formatCpfCnpj'
-import { openFile } from '@/utils/openFile'
+import { openArquivoRegistrado } from '@/utils/openFile'
 import { useDebouncedSearch } from '@/composables/useDebouncedSearch'
 import iconSearch from '@/assets/imgs/administradores/icon-search.svg'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
@@ -212,7 +212,7 @@ function closeTileMenu() {
 
 function downloadArquivo(item: IGetArquivosDataRes) {
   closeTileMenu()
-  openFile(item.url)
+  openArquivoRegistrado(item)
 }
 
 function shareArquivo(item: IGetArquivosDataRes) {
@@ -357,7 +357,7 @@ watch(viewMode, () => {
             <button
               type="button"
               class="arquivos-mobile-list__row"
-              @click="openFile(item.url)"
+              @click="openArquivoRegistrado(item)"
             >
                 <img
                   class="arquivos-mobile-list__icon"
@@ -380,7 +380,7 @@ watch(viewMode, () => {
             type="button"
             class="arquivos-tile"
             :aria-label="item.descricao"
-            @click="openFile(item.url)"
+            @click="openArquivoRegistrado(item)"
           >
             <span class="arquivos-tile__box">
               <img class="arquivos-tile__icon" :src="iconFolder" width="40" height="40" alt="" />
@@ -415,7 +415,7 @@ watch(viewMode, () => {
                     type="button"
                     class="arquivos-action"
                     aria-label="Baixar arquivo"
-                    @click="openFile(item.url)"
+                    @click="openArquivoRegistrado(item)"
                   >
                     <img :src="iconDownload" width="24" height="24" alt="" />
                   </button>

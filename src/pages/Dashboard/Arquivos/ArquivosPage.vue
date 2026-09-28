@@ -31,6 +31,16 @@ import { RouterView } from 'vue-router'
   }
 }
 
+/* Tablet: o layout já reserva o espaço do menu inferior (padding do container). */
+@media (min-width: 769px) and (max-width: 900px) {
+  .arquivos-shell.dashboard_padding {
+    height: auto;
+    flex: 1 1 auto;
+    padding-top: 20px;
+    padding-bottom: 12px;
+  }
+}
+
 /* Figma mobile: laterais 18px, fundo #212121 em tela cheia */
 @media (max-width: 768px) {
   .arquivos-shell.dashboard_padding {

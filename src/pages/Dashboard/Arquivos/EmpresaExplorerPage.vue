@@ -24,7 +24,7 @@ import {
 import { postAddEmpresaToArquivo } from '@/services/http/administradores'
 import { useAuthStore } from '@/stores/auth'
 import { getApiErrorMessage } from '@/utils/apiError'
-import { openFile } from '@/utils/openFile'
+import { openArquivoRegistrado } from '@/utils/openFile'
 import { usePageFileDrop } from '@/composables/usePageFileDrop'
 import { useDropdownPlacement } from '@/composables/useDropdownPlacement'
 import { useArquivoInteractions } from '@/composables/useArquivoInteractions'
@@ -34,6 +34,7 @@ import MoverArquivosModal from '@/components/MoverArquivosModal/MoverArquivosMod
 import PermissoesArquivosModal from '@/components/PermissoesArquivosModal/PermissoesArquivosModal.vue'
 import CompartilharArquivoModal from '@/components/CompartilharArquivoModal/CompartilharArquivoModal.vue'
 import CompartilharMultiplosModal from '@/components/CompartilharMultiplosModal/CompartilharMultiplosModal.vue'
+import LogAcessosArquivoModal from '@/components/LogAcessosArquivoModal/LogAcessosArquivoModal.vue'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import iconChevronDown from '@/assets/imgs/administradores/icon-chevron-down.svg'
 import iconNewFolder from '@/assets/imgs/administradores/icon-new-folder.svg'
@@ -321,7 +322,7 @@ async function loadHierarchyItems() {
     }
 
     if (level.value === 'setor') {
-      const { data } = await getFuncoes(1, '', empresaId.value)
+      const { data } = await getFuncoes(1, '', empresaId.value, setorId.value || undefined)
       funcoes.value = data.data || []
       setores.value = []
       funcionarios.value = []
@@ -472,7 +473,7 @@ function enterPasta(pasta: IPasta) {
 }
 
 function openArquivo(item: IGetArquivosDataRes) {
-  if (item.url) openFile(item.url)
+  void openArquivoRegistrado(item)
 }
 
 function openNovoHierarchyModal() {
@@ -572,6 +573,7 @@ async function saveFuncao() {
   try {
     await postFuncao({
       nome: funcaoFormNome.value.trim(),
+      setor_id: setorId.value as string,
       ...(funcaoFormDescricao.value.trim()
         ? { descricao: funcaoFormDescricao.value.trim() }
         : {}),
@@ -706,6 +708,7 @@ const {
   moverOpen,
   permissoesOpen,
   compartilharOpen,
+  logOpen,
   alvo,
   onTileClick,
   onTileDblClick,
@@ -1202,6 +1205,12 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
       :open="compartilharOpen && alvo.length > 1"
       :arquivos="alvo"
       @close="compartilharOpen = false"
+    />
+    <LogAcessosArquivoModal
+      :open="logOpen && alvo.length === 1"
+      :arquivo-id="alvo[0]?.id || ''"
+      :arquivo-nome="alvo[0]?.descricao"
+      @close="logOpen = false"
     />
 
     <!-- Modais -->

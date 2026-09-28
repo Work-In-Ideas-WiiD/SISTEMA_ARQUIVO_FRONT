@@ -142,6 +142,28 @@ export async function editarPermissoesArquivos(
   return res
 }
 
+/** Link temporário do arquivo; a API registra a visualização no log de acessos. */
+export async function abrirArquivo(id: string): Promise<AxiosResponse<{ url: string }>> {
+  const res = await api.get(`/arquivo/${id}/abrir`)
+  return res
+}
+
+export interface IArquivoLogEvento {
+  id: string
+  tipo: 'acesso' | 'alteracao'
+  acao: string
+  nome: string | null
+  email: string | null
+  detalhe: string | null
+  ip: string | null
+  data: string
+}
+
+export async function getArquivoLog(id: string): Promise<AxiosResponse<IArquivoLogEvento[]>> {
+  const res = await api.get(`/arquivo/${id}/log`)
+  return res
+}
+
 export async function deleteArquivo(id: string): Promise<AxiosResponse<any>> {
   const res = await api.delete(`/arquivo/${id}`)
   return res

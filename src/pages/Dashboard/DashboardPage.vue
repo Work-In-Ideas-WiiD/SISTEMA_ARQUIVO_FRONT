@@ -120,5 +120,17 @@ onMounted(async () => {
       display: none;
     }
   }
+
+  /* Telas "explorer" em tablet: container com altura da tela; a rolagem fica nos painéis. */
+  @media (min-width: 769px) and (max-width: 900px) {
+    .outlat_container:has(.arquivos-shell, .agrup-shell) {
+      height: 100vh;
+      height: 100dvh;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+  }
 }
 </style>

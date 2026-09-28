@@ -25,7 +25,7 @@ import {
   type ICategoriaArquivo
 } from '@/services/http/categorias-arquivo'
 import { getApiErrorMessage } from '@/utils/apiError'
-import { openFile } from '@/utils/openFile'
+import { openArquivoRegistrado } from '@/utils/openFile'
 import { usePageFileDrop } from '@/composables/usePageFileDrop'
 import { useNightConfirm } from '@/composables/useNightConfirm'
 import { useDropdownPlacement } from '@/composables/useDropdownPlacement'
@@ -37,6 +37,7 @@ import MoverArquivosModal from '@/components/MoverArquivosModal/MoverArquivosMod
 import PermissoesArquivosModal from '@/components/PermissoesArquivosModal/PermissoesArquivosModal.vue'
 import CompartilharArquivoModal from '@/components/CompartilharArquivoModal/CompartilharArquivoModal.vue'
 import CompartilharMultiplosModal from '@/components/CompartilharMultiplosModal/CompartilharMultiplosModal.vue'
+import LogAcessosArquivoModal from '@/components/LogAcessosArquivoModal/LogAcessosArquivoModal.vue'
 import { useArquivoInteractions } from '@/composables/useArquivoInteractions'
 import {
   MESES,
@@ -495,7 +496,7 @@ async function saveUpload(payload: ArquivoUploadPayload) {
 }
 
 function openArquivo(item: IGetArquivosDataRes) {
-  if (item.url) openFile(item.url)
+  void openArquivoRegistrado(item)
 }
 
 function arquivoExtensao(arquivo: IGetArquivosDataRes): string {
@@ -529,6 +530,7 @@ const {
   moverOpen,
   permissoesOpen,
   compartilharOpen,
+  logOpen,
   alvo,
   onTileClick,
   onTileDblClick,
@@ -1132,6 +1134,12 @@ onUnmounted(() => {
       :open="compartilharOpen && alvo.length > 1"
       :arquivos="alvo"
       @close="compartilharOpen = false"
+    />
+    <LogAcessosArquivoModal
+      :open="logOpen && alvo.length === 1"
+      :arquivo-id="alvo[0]?.id || ''"
+      :arquivo-nome="alvo[0]?.descricao"
+      @close="logOpen = false"
     />
 
     <NightConfirmModal
@@ -1858,23 +1866,37 @@ onUnmounted(() => {
   }
 }
 
+/* Tablet: painéis empilhados, mas a tela continua fixa e cada painel rola por dentro. */
 @media (max-width: 1100px) {
+  .agrup-explorer__body {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .agrup-explorer__panel--membros {
+    max-height: 30dvh;
+  }
+
+  .agrup-explorer__scroll--rows {
+    max-height: calc(var(--tile-row) + 8px);
+  }
+}
+
+@media (max-width: 768px) {
   .agrup-explorer {
     height: auto;
     overflow: visible;
   }
 
   .agrup-explorer__body {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
   }
 
   .agrup-explorer__panel--arquivos,
   .agrup-explorer__panel--membros {
     max-height: min(58dvh, 520px);
   }
-}
 
-@media (max-width: 768px) {
   .agrup-explorer__panel {
     padding: 18px 16px 22px;
   }

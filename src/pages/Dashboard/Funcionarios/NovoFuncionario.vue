@@ -120,9 +120,24 @@ function toggleSetor(id: string) {
   const index = form.value.setores.indexOf(id)
   if (index > -1) {
     form.value.setores.splice(index, 1)
+    const doSetor = new Set(
+      funcoesDisponiveis.value.filter((f) => f.setor_id === id).map((f) => f.id)
+    )
+    form.value.funcoes = form.value.funcoes.filter((fid) => !doSetor.has(fid))
   } else {
     form.value.setores.push(id)
   }
+}
+
+/** Função pertence a um setor: só aparecem as dos setores marcados. */
+const funcoesDoSetor = computed(() =>
+  funcoesDisponiveis.value.filter(
+    (f) => !f.setor_id || form.value.setores.includes(f.setor_id)
+  )
+)
+
+function nomeSetor(id?: string | null) {
+  return setoresDisponiveis.value.find((s) => s.id === id)?.nome
 }
 
 function toggleFuncao(id: string) {
@@ -362,11 +377,14 @@ function goBack() {
             <div v-if="isAdmin && !form.empresa_id" class="novo-funcionario__checks-empty">
               Selecione uma empresa primeiro
             </div>
-            <div v-else-if="funcoesDisponiveis.length === 0" class="novo-funcionario__checks-empty">
-              Nenhuma função cadastrada
+            <div v-else-if="!form.setores.length" class="novo-funcionario__checks-empty">
+              Selecione um setor para ver as funções
+            </div>
+            <div v-else-if="funcoesDoSetor.length === 0" class="novo-funcionario__checks-empty">
+              Nenhuma função nos setores selecionados
             </div>
             <label
-              v-for="funcao in funcoesDisponiveis"
+              v-for="funcao in funcoesDoSetor"
               :key="funcao.id"
               class="novo-funcionario__check"
             >
@@ -376,6 +394,9 @@ function goBack() {
                 @change="toggleFuncao(funcao.id)"
               />
               <span>{{ funcao.nome }}</span>
+              <small v-if="form.setores.length > 1 && nomeSetor(funcao.setor_id)" class="novo-funcionario__check-setor">
+                {{ nomeSetor(funcao.setor_id) }}
+              </small>
             </label>
           </div>
         </div>
@@ -661,6 +682,11 @@ function goBack() {
     color: #f7f7f7;
     opacity: 0.6;
     font-style: italic;
+  }
+
+  &__check-setor {
+    opacity: 0.55;
+    font-size: 11px;
   }
 
   &__check {

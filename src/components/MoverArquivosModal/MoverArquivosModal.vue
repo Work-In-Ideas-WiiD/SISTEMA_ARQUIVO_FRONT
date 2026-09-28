@@ -120,7 +120,8 @@ async function loadChildren(n: DestNode) {
     } else if (n.type === 'setor') {
       funcoesCache ??= (await getAllFuncoes(props.empresaId)).data || []
       const pastas = await pastaNodes(n, null)
-      const funcoes = funcoesCache.map((f) => {
+      const setorId = n.ctx.setor_id
+      const funcoes = funcoesCache.filter((f) => f.setor_id === setorId).map((f) => {
         const ctx = { ...n.ctx, funcao_id: f.id }
         return node(`${n.key}|f:${f.id}`, 'funcao', f.nome, ctx, ctx, `${n.caminho} › ${f.nome}`)
       })

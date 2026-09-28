@@ -208,10 +208,21 @@ function toggleSetor(id: string) {
   const idx = setoresSelecionados.value.indexOf(id)
   if (idx >= 0) {
     setoresSelecionados.value.splice(idx, 1)
+    const doSetor = new Set(
+      funcoesDisponiveis.value.filter((f) => f.setor_id === id).map((f) => f.id)
+    )
+    funcoesSelecionadas.value = funcoesSelecionadas.value.filter((fid) => !doSetor.has(fid))
   } else {
     setoresSelecionados.value.push(id)
   }
 }
+
+/** Função pertence a um setor: só aparecem as dos setores marcados. */
+const funcoesDoSetor = computed(() =>
+  funcoesDisponiveis.value.filter(
+    (f) => !f.setor_id || setoresSelecionados.value.includes(f.setor_id)
+  )
+)
 
 function toggleFuncao(id: string) {
   const idx = funcoesSelecionadas.value.indexOf(id)
@@ -462,11 +473,14 @@ function goBack() {
             <div v-if="!empresaId" class="novo-arquivo__checks-empty">
               Selecione uma empresa primeiro
             </div>
-            <div v-else-if="funcoesDisponiveis.length === 0" class="novo-arquivo__checks-empty">
-              Nenhuma função cadastrada
+            <div v-else-if="!setoresSelecionados.length" class="novo-arquivo__checks-empty">
+              Selecione um setor para ver as funções
+            </div>
+            <div v-else-if="funcoesDoSetor.length === 0" class="novo-arquivo__checks-empty">
+              Nenhuma função nos setores selecionados
             </div>
             <label
-              v-for="funcao in funcoesDisponiveis"
+              v-for="funcao in funcoesDoSetor"
               :key="funcao.id"
               class="novo-arquivo__check"
             >

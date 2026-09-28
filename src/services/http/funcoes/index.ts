@@ -6,6 +6,8 @@ export interface IFuncao {
   nome: string
   descricao?: string
   empresa_id: string
+  setor_id?: string | null
+  setor?: { id: string; nome: string } | null
   created_at?: string
   updated_at?: string
 }
@@ -24,28 +26,35 @@ export interface IPostFuncaoModel {
   nome: string
   descricao?: string
   empresa_id?: string
+  setor_id: string
 }
 
 export async function getFuncoes(
   page: number = 1,
   like: string = '',
-  empresa_id?: string
+  empresa_id?: string,
+  setor_id?: string
 ): Promise<AxiosResponse<IGetFuncoesRes>> {
   const res = await api.get('/funcao', {
     params: {
       ...(like ? { like } : {}),
       page,
-      ...(empresa_id ? { empresa_id } : {})
+      ...(empresa_id ? { empresa_id } : {}),
+      ...(setor_id ? { setor_id } : {})
     }
   })
   return res
 }
 
 export async function getAllFuncoes(
-  empresa_id?: string
+  empresa_id?: string,
+  setor_id?: string
 ): Promise<AxiosResponse<IFuncao[]>> {
   const res = await api.get('/funcoes/all', {
-    params: empresa_id ? { empresa_id } : {}
+    params: {
+      ...(empresa_id ? { empresa_id } : {}),
+      ...(setor_id ? { setor_id } : {})
+    }
   })
   return res
 }

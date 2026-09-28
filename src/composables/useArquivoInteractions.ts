@@ -13,8 +13,9 @@ import iconAbrir from '@/assets/imgs/arquivos/menu-abrir.svg'
 import iconMover from '@/assets/imgs/arquivos/menu-mover.svg'
 import iconPermissoes from '@/assets/imgs/arquivos/menu-permissoes.svg'
 import iconCompartilhar from '@/assets/imgs/arquivos/share.svg'
+import iconLog from '@/assets/imgs/arquivos/menu-log.svg'
 
-type MenuKey = 'abrir' | 'mover' | 'permissoes' | 'compartilhar'
+type MenuKey = 'abrir' | 'mover' | 'permissoes' | 'compartilhar' | 'log'
 
 /**
  * Interações dos tiles de arquivo no explorer: seleção (clique, Shift/Ctrl, setas),
@@ -33,6 +34,7 @@ export function useArquivoInteractions(opts: {
   const moverOpen = ref(false)
   const permissoesOpen = ref(false)
   const compartilharOpen = ref(false)
+  const logOpen = ref(false)
   /** Arquivos alvo da ação aberta (congelados ao abrir o modal). */
   const alvo = ref<IGetArquivosDataRes[]>([])
 
@@ -44,6 +46,7 @@ export function useArquivoInteractions(opts: {
     ]
     if (selection.selectedItems.value.length <= 1) {
       itens.unshift({ key: 'abrir', label: 'Abrir', icon: iconAbrir })
+      itens.push({ key: 'log', label: 'Log de acessos', icon: iconLog })
     }
     return itens
   })
@@ -125,6 +128,9 @@ export function useArquivoInteractions(opts: {
       case 'compartilhar':
         compartilharOpen.value = true
         break
+      case 'log':
+        logOpen.value = true
+        break
     }
   }
 
@@ -147,6 +153,7 @@ export function useArquivoInteractions(opts: {
     moverOpen,
     permissoesOpen,
     compartilharOpen,
+    logOpen,
     alvo,
     mover,
     onTileClick,

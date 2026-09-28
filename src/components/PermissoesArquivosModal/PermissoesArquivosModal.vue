@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { useToast } from 'vue-toastification'
 import { getAllSetores } from '@/services/http/setores'
-import { getAllFuncoes } from '@/services/http/funcoes'
+import { getAllFuncoes, type IFuncao } from '@/services/http/funcoes'
 import { getAllFuncionarios, type IFuncionario } from '@/services/http/funcionarios'
 import { getAgrupamento, getAllAgrupamentos } from '@/services/http/agrupamentos'
 import {
@@ -19,11 +19,22 @@ import iconAgrupamento from '@/assets/imgs/dashboard/icon-menu-agrupamentos.svg'
 import iconPessoa from '@/assets/imgs/dashboard/icon-menu-funcionarios.svg'
 
 type Estado = 'on' | 'off' | 'mixed'
-type TipoGrupo = Exclude<TipoPermissao, 'funcionarios'>
 
 interface Opcao {
   id: string
   nome: string
+}
+
+/** Nó da árvore: setor › função › pessoa, agrupamento › pessoa, ou pessoa solta. */
+interface No {
+  key: string
+  tipo: TipoPermissao
+  id: string
+  nome: string
+  icon: string
+  filhos?: () => No[]
+  /** Membros carregados sob demanda (agrupamentos). */
+  lazy?: boolean
 }
 
 interface Linha {
@@ -37,8 +48,11 @@ interface Linha {
   expandable: boolean
   expanded: boolean
   loading?: boolean
-  /** Pessoa já coberta porque o grupo acima está marcado. */
-  viaGrupo?: boolean
+  /** Coberto porque um grupo acima está marcado. */
+  via?: string
+  /** Agrupamento onde o arquivo está guardado (acesso vem do local, não da permissão). */
+  local?: Estado
+  marcadosDentro?: number
   vazio?: string
 }
 
@@ -55,12 +69,13 @@ const emit = defineEmits<{
 
 const toast = useToast()
 
-const SECOES: { tipo: TipoPermissao; titulo: string; icon: string }[] = [
-  { tipo: 'setores', titulo: 'Setores', icon: iconSetor },
-  { tipo: 'funcoes', titulo: 'Funções', icon: iconFuncao },
-  { tipo: 'agrupamentos', titulo: 'Agrupamentos', icon: iconAgrupamento },
-  { tipo: 'funcionarios', titulo: 'Pessoas', icon: iconPessoa }
+type Secao = 'setores' | 'agrupamentos' | 'funcionarios'
+const SECOES: { id: Secao; titulo: string }[] = [
+  { id: 'setores', titulo: 'Setores e funções' },
+  { id: 'agrupamentos', titulo: 'Agrupamentos' },
+  { id: 'funcionarios', titulo: 'Pessoas' }
 ]
+const TIPOS: TipoPermissao[] = ['setores', 'funcoes', 'agrupamentos', 'funcionarios']
 
 const CHAVE_NO_ARQUIVO: Record<TipoPermissao, keyof IGetArquivosDataRes> = {
   setores: 'setores',
@@ -69,30 +84,23 @@ const CHAVE_NO_ARQUIVO: Record<TipoPermissao, keyof IGetArquivosDataRes> = {
   funcionarios: 'funcionarios'
 }
 
-const opcoes = ref<Record<TipoPermissao, Opcao[]>>({
-  setores: [],
-  funcoes: [],
-  agrupamentos: [],
-  funcionarios: []
-})
+const setores = ref<Opcao[]>([])
+const funcoes = ref<IFuncao[]>([])
+const agrupamentos = ref<Opcao[]>([])
 const funcionarios = ref<IFuncionario[]>([])
 const membrosAgrupamento = ref<Record<string, Opcao[]>>({})
 const carregandoAgrupamento = ref(new Set<string>())
 
-const estado = ref<Record<TipoPermissao, Record<string, Estado>>>({
+const vazio = (): Record<TipoPermissao, Record<string, Estado>> => ({
   setores: {},
   funcoes: {},
   agrupamentos: {},
   funcionarios: {}
 })
-let estadoInicial: Record<TipoPermissao, Record<string, Estado>> = {
-  setores: {},
-  funcoes: {},
-  agrupamentos: {},
-  funcionarios: {}
-}
+const estado = ref(vazio())
+let estadoInicial = vazio()
 
-const expanded = ref(new Set<string>(SECOES.map((s) => `sec:${s.tipo}`)))
+const expanded = ref(new Set<string>())
 const busca = ref('')
 const loading = ref(false)
 const saving = ref(false)
@@ -103,25 +111,143 @@ const titulo = computed(() =>
     : `${props.arquivos.length} arquivos selecionados`
 )
 
+/** Caminho onde o arquivo está (ex.: "TI › Auxiliar TI"), só quando é um arquivo. */
+const localDoArquivo = computed(() => {
+  if (props.arquivos.length !== 1) return ''
+  const a = props.arquivos[0]
+  if (ehLivre(a)) {
+    const empresa = a.empresas?.[0]?.empresa
+    return `${empresa?.nome_empresa || empresa?.nome || 'raiz da empresa'} (toda a empresa)`
+  }
+  if (a.agrupamento_id) {
+    return agrupamentos.value.find((g) => g.id === a.agrupamento_id)?.nome ?? ''
+  }
+  const setor = a.setores?.[0]?.nome
+  const funcao = a.funcoes?.[0]?.nome
+  return [setor, funcao].filter(Boolean).join(' › ')
+})
+
+/** Arquivo na raiz da empresa, sem nenhuma restrição: toda a empresa tem acesso. */
+function ehLivre(a: IGetArquivosDataRes) {
+  return (
+    !a.agrupamento_id &&
+    !a.setores?.length &&
+    !a.funcoes?.length &&
+    !a.funcionarios?.length &&
+    !a.agrupamentos_acesso?.length
+  )
+}
+
+/** Num arquivo livre, todos os setores e funções contam como marcados. */
+const cobreEmpresa = (tipo: TipoPermissao) => tipo === 'setores' || tipo === 'funcoes'
+
 function calcularEstado(tipo: TipoPermissao, ids: string[]): Record<string, Estado> {
   const total = props.arquivos.length
   const chave = CHAVE_NO_ARQUIVO[tipo]
   const out: Record<string, Estado> = {}
   for (const id of ids) {
-    const qtd = props.arquivos.filter((a) =>
-      (a[chave] as Opcao[] | undefined)?.some((v) => v.id === id)
+    const qtd = props.arquivos.filter(
+      (a) =>
+        (cobreEmpresa(tipo) && ehLivre(a)) ||
+        (a[chave] as Opcao[] | undefined)?.some((v) => v.id === id)
     ).length
     out[id] = qtd === 0 ? 'off' : qtd === total ? 'on' : 'mixed'
   }
   return out
 }
 
-function pessoasDoGrupo(tipo: TipoGrupo, id: string): Opcao[] {
-  if (tipo === 'agrupamentos') return membrosAgrupamento.value[id] || []
-  const campo = tipo === 'setores' ? 'setores' : 'funcoes'
-  return funcionarios.value
-    .filter((f) => (f[campo] as Opcao[] | undefined)?.some((v) => v.id === id))
-    .map(({ id: fid, nome }) => ({ id: fid, nome }))
+function estadoLocal(agrupamentoId: string): Estado {
+  const qtd = props.arquivos.filter((a) => a.agrupamento_id === agrupamentoId).length
+  return qtd === 0 ? 'off' : qtd === props.arquivos.length ? 'on' : 'mixed'
+}
+
+const pessoa = (f: Opcao, prefixo: string): No => ({
+  key: `${prefixo}:p:${f.id}`,
+  tipo: 'funcionarios',
+  id: f.id,
+  nome: f.nome,
+  icon: iconPessoa
+})
+
+function pessoasCom(campo: 'setores' | 'funcoes', id: string) {
+  return funcionarios.value.filter((f) =>
+    (f[campo] as Opcao[] | undefined)?.some((v) => v.id === id)
+  )
+}
+
+function noFuncao(f: IFuncao, prefixo: string): No {
+  const key = `${prefixo}:funcoes:${f.id}`
+  return {
+    key,
+    tipo: 'funcoes',
+    id: f.id,
+    nome: f.nome,
+    icon: iconFuncao,
+    filhos: () => pessoasCom('funcoes', f.id).map((p) => pessoa(p, key))
+  }
+}
+
+const arvore = computed<Record<Secao, No[]>>(() => {
+  const setorNos: No[] = setores.value.map((s) => {
+    const key = `setores:${s.id}`
+    return {
+      key,
+      tipo: 'setores',
+      id: s.id,
+      nome: s.nome,
+      icon: iconSetor,
+      filhos: () => {
+        const funcoesDoSetor = funcoes.value.filter((f) => f.setor_id === s.id)
+        const idsFuncoes = new Set(funcoesDoSetor.map((f) => f.id))
+        const semFuncao = pessoasCom('setores', s.id).filter(
+          (p) => !p.funcoes?.some((f) => idsFuncoes.has(f.id))
+        )
+        return [
+          ...funcoesDoSetor.map((f) => noFuncao(f, key)),
+          ...semFuncao.map((p) => pessoa(p, key))
+        ]
+      }
+    }
+  })
+  const orfas = funcoes.value.filter((f) => !f.setor_id || !setores.value.some((s) => s.id === f.setor_id))
+
+  return {
+    setores: [...setorNos, ...orfas.map((f) => noFuncao(f, 'sem-setor'))],
+    agrupamentos: agrupamentos.value.map((g) => {
+      const key = `agrupamentos:${g.id}`
+      return {
+        key,
+        tipo: 'agrupamentos' as const,
+        id: g.id,
+        nome: g.nome,
+        icon: iconAgrupamento,
+        lazy: true,
+        filhos: () => (membrosAgrupamento.value[g.id] || []).map((p) => pessoa(p, key))
+      }
+    }),
+    funcionarios: funcionarios.value.map((p) => pessoa(p, 'pessoas'))
+  }
+})
+
+function marcado(no: No) {
+  return (estado.value[no.tipo][no.id] || 'off') !== 'off'
+}
+
+/** Quantos itens marcados existem abaixo do nó (para mostrar com a lista fechada). */
+function contarMarcados(nos: No[]): number {
+  let total = 0
+  for (const no of nos) {
+    if (marcado(no)) total++
+    if (no.filhos) total += contarMarcados(no.filhos())
+  }
+  return total
+}
+
+/** Nós com função marcada dentro abrem sozinhos; listas de pessoas ficam fechadas. */
+function temGrupoMarcadoDentro(no: No): boolean {
+  return (no.filhos?.() || []).some(
+    (f) => f.tipo !== 'funcionarios' && (marcado(f) || temGrupoMarcadoDentro(f))
+  )
 }
 
 async function carregarMembros(agrupamentoId: string) {
@@ -156,7 +282,7 @@ function toggleExpand(linha: Linha) {
 }
 
 function alternar(linha: Linha) {
-  if (!linha.tipo || linha.viaGrupo) return
+  if (!linha.tipo || linha.via || linha.local === 'on') return
   const mapa = estado.value[linha.tipo]
   mapa[linha.id] = mapa[linha.id] === 'on' ? 'off' : 'on'
 }
@@ -166,100 +292,85 @@ function combina(nome: string) {
   return !q || nome.toLowerCase().includes(q)
 }
 
+function algumCombina(no: No): boolean {
+  return combina(no.nome) || (no.filhos?.() || []).some(algumCombina)
+}
+
+function montar(nos: No[], depth: number, via: string | undefined, out: Linha[]) {
+  const buscando = Boolean(busca.value.trim())
+  for (const no of nos) {
+    if (buscando && !algumCombina(no)) continue
+    const filhos = no.filhos?.() || []
+    const ehGrupo = Boolean(no.filhos)
+    const aberto =
+      expanded.value.has(no.key) ||
+      (buscando && !combina(no.nome) && filhos.some(algumCombina))
+    const local = no.tipo === 'agrupamentos' ? estadoLocal(no.id) : undefined
+
+    out.push({
+      key: no.key,
+      kind: ehGrupo ? 'grupo' : 'pessoa',
+      tipo: no.tipo,
+      id: no.id,
+      nome: no.nome,
+      depth,
+      icon: no.icon,
+      expandable: ehGrupo,
+      expanded: aberto,
+      loading: no.lazy && carregandoAgrupamento.value.has(no.id),
+      via: no.tipo === 'funcionarios' ? via : undefined,
+      local,
+      marcadosDentro: ehGrupo && !aberto ? contarMarcados(filhos) : 0
+    })
+
+    if (!ehGrupo || !aberto) continue
+    const cobre = estadoDe(out[out.length - 1]) === 'on' ? no.nome : via
+    const visiveis = buscando && !combina(no.nome) ? filhos.filter(algumCombina) : filhos
+    if (!visiveis.length && !(no.lazy && carregandoAgrupamento.value.has(no.id))) {
+      out.push({
+        key: `${no.key}:vazio`,
+        kind: 'pessoa',
+        tipo: null,
+        id: '',
+        nome: '',
+        depth: depth + 1,
+        expandable: false,
+        expanded: false,
+        vazio: no.tipo === 'setores' ? 'Nenhuma função ou pessoa' : 'Nenhuma pessoa'
+      })
+      continue
+    }
+    montar(visiveis, depth + 1, cobre, out)
+  }
+}
+
 const linhas = computed<Linha[]>(() => {
   const buscando = Boolean(busca.value.trim())
   const out: Linha[] = []
-
   for (const secao of SECOES) {
-    const secKey = `sec:${secao.tipo}`
-    const secAberta = buscando || expanded.value.has(secKey)
-    const filhos: Linha[] = []
-
-    for (const item of opcoes.value[secao.tipo]) {
-      if (secao.tipo === 'funcionarios') {
-        if (!combina(item.nome)) continue
-        filhos.push({
-          key: `p:${item.id}`,
-          kind: 'pessoa',
-          tipo: 'funcionarios',
-          id: item.id,
-          nome: item.nome,
-          depth: 1,
-          icon: iconPessoa,
-          expandable: false,
-          expanded: false
-        })
-        continue
-      }
-
-      const tipo = secao.tipo as TipoGrupo
-      const grupoKey = `${tipo}:${item.id}`
-      const membros = pessoasDoGrupo(tipo, item.id)
-      const membrosVisiveis = membros.filter((m) => combina(m.nome))
-      const grupoCombina = combina(item.nome)
-      if (buscando && !grupoCombina && !membrosVisiveis.length) continue
-
-      const aberto =
-        expanded.value.has(grupoKey) || (buscando && !grupoCombina && membrosVisiveis.length > 0)
-      filhos.push({
-        key: grupoKey,
-        kind: 'grupo',
-        tipo,
-        id: item.id,
-        nome: item.nome,
-        depth: 1,
-        icon: secao.icon,
-        expandable: true,
-        expanded: aberto,
-        loading: carregandoAgrupamento.value.has(item.id)
-      })
-
-      if (!aberto) continue
-      const grupoMarcado = estado.value[tipo][item.id] === 'on'
-      const lista = buscando && !grupoCombina ? membrosVisiveis : membros
-      for (const m of lista) {
-        filhos.push({
-          key: `${grupoKey}:p:${m.id}`,
-          kind: 'pessoa',
-          tipo: 'funcionarios',
-          id: m.id,
-          nome: m.nome,
-          depth: 2,
-          icon: iconPessoa,
-          expandable: false,
-          expanded: false,
-          viaGrupo: grupoMarcado
-        })
-      }
-      const carregando = carregandoAgrupamento.value.has(item.id)
-      if (!lista.length && !carregando) {
-        filhos.push({
-          key: `${grupoKey}:vazio`,
-          kind: 'pessoa',
-          tipo: null,
-          id: '',
-          nome: '',
-          depth: 2,
-          expandable: false,
-          expanded: false,
-          vazio: 'Nenhuma pessoa'
-        })
-      }
-    }
-
-    if (buscando && !filhos.length) continue
+    const nos = arvore.value[secao.id]
+    const secKey = `sec:${secao.id}`
+    const aberta = buscando || expanded.value.has(secKey)
+    const inicio = out.length
     out.push({
       key: secKey,
       kind: 'secao',
       tipo: null,
-      id: secao.tipo,
+      id: secao.id,
       nome: secao.titulo,
       depth: 0,
       expandable: true,
-      expanded: secAberta
+      expanded: aberta,
+      marcadosDentro: aberta ? 0 : contarMarcados(nos)
     })
-    if (!secAberta) continue
-    if (!filhos.length) {
+    if (!aberta) continue
+    const antes = out.length
+    montar(nos, 1, undefined, out)
+    if (out.length === antes) {
+      if (buscando) {
+        out.splice(inicio, 1)
+        continue
+      }
       out.push({
         key: `${secKey}:vazio`,
         kind: 'pessoa',
@@ -272,29 +383,46 @@ const linhas = computed<Linha[]>(() => {
         vazio: 'Nenhum item cadastrado'
       })
     }
-    out.push(...filhos)
   }
   return out
 })
 
 function estadoDe(linha: Linha): Estado {
   if (!linha.tipo) return 'off'
-  if (linha.viaGrupo) return 'on'
-  return estado.value[linha.tipo][linha.id] || 'off'
+  if (linha.via || linha.local === 'on') return 'on'
+  const atual = estado.value[linha.tipo][linha.id] || 'off'
+  if (atual === 'off' && linha.local === 'mixed') return 'mixed'
+  return atual
 }
 
 const totalMarcados = computed(() =>
-  SECOES.reduce(
-    (acc, s) => acc + Object.values(estado.value[s.tipo]).filter((v) => v === 'on').length,
+  TIPOS.reduce(
+    (acc, t) => acc + Object.values(estado.value[t]).filter((v) => v !== 'off').length,
     0
   )
 )
+
+function expandirCaminhos() {
+  const abertos = new Set<string>(['sec:setores', 'sec:agrupamentos'])
+  if (props.arquivos.every(ehLivre)) {
+    expanded.value = abertos
+    return
+  }
+  const visitar = (nos: No[]) => {
+    for (const no of nos) {
+      if (!no.filhos || no.tipo === 'funcoes') continue
+      if (temGrupoMarcadoDentro(no)) abertos.add(no.key)
+      visitar(no.filhos())
+    }
+  }
+  visitar(arvore.value.setores)
+  expanded.value = abertos
+}
 
 async function carregar() {
   loading.value = true
   busca.value = ''
   membrosAgrupamento.value = {}
-  expanded.value = new Set(SECOES.map((s) => `sec:${s.tipo}`))
   try {
     const [{ data: s }, { data: f }, { data: pessoas }, { data: agrup }] = await Promise.all([
       getAllSetores(props.empresaId),
@@ -303,21 +431,21 @@ async function carregar() {
       getAllAgrupamentos(props.empresaId)
     ])
     funcionarios.value = pessoas || []
-    opcoes.value = {
-      setores: (s || []).map(({ id, nome }) => ({ id, nome })),
-      funcoes: (f || []).map(({ id, nome }) => ({ id, nome })),
-      agrupamentos: (agrup || []).map(({ id, nome }) => ({ id, nome })),
-      funcionarios: funcionarios.value.map(({ id, nome }) => ({ id, nome }))
+    setores.value = (s || []).map(({ id, nome }) => ({ id, nome }))
+    funcoes.value = f || []
+    agrupamentos.value = (agrup || []).map(({ id, nome }) => ({ id, nome }))
+
+    const ids: Record<TipoPermissao, string[]> = {
+      setores: setores.value.map((o) => o.id),
+      funcoes: funcoes.value.map((o) => o.id),
+      agrupamentos: agrupamentos.value.map((o) => o.id),
+      funcionarios: funcionarios.value.map((o) => o.id)
     }
-    const novo = {} as Record<TipoPermissao, Record<string, Estado>>
-    for (const secao of SECOES) {
-      novo[secao.tipo] = calcularEstado(
-        secao.tipo,
-        opcoes.value[secao.tipo].map((o) => o.id)
-      )
-    }
+    const novo = vazio()
+    for (const tipo of TIPOS) novo[tipo] = calcularEstado(tipo, ids[tipo])
     estado.value = novo
     estadoInicial = JSON.parse(JSON.stringify(novo))
+    expandirCaminhos()
   } catch (error) {
     toast.error(getApiErrorMessage(error, 'Erro ao carregar permissões'))
   } finally {
@@ -327,13 +455,18 @@ async function carregar() {
 
 async function salvar() {
   const alteracoes: IAlteracoesPermissao = {}
+  /** Arquivo livre que passa a ter restrição recebe a lista completa do que ficou marcado. */
+  const paraLivres: IAlteracoesPermissao = {}
   let mudou = false
-  for (const { tipo } of SECOES) {
+  for (const tipo of TIPOS) {
     const atual = estado.value[tipo]
     const inicial = estadoInicial[tipo]
     const ids = Object.keys(atual).filter((id) => atual[id] !== inicial[id])
     alteracoes[`${tipo}_adicionar`] = ids.filter((id) => atual[id] === 'on')
     alteracoes[`${tipo}_remover`] = ids.filter((id) => atual[id] === 'off')
+    paraLivres[`${tipo}_adicionar`] = Object.keys(atual).filter(
+      (id) => atual[id] === 'on' || (cobreEmpresa(tipo) && atual[id] === 'mixed')
+    )
     if (ids.length) mudou = true
   }
   if (!mudou) {
@@ -341,13 +474,15 @@ async function salvar() {
     return
   }
 
+  const livres = props.arquivos.filter(ehLivre).map((a) => a.id)
+  const restritos = props.arquivos.filter((a) => !ehLivre(a)).map((a) => a.id)
+
   saving.value = true
   try {
-    await editarPermissoesArquivos(
-      props.arquivos.map((a) => a.id),
-      props.empresaId,
-      alteracoes
-    )
+    await Promise.all([
+      restritos.length && editarPermissoesArquivos(restritos, props.empresaId, alteracoes),
+      livres.length && editarPermissoesArquivos(livres, props.empresaId, paraLivres)
+    ])
     toast.success('Permissões atualizadas')
     emit('saved')
     emit('close')
@@ -374,9 +509,12 @@ watch(
       <div class="night-confirm__modal perm-modal" role="dialog" aria-modal="true">
         <h3 class="night-confirm__title">Editar permissões</h3>
         <p class="perm-modal__sub">{{ titulo }}</p>
+        <p v-if="localDoArquivo" class="perm-modal__local">
+          Está em: <strong>{{ localDoArquivo }}</strong>
+        </p>
         <p class="perm-modal__hint">
-          Marque quem pode ver {{ arquivos.length === 1 ? 'o arquivo' : 'os arquivos' }}. Clique na
-          seta para ver as pessoas de cada setor, função ou agrupamento.
+          Marque quem pode ver {{ arquivos.length === 1 ? 'o arquivo' : 'os arquivos' }}. Abra um
+          setor para ver as funções; abra uma função ou agrupamento para ver as pessoas.
           <template v-if="arquivos.length > 1">
             Itens “parcial” ficam como estão em cada arquivo, a menos que você os altere.
           </template>
@@ -397,8 +535,8 @@ watch(
               v-for="linha in linhas"
               :key="linha.key"
               class="perm-modal__row"
-              :class="[`perm-modal__row--${linha.kind}`, { 'is-via': linha.viaGrupo }]"
-              :style="{ paddingLeft: `${linha.depth * 20}px` }"
+              :class="[`perm-modal__row--${linha.kind}`, { 'is-via': linha.via || linha.local === 'on' }]"
+              :style="{ paddingLeft: `${Math.max(linha.depth - 1, 0) * 20}px` }"
               role="treeitem"
               :aria-expanded="linha.expandable ? linha.expanded : undefined"
             >
@@ -417,6 +555,9 @@ watch(
                     alt=""
                   />
                   <span>{{ linha.nome }}</span>
+                  <small v-if="linha.marcadosDentro" class="perm-modal__badge">
+                    {{ linha.marcadosDentro }} com acesso
+                  </small>
                 </button>
               </template>
 
@@ -444,14 +585,18 @@ watch(
                     type="checkbox"
                     :checked="estadoDe(linha) === 'on'"
                     :indeterminate="estadoDe(linha) === 'mixed'"
-                    :disabled="linha.viaGrupo"
+                    :disabled="Boolean(linha.via) || linha.local === 'on'"
                     @change="alternar(linha)"
                   />
                   <img class="perm-modal__icon" :src="linha.icon" width="16" height="16" alt="" />
                   <span class="perm-modal__nome">{{ linha.nome }}</span>
                   <small v-if="linha.loading">carregando…</small>
-                  <small v-else-if="linha.viaGrupo">via grupo</small>
+                  <small v-else-if="linha.local === 'on'">local do arquivo</small>
+                  <small v-else-if="linha.via">via {{ linha.via }}</small>
                   <small v-else-if="estadoDe(linha) === 'mixed'">parcial</small>
+                  <small v-if="linha.marcadosDentro" class="perm-modal__badge">
+                    {{ linha.marcadosDentro }} marcado{{ linha.marcadosDentro > 1 ? 's' : '' }}
+                  </small>
                 </label>
               </template>
             </li>
@@ -559,6 +704,30 @@ watch(
   text-transform: uppercase;
   letter-spacing: 0.04em;
   overflow-wrap: anywhere;
+}
+
+.perm-modal__local {
+  margin: 0 0 8px;
+  color: rgba(255, 252, 255, 0.75);
+  font-size: 12px;
+
+  strong {
+    color: #fffcff;
+    font-weight: 600;
+  }
+}
+
+.perm-modal__badge {
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(176, 141, 87, 0.18);
+  color: #d9b77e !important;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  white-space: nowrap;
 }
 
 .perm-modal__hint {
