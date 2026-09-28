@@ -35,6 +35,7 @@ import PermissoesArquivosModal from '@/components/PermissoesArquivosModal/Permis
 import CompartilharArquivoModal from '@/components/CompartilharArquivoModal/CompartilharArquivoModal.vue'
 import CompartilharMultiplosModal from '@/components/CompartilharMultiplosModal/CompartilharMultiplosModal.vue'
 import LogAcessosArquivoModal from '@/components/LogAcessosArquivoModal/LogAcessosArquivoModal.vue'
+import EditarCategoriaDataModal from '@/components/EditarCategoriaDataModal/EditarCategoriaDataModal.vue'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import iconChevronDown from '@/assets/imgs/administradores/icon-chevron-down.svg'
 import iconNewFolder from '@/assets/imgs/administradores/icon-new-folder.svg'
@@ -709,6 +710,7 @@ const {
   permissoesOpen,
   compartilharOpen,
   logOpen,
+  categoriaDataOpen,
   alvo,
   onTileClick,
   onTileDblClick,
@@ -1210,7 +1212,16 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
       :open="logOpen && alvo.length === 1"
       :arquivo-id="alvo[0]?.id || ''"
       :arquivo-nome="alvo[0]?.descricao"
+      :arquivo-formato="alvo[0] ? arquivoExtensao(alvo[0]) : ''"
       @close="logOpen = false"
+    />
+    <EditarCategoriaDataModal
+      :open="categoriaDataOpen && alvo.length === 1"
+      :empresa-id="empresaId"
+      :arquivo="alvo[0] || null"
+      :formato="alvo[0] ? arquivoExtensao(alvo[0]) : ''"
+      @close="categoriaDataOpen = false"
+      @saved="onPermissoesSaved"
     />
 
     <!-- Modais -->

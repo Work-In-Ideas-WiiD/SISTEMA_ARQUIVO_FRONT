@@ -38,6 +38,7 @@ import PermissoesArquivosModal from '@/components/PermissoesArquivosModal/Permis
 import CompartilharArquivoModal from '@/components/CompartilharArquivoModal/CompartilharArquivoModal.vue'
 import CompartilharMultiplosModal from '@/components/CompartilharMultiplosModal/CompartilharMultiplosModal.vue'
 import LogAcessosArquivoModal from '@/components/LogAcessosArquivoModal/LogAcessosArquivoModal.vue'
+import EditarCategoriaDataModal from '@/components/EditarCategoriaDataModal/EditarCategoriaDataModal.vue'
 import { useArquivoInteractions } from '@/composables/useArquivoInteractions'
 import {
   MESES,
@@ -531,6 +532,7 @@ const {
   permissoesOpen,
   compartilharOpen,
   logOpen,
+  categoriaDataOpen,
   alvo,
   onTileClick,
   onTileDblClick,
@@ -1139,7 +1141,16 @@ onUnmounted(() => {
       :open="logOpen && alvo.length === 1"
       :arquivo-id="alvo[0]?.id || ''"
       :arquivo-nome="alvo[0]?.descricao"
+      :arquivo-formato="alvo[0] ? arquivoExtensao(alvo[0]) : ''"
       @close="logOpen = false"
+    />
+    <EditarCategoriaDataModal
+      :open="categoriaDataOpen && alvo.length === 1"
+      :empresa-id="empresaIdAtual"
+      :arquivo="alvo[0] || null"
+      :formato="alvo[0] ? arquivoExtensao(alvo[0]) : ''"
+      @close="categoriaDataOpen = false"
+      @saved="onPermissoesSaved"
     />
 
     <NightConfirmModal

@@ -230,6 +230,7 @@ const arvore = computed<Record<Secao, No[]>>(() => {
 })
 
 function marcado(no: No) {
+  if (no.tipo === 'agrupamentos' && estadoLocal(no.id) !== 'off') return true
   return (estado.value[no.tipo][no.id] || 'off') !== 'off'
 }
 
@@ -403,7 +404,7 @@ const totalMarcados = computed(() =>
 )
 
 function expandirCaminhos() {
-  const abertos = new Set<string>(['sec:setores', 'sec:agrupamentos'])
+  const abertos = new Set<string>(['sec:setores'])
   if (props.arquivos.every(ehLivre)) {
     expanded.value = abertos
     return

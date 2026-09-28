@@ -10,6 +10,7 @@ const props = defineProps<{
   open: boolean
   arquivoId: string
   arquivoNome?: string
+  arquivoFormato?: string
 }>()
 
 const emit = defineEmits<{ (e: 'close'): void }>()
@@ -98,7 +99,10 @@ watch(
     <div v-if="open" class="log-overlay" @click.self="emit('close')">
       <div class="log-modal" role="dialog" aria-modal="true" aria-labelledby="log-modal-title">
         <h3 id="log-modal-title" class="log-modal__title">Log de acessos</h3>
-        <p v-if="arquivoNome" class="log-modal__sub">{{ arquivoNome }}</p>
+        <p v-if="arquivoNome" class="log-modal__sub">
+          <span class="log-modal__nome">{{ arquivoNome }}</span>
+          <span v-if="arquivoFormato" class="log-modal__ext">{{ arquivoFormato }}</span>
+        </p>
 
         <input
           v-model="busca"
@@ -187,13 +191,31 @@ watch(
 }
 
 .log-modal__sub {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
   margin: 4px 0 12px;
-  color: #b08d57;
-  font-size: 12px;
+}
+
+.log-modal__nome {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgba(255, 252, 255, 0.85);
+  font-size: 13px;
   font-weight: 600;
-  text-transform: uppercase;
+}
+
+.log-modal__ext {
+  flex-shrink: 0;
+  font-size: 9px;
+  font-weight: 600;
   letter-spacing: 0.04em;
-  overflow-wrap: anywhere;
+  line-height: 1;
+  color: rgba(176, 141, 87, 0.95);
+  text-transform: uppercase;
 }
 
 .log-modal__search {
@@ -244,8 +266,9 @@ watch(
 }
 
 .log-modal__body {
-  flex: 1 1 auto;
-  min-height: 200px;
+  flex: 0 0 auto;
+  /* Altura fixa para ~6 registros; o resto rola. */
+  height: min(430px, 55vh);
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 4px 10px;

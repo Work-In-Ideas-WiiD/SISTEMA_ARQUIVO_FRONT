@@ -142,6 +142,14 @@ export async function editarPermissoesArquivos(
   return res
 }
 
+export async function patchArquivoCategoriaData(
+  id: string,
+  data: { categoria_id: string; mes: number | null; ano: number | null }
+): Promise<AxiosResponse<IGetArquivosDataRes>> {
+  const res = await api.patch(`/arquivo/${id}`, data)
+  return res
+}
+
 /** Link temporário do arquivo; a API registra a visualização no log de acessos. */
 export async function abrirArquivo(id: string): Promise<AxiosResponse<{ url: string }>> {
   const res = await api.get(`/arquivo/${id}/abrir`)
