@@ -51,6 +51,7 @@ export async function getArquivos(
   filters: {
     empresa_id?: string
     pasta_id?: string | null
+    agrupamento_id?: string | null
     setor_id?: string | null
     funcao_id?: string | null
     todas_pastas?: boolean
@@ -66,6 +67,7 @@ export async function getArquivos(
       ...(like ? { like } : {}),
       ...(filters.empresa_id ? { empresa_id: filters.empresa_id } : {}),
       ...(filters.pasta_id ? { pasta_id: filters.pasta_id } : {}),
+      ...(filters.agrupamento_id ? { agrupamento_id: filters.agrupamento_id } : {}),
       ...(filters.setor_id ? { setor_id: filters.setor_id } : {}),
       ...(filters.funcao_id ? { funcao_id: filters.funcao_id } : {}),
       ...(filters.todas_pastas ? { todas_pastas: 1 } : {}),

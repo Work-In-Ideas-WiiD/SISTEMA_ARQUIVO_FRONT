@@ -327,7 +327,7 @@ const routes: RouteRecordRaw[] = [
           {
             path: '',
             name: 'agrupamentos-table',
-            component: () => import('@/pages/Dashboard/Agrupamentos/AgrupamentosTable.vue')
+            component: () => import('@/pages/Dashboard/Agrupamentos/AgrupamentosExplorer.vue')
           },
           {
             path: 'novo',

@@ -7,6 +7,7 @@ export interface IPasta {
   descricao?: string | null
   empresa_id: string
   parent_id?: string | null
+  agrupamento_id?: string | null
   created_at?: string
   updated_at?: string
 }
@@ -21,14 +22,16 @@ export interface IGetPastasRes {
 export async function getPastas(
   empresaId: string,
   parentId?: string | null,
-  page: number = 1
+  page: number = 1,
+  agrupamentoId?: string | null
 ): Promise<AxiosResponse<IGetPastasRes>> {
   const res = await api.get('/pasta', {
     params: {
       empresa_id: empresaId,
       page,
       limit: 100,
-      ...(parentId ? { parent_id: parentId } : {})
+      ...(parentId ? { parent_id: parentId } : {}),
+      ...(agrupamentoId ? { agrupamento_id: agrupamentoId } : {})
     }
   })
   return res
@@ -44,6 +47,7 @@ export async function postPasta(data: {
   descricao?: string
   empresa_id: string
   parent_id?: string | null
+  agrupamento_id?: string | null
 }): Promise<AxiosResponse<IPasta>> {
   const res = await api.post('/pasta', data)
   return res

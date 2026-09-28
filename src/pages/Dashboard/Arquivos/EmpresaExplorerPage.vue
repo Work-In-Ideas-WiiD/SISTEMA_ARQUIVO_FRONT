@@ -25,6 +25,7 @@ import { useAuthStore } from '@/stores/auth'
 import { getApiErrorMessage } from '@/utils/apiError'
 import { openFile } from '@/utils/openFile'
 import { usePageFileDrop } from '@/composables/usePageFileDrop'
+import { useDropdownPlacement } from '@/composables/useDropdownPlacement'
 import UploadDropOverlay from '@/components/UploadDropOverlay/UploadDropOverlay.vue'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import iconChevronDown from '@/assets/imgs/administradores/icon-chevron-down.svg'
@@ -164,9 +165,16 @@ function toggleUploadSelect(key: 'categoria' | 'mes' | 'ano') {
   uploadSelectOpen.value = uploadSelectOpen.value === key ? null : key
 }
 
-function toggleFilterSelect(key: 'categoria' | 'mes' | 'ano') {
+const {
+  place: placeFilterMenu,
+  menuClass: filterMenuClass,
+  menuStyle: filterMenuStyle
+} = useDropdownPlacement('.empresa-explorer')
+
+function toggleFilterSelect(key: 'categoria' | 'mes' | 'ano', event?: MouseEvent) {
   uploadSelectOpen.value = null
   filterSelectOpen.value = filterSelectOpen.value === key ? null : key
+  if (filterSelectOpen.value && event) placeFilterMenu(event.currentTarget)
 }
 
 function selectUploadCategoria(id: string) {
@@ -877,7 +885,7 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
                     'is-open': filterSelectOpen === 'categoria'
                   }"
                   aria-label="Categoria"
-                  @click="toggleFilterSelect('categoria')"
+                  @click="toggleFilterSelect('categoria', $event)"
                 >
                   <span>{{ filterCategoriaLabel }}</span>
                   <img
@@ -892,6 +900,8 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
                 <ul
                   v-if="filterSelectOpen === 'categoria'"
                   class="night-select__menu"
+                  :class="filterMenuClass"
+                  :style="filterMenuStyle"
                   role="listbox"
                 >
                   <li v-for="cat in categorias" :key="cat.id">
@@ -920,7 +930,7 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
                     'is-open': filterSelectOpen === 'mes'
                   }"
                   aria-label="Mês"
-                  @click="toggleFilterSelect('mes')"
+                  @click="toggleFilterSelect('mes', $event)"
                 >
                   <span>{{ filterMesLabel }}</span>
                   <img
@@ -932,7 +942,13 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
                     alt=""
                   />
                 </button>
-                <ul v-if="filterSelectOpen === 'mes'" class="night-select__menu" role="listbox">
+                <ul
+                  v-if="filterSelectOpen === 'mes'"
+                  class="night-select__menu"
+                  :class="filterMenuClass"
+                  :style="filterMenuStyle"
+                  role="listbox"
+                >
                   <li v-for="m in MESES" :key="m.value">
                     <button
                       type="button"
@@ -959,7 +975,7 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
                     'is-open': filterSelectOpen === 'ano'
                   }"
                   aria-label="Ano"
-                  @click="toggleFilterSelect('ano')"
+                  @click="toggleFilterSelect('ano', $event)"
                 >
                   <span>{{ filterAnoLabel }}</span>
                   <img
@@ -973,7 +989,9 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
                 </button>
                 <ul
                   v-if="filterSelectOpen === 'ano'"
-                  class="night-select__menu night-select__menu--scroll"
+                  class="night-select__menu"
+                  :class="filterMenuClass"
+                  :style="filterMenuStyle"
                   role="listbox"
                 >
                   <li v-for="y in anosFiltro" :key="y">
@@ -1842,6 +1860,11 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
 
   &--scroll {
     max-height: 160px;
+  }
+
+  &--up {
+    top: auto;
+    bottom: calc(100% + 4px);
   }
 }
 

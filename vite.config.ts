@@ -9,6 +9,10 @@ export default defineConfig(({ mode }) => ({
   build: {
     sourcemap: false
   },
+  server: {
+    // Libera acesso via túnel (cloudflared/ngrok) em testes locais
+    allowedHosts: true
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
