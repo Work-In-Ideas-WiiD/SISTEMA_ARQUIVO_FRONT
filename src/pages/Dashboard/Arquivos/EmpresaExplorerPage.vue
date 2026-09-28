@@ -14,6 +14,7 @@ import { getPastas, getPasta, postPasta, type IPasta } from '@/services/http/pas
 import {
   getArquivos,
   postArquivo,
+  type IDestinoArquivo,
   type IGetArquivosDataRes
 } from '@/services/http/arquivos'
 import {
@@ -26,7 +27,13 @@ import { getApiErrorMessage } from '@/utils/apiError'
 import { openFile } from '@/utils/openFile'
 import { usePageFileDrop } from '@/composables/usePageFileDrop'
 import { useDropdownPlacement } from '@/composables/useDropdownPlacement'
+import { useArquivoInteractions } from '@/composables/useArquivoInteractions'
 import UploadDropOverlay from '@/components/UploadDropOverlay/UploadDropOverlay.vue'
+import ArquivoContextMenu from '@/components/ArquivoContextMenu/ArquivoContextMenu.vue'
+import MoverArquivosModal from '@/components/MoverArquivosModal/MoverArquivosModal.vue'
+import PermissoesArquivosModal from '@/components/PermissoesArquivosModal/PermissoesArquivosModal.vue'
+import CompartilharArquivoModal from '@/components/CompartilharArquivoModal/CompartilharArquivoModal.vue'
+import CompartilharMultiplosModal from '@/components/CompartilharMultiplosModal/CompartilharMultiplosModal.vue'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import iconChevronDown from '@/assets/imgs/administradores/icon-chevron-down.svg'
 import iconNewFolder from '@/assets/imgs/administradores/icon-new-folder.svg'
@@ -687,6 +694,44 @@ const { isDragging } = usePageFileDrop((file) => {
   applyFileToUpload(file)
 })
 
+const arquivosGridRef = ref<HTMLElement | null>(null)
+
+const {
+  isSelected,
+  clear: clearSelection,
+  drag: { dragging, hoverKey, end: dragEnd, over: dragOver, leave: dragLeave, drop: dragDrop },
+  menu,
+  menuItems,
+  menuTitle,
+  moverOpen,
+  permissoesOpen,
+  compartilharOpen,
+  alvo,
+  onTileClick,
+  onTileDblClick,
+  onTileContextMenu,
+  onTileDragStart,
+  onGridKeydown,
+  closeMenu,
+  onMenuSelect,
+  onMoved,
+  onPermissoesSaved
+} = useArquivoInteractions({
+  arquivos,
+  empresaId,
+  abrir: openArquivo,
+  recarregar: loadArquivos
+})
+
+const destinoAtual = computed<IDestinoArquivo>(() => ({
+  setor_id: setorId.value || undefined,
+  funcao_id: funcaoId.value || undefined
+}))
+
+function destinoPasta(id: string): IDestinoArquivo {
+  return { ...destinoAtual.value, pasta_id: id }
+}
+
 watch(uploadModalOpen, (open) => {
   if (typeof document === 'undefined') return
   document.body.style.overflow = open ? 'hidden' : ''
@@ -738,7 +783,11 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
         <button
           type="button"
           class="empresa-explorer__crumb-link"
+          :class="{ 'is-drop-target': hoverKey === 'c:empresa' }"
           @click="router.push(routeForLevel({ setorId: null, funcaoId: null, pastaId: null }))"
+          @dragover="dragOver($event, 'c:empresa')"
+          @dragleave="dragLeave('c:empresa')"
+          @drop="dragDrop($event, {})"
         >
           {{ empresaNome }}
         </button>
@@ -747,7 +796,11 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
           <button
             type="button"
             class="empresa-explorer__crumb-link"
+            :class="{ 'is-drop-target': hoverKey === 'c:setor' }"
             @click="router.push(routeForLevel({ setorId, funcaoId: null, pastaId: null }))"
+            @dragover="dragOver($event, 'c:setor')"
+            @dragleave="dragLeave('c:setor')"
+            @drop="dragDrop($event, { setor_id: setorId || undefined })"
           >
             {{ setorNome }}
           </button>
@@ -757,7 +810,11 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
           <button
             type="button"
             class="empresa-explorer__crumb-link"
+            :class="{ 'is-drop-target': hoverKey === 'c:funcao' }"
             @click="router.push(routeForLevel({ setorId, funcaoId, pastaId: null }))"
+            @dragover="dragOver($event, 'c:funcao')"
+            @dragleave="dragLeave('c:funcao')"
+            @drop="dragDrop($event, destinoAtual)"
           >
             {{ funcaoNome }}
           </button>
@@ -767,8 +824,14 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
           <button
             type="button"
             class="empresa-explorer__crumb-link"
-            :class="{ 'is-current': idx === breadcrumbPastas.length - 1 }"
+            :class="{
+              'is-current': idx === breadcrumbPastas.length - 1,
+              'is-drop-target': hoverKey === 'c:p:' + p.id
+            }"
             @click="router.push(routeForLevel({ pastaId: p.id }))"
+            @dragover="dragOver($event, 'c:p:' + p.id)"
+            @dragleave="dragLeave('c:p:' + p.id)"
+            @drop="dragDrop($event, destinoPasta(p.id))"
           >
             {{ p.nome }}
           </button>
@@ -802,7 +865,15 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
             role="list"
           >
             <li v-for="setor in setores" :key="setor.id">
-              <button type="button" class="empresa-explorer__tile" @click="enterSetor(setor)">
+              <button
+                type="button"
+                class="empresa-explorer__tile"
+                :class="{ 'is-drop-target': hoverKey === 's:' + setor.id }"
+                @click="enterSetor(setor)"
+                @dragover="dragOver($event, 's:' + setor.id)"
+                @dragleave="dragLeave('s:' + setor.id)"
+                @drop="dragDrop($event, { setor_id: setor.id })"
+              >
                 <span class="empresa-explorer__box">
                   <img
                     :src="iconSetores"
@@ -823,7 +894,15 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
             role="list"
           >
             <li v-for="funcao in funcoes" :key="funcao.id">
-              <button type="button" class="empresa-explorer__tile" @click="enterFuncao(funcao)">
+              <button
+                type="button"
+                class="empresa-explorer__tile"
+                :class="{ 'is-drop-target': hoverKey === 'f:' + funcao.id }"
+                @click="enterFuncao(funcao)"
+                @dragover="dragOver($event, 'f:' + funcao.id)"
+                @dragleave="dragLeave('f:' + funcao.id)"
+                @drop="dragDrop($event, { setor_id: setorId || undefined, funcao_id: funcao.id })"
+              >
                 <span class="empresa-explorer__box">
                   <img
                     :src="iconFuncoes"
@@ -1020,22 +1099,51 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
           </div>
         </div>
 
-        <div class="empresa-explorer__scroll empresa-explorer__scroll--fill">
+        <div
+          class="empresa-explorer__scroll empresa-explorer__scroll--fill"
+          @click="clearSelection"
+        >
           <ul
             v-if="pastas.length || arquivos.length"
+            ref="arquivosGridRef"
             class="empresa-explorer__grid"
             role="list"
+            tabindex="-1"
+            @keydown="onGridKeydown($event, arquivosGridRef, pastas.length)"
           >
             <li v-for="pasta in pastas" :key="'p-' + pasta.id">
-              <button type="button" class="empresa-explorer__tile" @click="enterPasta(pasta)">
+              <button
+                type="button"
+                class="empresa-explorer__tile"
+                :class="{ 'is-drop-target': hoverKey === 'p:' + pasta.id }"
+                @click.stop="enterPasta(pasta)"
+                @dragover="dragOver($event, 'p:' + pasta.id)"
+                @dragleave="dragLeave('p:' + pasta.id)"
+                @drop="dragDrop($event, destinoPasta(pasta.id))"
+              >
                 <span class="empresa-explorer__box">
                   <img :src="iconFolder" width="40" height="40" alt="" />
                 </span>
                 <span class="empresa-explorer__name">{{ pasta.nome }}</span>
               </button>
             </li>
-            <li v-for="arquivo in arquivos" :key="'a-' + arquivo.id">
-              <button type="button" class="empresa-explorer__tile" @click="openArquivo(arquivo)">
+            <li v-for="(arquivo, index) in arquivos" :key="'a-' + arquivo.id">
+              <button
+                type="button"
+                class="empresa-explorer__tile empresa-explorer__tile--arquivo"
+                :class="{
+                  'is-selected': isSelected(arquivo.id),
+                  'is-dragging': dragging && isSelected(arquivo.id)
+                }"
+                :data-arquivo-index="index"
+                draggable="true"
+                :title="arquivo.descricao"
+                @click.stop="onTileClick(index, $event)"
+                @dblclick="onTileDblClick(arquivo)"
+                @contextmenu.prevent.stop="onTileContextMenu(index, $event)"
+                @dragstart="onTileDragStart($event, arquivo)"
+                @dragend="dragEnd"
+              >
                 <span class="empresa-explorer__box">
                   <span
                     v-if="arquivoExtensao(arquivo)"
@@ -1059,6 +1167,42 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
         </div>
       </div>
     </template>
+
+    <ArquivoContextMenu
+      :open="menu.open"
+      :x="menu.x"
+      :y="menu.y"
+      :items="menuItems"
+      :title="menuTitle"
+      @select="onMenuSelect"
+      @close="closeMenu"
+    />
+    <MoverArquivosModal
+      :open="moverOpen"
+      :empresa-id="empresaId"
+      :empresa-nome="empresaNome"
+      :arquivo-ids="alvo.map((a) => a.id)"
+      @close="moverOpen = false"
+      @moved="onMoved"
+    />
+    <PermissoesArquivosModal
+      :open="permissoesOpen"
+      :empresa-id="empresaId"
+      :arquivos="alvo"
+      @close="permissoesOpen = false"
+      @saved="onPermissoesSaved"
+    />
+    <CompartilharArquivoModal
+      :open="compartilharOpen && alvo.length === 1"
+      :arquivo-id="alvo[0]?.id || ''"
+      :arquivo-nome="alvo[0]?.descricao"
+      @close="compartilharOpen = false"
+    />
+    <CompartilharMultiplosModal
+      :open="compartilharOpen && alvo.length > 1"
+      :arquivos="alvo"
+      @close="compartilharOpen = false"
+    />
 
     <!-- Modais -->
     <Teleport to="body">
@@ -1692,6 +1836,43 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
     background: rgba(255, 255, 255, 0.1);
     border-color: rgba(176, 141, 87, 0.3);
   }
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  &--arquivo {
+    user-select: none;
+  }
+
+  &.is-selected .empresa-explorer__box,
+  &.is-selected:hover .empresa-explorer__box {
+    border-color: #fffcff;
+    box-shadow: 0 0 0 1px #fffcff;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  &.is-dragging {
+    opacity: 0.45;
+  }
+
+  &.is-drop-target .empresa-explorer__box {
+    border: 1px dashed #b08d57;
+    box-shadow: 0 0 0 1px #b08d57;
+    background: rgba(176, 141, 87, 0.22);
+  }
+}
+
+.empresa-explorer__grid:focus {
+  outline: none;
+}
+
+.empresa-explorer__crumb-link.is-drop-target {
+  color: #b08d57;
+  opacity: 1;
+  border-radius: 6px;
+  outline: 1px dashed #b08d57;
+  outline-offset: 3px;
 }
 
 .empresa-explorer__box {

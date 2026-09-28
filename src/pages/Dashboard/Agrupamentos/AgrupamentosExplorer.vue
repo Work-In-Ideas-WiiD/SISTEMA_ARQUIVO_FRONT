@@ -14,7 +14,12 @@ import {
 import { getAllFuncionarios, type IFuncionario } from '@/services/http/funcionarios'
 import { getAllEmpresas } from '@/services/http/empresas'
 import { getPastas, postPasta, type IPasta } from '@/services/http/pastas'
-import { getArquivos, postArquivo, type IGetArquivosDataRes } from '@/services/http/arquivos'
+import {
+  getArquivos,
+  postArquivo,
+  type IDestinoArquivo,
+  type IGetArquivosDataRes
+} from '@/services/http/arquivos'
 import {
   getAllCategoriasArquivo,
   type ICategoriaArquivo
@@ -27,6 +32,12 @@ import { useDropdownPlacement } from '@/composables/useDropdownPlacement'
 import UploadDropOverlay from '@/components/UploadDropOverlay/UploadDropOverlay.vue'
 import NightConfirmModal from '@/components/NightConfirmModal/NightConfirmModal.vue'
 import ArquivoUploadModal from '@/components/ArquivoUploadModal/ArquivoUploadModal.vue'
+import ArquivoContextMenu from '@/components/ArquivoContextMenu/ArquivoContextMenu.vue'
+import MoverArquivosModal from '@/components/MoverArquivosModal/MoverArquivosModal.vue'
+import PermissoesArquivosModal from '@/components/PermissoesArquivosModal/PermissoesArquivosModal.vue'
+import CompartilharArquivoModal from '@/components/CompartilharArquivoModal/CompartilharArquivoModal.vue'
+import CompartilharMultiplosModal from '@/components/CompartilharMultiplosModal/CompartilharMultiplosModal.vue'
+import { useArquivoInteractions } from '@/composables/useArquivoInteractions'
 import {
   MESES,
   yearOptions,
@@ -505,6 +516,44 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
   if (selected.value) void loadArquivos()
 })
 
+const arquivosGridRef = ref<HTMLElement | null>(null)
+const empresaIdAtual = computed(() => selected.value?.empresa_id || '')
+
+const {
+  isSelected,
+  clear: limparSelecaoArquivos,
+  drag: { dragging, hoverKey, end: dragEnd, over: dragOver, leave: dragLeave, drop: dragDrop },
+  menu,
+  menuItems,
+  menuTitle,
+  moverOpen,
+  permissoesOpen,
+  compartilharOpen,
+  alvo,
+  onTileClick,
+  onTileDblClick,
+  onTileContextMenu,
+  onTileDragStart,
+  onGridKeydown,
+  closeMenu,
+  onMenuSelect,
+  onMoved,
+  onPermissoesSaved
+} = useArquivoInteractions({
+  arquivos,
+  empresaId: empresaIdAtual,
+  abrir: openArquivo,
+  recarregar: loadArquivos
+})
+
+function destinoGrupo(grupoId: string, pastaId?: string): IDestinoArquivo {
+  return { agrupamento_id: grupoId, ...(pastaId ? { pasta_id: pastaId } : {}) }
+}
+
+function aceitaDrop(grupo: IAgrupamento) {
+  return !!selected.value && grupo.empresa_id === selected.value.empresa_id
+}
+
 onMounted(async () => {
   document.addEventListener('click', onDocClick)
   await loadEmpresas()
@@ -533,8 +582,11 @@ onUnmounted(() => {
         <button
           type="button"
           class="agrup-explorer__crumb-link"
-          :class="{ 'is-current': !pastaStack.length }"
+          :class="{ 'is-current': !pastaStack.length, 'is-drop-target': hoverKey === 'c:grupo' }"
           @click="goToGrupoRaiz"
+          @dragover="dragOver($event, 'c:grupo')"
+          @dragleave="dragLeave('c:grupo')"
+          @drop="dragDrop($event, destinoGrupo(selected.id))"
         >
           {{ selected.nome }}
         </button>
@@ -543,8 +595,14 @@ onUnmounted(() => {
           <button
             type="button"
             class="agrup-explorer__crumb-link"
-            :class="{ 'is-current': idx === pastaStack.length - 1 }"
+            :class="{
+              'is-current': idx === pastaStack.length - 1,
+              'is-drop-target': hoverKey === 'c:p:' + p.id
+            }"
             @click="goToPasta(idx)"
+            @dragover="dragOver($event, 'c:p:' + p.id)"
+            @dragleave="dragLeave('c:p:' + p.id)"
+            @drop="dragDrop($event, destinoGrupo(selected.id, p.id))"
           >
             {{ p.nome }}
           </button>
@@ -621,13 +679,19 @@ onUnmounted(() => {
                 v-for="grupo in agrupamentos"
                 :key="grupo.id"
                 class="agrup-explorer__item"
-                :class="{ 'is-selected': selected?.id === grupo.id }"
+                :class="{
+                  'is-selected': selected?.id === grupo.id,
+                  'is-drop-target': hoverKey === 'g:' + grupo.id
+                }"
               >
                 <button
                   type="button"
                   class="agrup-explorer__tile"
                   :aria-pressed="selected?.id === grupo.id"
                   @click="selectGrupo(grupo)"
+                  @dragover="aceitaDrop(grupo) && dragOver($event, 'g:' + grupo.id)"
+                  @dragleave="dragLeave('g:' + grupo.id)"
+                  @drop="aceitaDrop(grupo) && dragDrop($event, destinoGrupo(grupo.id))"
                 >
                   <span class="agrup-explorer__box">
                     <img
@@ -816,18 +880,51 @@ onUnmounted(() => {
             </div>
           </div>
 
-          <div class="agrup-explorer__scroll agrup-explorer__scroll--fill">
-            <ul v-if="pastas.length || arquivos.length" class="agrup-explorer__grid" role="list">
+          <div
+            class="agrup-explorer__scroll agrup-explorer__scroll--fill"
+            @click="limparSelecaoArquivos"
+          >
+            <ul
+              v-if="pastas.length || arquivos.length"
+              ref="arquivosGridRef"
+              class="agrup-explorer__grid"
+              role="list"
+              tabindex="-1"
+              @keydown="onGridKeydown($event, arquivosGridRef, pastas.length)"
+            >
               <li v-for="pasta in pastas" :key="'p-' + pasta.id">
-                <button type="button" class="agrup-explorer__tile" @click="enterPasta(pasta)">
+                <button
+                  type="button"
+                  class="agrup-explorer__tile"
+                  :class="{ 'is-drop-target': hoverKey === 'p:' + pasta.id }"
+                  @click.stop="enterPasta(pasta)"
+                  @dragover="dragOver($event, 'p:' + pasta.id)"
+                  @dragleave="dragLeave('p:' + pasta.id)"
+                  @drop="selected && dragDrop($event, destinoGrupo(selected.id, pasta.id))"
+                >
                   <span class="agrup-explorer__box">
                     <img :src="iconFolder" width="40" height="40" alt="" />
                   </span>
                   <span class="agrup-explorer__name">{{ pasta.nome }}</span>
                 </button>
               </li>
-              <li v-for="arquivo in arquivos" :key="'a-' + arquivo.id">
-                <button type="button" class="agrup-explorer__tile" @click="openArquivo(arquivo)">
+              <li v-for="(arquivo, index) in arquivos" :key="'a-' + arquivo.id">
+                <button
+                  type="button"
+                  class="agrup-explorer__tile agrup-explorer__tile--arquivo"
+                  :class="{
+                    'is-selected': isSelected(arquivo.id),
+                    'is-dragging': dragging && isSelected(arquivo.id)
+                  }"
+                  :data-arquivo-index="index"
+                  draggable="true"
+                  :title="arquivo.descricao"
+                  @click.stop="onTileClick(index, $event)"
+                  @dblclick="onTileDblClick(arquivo)"
+                  @contextmenu.prevent.stop="onTileContextMenu(index, $event)"
+                  @dragstart="onTileDragStart($event, arquivo)"
+                  @dragend="dragEnd"
+                >
                   <span class="agrup-explorer__box">
                     <span v-if="arquivoExtensao(arquivo)" class="agrup-explorer__ext">
                       {{ arquivoExtensao(arquivo) }}
@@ -997,6 +1094,44 @@ onUnmounted(() => {
       :saving="saving"
       @close="membrosModalOpen = false"
       @save="saveMembros"
+    />
+
+    <ArquivoContextMenu
+      :open="menu.open"
+      :x="menu.x"
+      :y="menu.y"
+      :items="menuItems"
+      :title="menuTitle"
+      @select="onMenuSelect"
+      @close="closeMenu"
+    />
+    <MoverArquivosModal
+      v-if="selected"
+      :open="moverOpen"
+      :empresa-id="selected.empresa_id"
+      :empresa-nome="empresaNome"
+      :arquivo-ids="alvo.map((a) => a.id)"
+      @close="moverOpen = false"
+      @moved="onMoved"
+    />
+    <PermissoesArquivosModal
+      v-if="selected"
+      :open="permissoesOpen"
+      :empresa-id="selected.empresa_id"
+      :arquivos="alvo"
+      @close="permissoesOpen = false"
+      @saved="onPermissoesSaved"
+    />
+    <CompartilharArquivoModal
+      :open="compartilharOpen && alvo.length === 1"
+      :arquivo-id="alvo[0]?.id || ''"
+      :arquivo-nome="alvo[0]?.descricao"
+      @close="compartilharOpen = false"
+    />
+    <CompartilharMultiplosModal
+      :open="compartilharOpen && alvo.length > 1"
+      :arquivos="alvo"
+      @close="compartilharOpen = false"
     />
 
     <NightConfirmModal
@@ -1354,6 +1489,49 @@ onUnmounted(() => {
     background: rgba(255, 255, 255, 0.1);
     border-color: rgba(176, 141, 87, 0.3);
   }
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  &--arquivo {
+    user-select: none;
+  }
+
+  &.is-selected .agrup-explorer__box,
+  &.is-selected:hover .agrup-explorer__box {
+    border-color: #fffcff;
+    box-shadow: 0 0 0 1px #fffcff;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  &.is-dragging {
+    opacity: 0.45;
+  }
+
+  &.is-drop-target .agrup-explorer__box {
+    border: 1px dashed #b08d57;
+    box-shadow: 0 0 0 1px #b08d57;
+    background: rgba(176, 141, 87, 0.22);
+  }
+}
+
+.agrup-explorer__item.is-drop-target .agrup-explorer__box {
+  border: 1px dashed #b08d57;
+  box-shadow: 0 0 0 1px #b08d57;
+  background: rgba(176, 141, 87, 0.22);
+}
+
+.agrup-explorer__grid:focus {
+  outline: none;
+}
+
+.agrup-explorer__crumb-link.is-drop-target {
+  color: #b08d57;
+  opacity: 1;
+  border-radius: 6px;
+  outline: 1px dashed #b08d57;
+  outline-offset: 3px;
 }
 
 .agrup-explorer__box {

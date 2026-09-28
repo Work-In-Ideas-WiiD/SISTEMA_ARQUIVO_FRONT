@@ -37,6 +37,8 @@ export interface IGetArquivosDataRes {
   categoria_id?: string | null
   mes?: number | null
   ano?: number | null
+  pasta_id?: string | null
+  agrupamento_id?: string | null
   path: string
   tamanho_bytes?: number
   status: 'pendente' | 'assinado'
@@ -92,6 +94,47 @@ export async function postArquivo(
       if (!onUploadProgress || !event.total) return
       onUploadProgress(Math.round((event.loaded * 100) / event.total))
     }
+  })
+  return res
+}
+
+export interface IDestinoArquivo {
+  setor_id?: string | null
+  funcao_id?: string | null
+  agrupamento_id?: string | null
+  pasta_id?: string | null
+}
+
+export async function moverArquivos(
+  arquivos: string[],
+  empresaId: string,
+  destino: IDestinoArquivo
+): Promise<AxiosResponse<{ movidos: number }>> {
+  const res = await api.post('/arquivos/mover', {
+    arquivos,
+    empresa_id: empresaId,
+    ...(destino.setor_id ? { setor_id: destino.setor_id } : {}),
+    ...(destino.funcao_id ? { funcao_id: destino.funcao_id } : {}),
+    ...(destino.agrupamento_id ? { agrupamento_id: destino.agrupamento_id } : {}),
+    ...(destino.pasta_id ? { pasta_id: destino.pasta_id } : {})
+  })
+  return res
+}
+
+export async function editarPermissoesArquivos(
+  arquivos: string[],
+  empresaId: string,
+  alteracoes: {
+    setores_adicionar: string[]
+    setores_remover: string[]
+    funcoes_adicionar: string[]
+    funcoes_remover: string[]
+  }
+): Promise<AxiosResponse<IGetArquivosDataRes[]>> {
+  const res = await api.post('/arquivos/permissoes', {
+    arquivos,
+    empresa_id: empresaId,
+    ...alteracoes
   })
   return res
 }
