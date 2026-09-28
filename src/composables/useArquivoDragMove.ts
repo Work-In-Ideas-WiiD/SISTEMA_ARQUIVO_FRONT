@@ -15,11 +15,58 @@ export function useArquivoDragMove(onMove: (ids: string[], destino: IDestinoArqu
     return Array.from(event.dataTransfer?.types || []).includes(MIME)
   }
 
-  function start(event: DragEvent, ids: string[]) {
+  function start(event: DragEvent, ids: string[], preview?: HTMLElement | null) {
     if (!event.dataTransfer || !ids.length) return
     event.dataTransfer.setData(MIME, JSON.stringify(ids))
     event.dataTransfer.effectAllowed = 'move'
+    if (preview) setPreview(event, preview, ids.length)
     dragging.value = true
+  }
+
+  /**
+   * O snapshot nativo do tile (botão transparente) captura o fundo do painel em volta
+   * do card arredondado; usa um clone só do card, com fundo sólido.
+   */
+  function setPreview(event: DragEvent, card: HTMLElement, total: number) {
+    const rect = card.getBoundingClientRect()
+    const ghost = card.cloneNode(true) as HTMLElement
+    Object.assign(ghost.style, {
+      position: 'fixed',
+      top: '-1000px',
+      left: '-1000px',
+      width: `${rect.width}px`,
+      height: `${rect.height}px`,
+      background: '#23364d',
+      borderColor: '#fffcff',
+      boxShadow: 'none',
+      opacity: '1',
+      pointerEvents: 'none'
+    })
+    if (total > 1) {
+      const badge = document.createElement('span')
+      badge.textContent = String(total)
+      Object.assign(badge.style, {
+        position: 'absolute',
+        top: '-8px',
+        right: '-8px',
+        minWidth: '24px',
+        height: '24px',
+        padding: '0 6px',
+        borderRadius: '12px',
+        background: '#b08d57',
+        color: '#0b1b2b',
+        font: '700 12px/24px Inter, sans-serif',
+        textAlign: 'center',
+        boxSizing: 'border-box'
+      })
+      ghost.style.overflow = 'visible'
+      ghost.appendChild(badge)
+    }
+    document.body.appendChild(ghost)
+    const x = Math.min(Math.max(event.clientX - rect.left, 0), rect.width)
+    const y = Math.min(Math.max(event.clientY - rect.top, 0), rect.height)
+    event.dataTransfer?.setDragImage(ghost, x, y)
+    setTimeout(() => ghost.remove(), 0)
   }
 
   function end() {

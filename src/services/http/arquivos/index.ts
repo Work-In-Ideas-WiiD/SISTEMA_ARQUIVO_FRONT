@@ -33,6 +33,8 @@ export interface IGetArquivosDataRes {
   }[]
   setores?: IArquivoVinculo[]
   funcoes?: IArquivoVinculo[]
+  funcionarios?: IArquivoVinculo[]
+  agrupamentos_acesso?: IArquivoVinculo[]
   categoria?: IArquivoVinculo | null
   categoria_id?: string | null
   mes?: number | null
@@ -121,15 +123,16 @@ export async function moverArquivos(
   return res
 }
 
+export type TipoPermissao = 'setores' | 'funcoes' | 'agrupamentos' | 'funcionarios'
+
+export type IAlteracoesPermissao = Partial<
+  Record<`${TipoPermissao}_adicionar` | `${TipoPermissao}_remover`, string[]>
+>
+
 export async function editarPermissoesArquivos(
   arquivos: string[],
   empresaId: string,
-  alteracoes: {
-    setores_adicionar: string[]
-    setores_remover: string[]
-    funcoes_adicionar: string[]
-    funcoes_remover: string[]
-  }
+  alteracoes: IAlteracoesPermissao
 ): Promise<AxiosResponse<IGetArquivosDataRes[]>> {
   const res = await api.post('/arquivos/permissoes', {
     arquivos,

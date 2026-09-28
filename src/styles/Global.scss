@@ -8,6 +8,12 @@ html {
   font-family: 'Inter', sans-serif;
 }
 
+/* Ícones da interface não são arrastáveis (evita abrir o upload ao arrastar um ícone). */
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
 $color-orange-100: #B08D57;
 $color-green-200: #1F3A5F;
 $color-orange-500: #1F3A5F;

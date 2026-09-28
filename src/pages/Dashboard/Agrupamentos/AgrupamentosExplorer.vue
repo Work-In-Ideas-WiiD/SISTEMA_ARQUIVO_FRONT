@@ -925,7 +925,7 @@ onUnmounted(() => {
                   @dragstart="onTileDragStart($event, arquivo)"
                   @dragend="dragEnd"
                 >
-                  <span class="agrup-explorer__box">
+                  <span class="agrup-explorer__box" data-drag-preview>
                     <span v-if="arquivoExtensao(arquivo)" class="agrup-explorer__ext">
                       {{ arquivoExtensao(arquivo) }}
                     </span>

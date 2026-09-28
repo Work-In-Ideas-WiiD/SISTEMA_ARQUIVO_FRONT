@@ -1144,7 +1144,7 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
                 @dragstart="onTileDragStart($event, arquivo)"
                 @dragend="dragEnd"
               >
-                <span class="empresa-explorer__box">
+                <span class="empresa-explorer__box" data-drag-preview>
                   <span
                     v-if="arquivoExtensao(arquivo)"
                     class="empresa-explorer__ext"

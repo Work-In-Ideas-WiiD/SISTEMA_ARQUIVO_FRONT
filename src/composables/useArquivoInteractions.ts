@@ -84,7 +84,8 @@ export function useArquivoInteractions(opts: {
     const ids = selection.isSelected(arquivo.id)
       ? selection.selectedItems.value.map((a) => a.id)
       : [arquivo.id]
-    drag.start(event, ids)
+    const tile = event.currentTarget as HTMLElement | null
+    drag.start(event, ids, tile?.querySelector<HTMLElement>('[data-drag-preview]'))
   }
 
   function onGridKeydown(event: KeyboardEvent, grid: HTMLElement | null, offset = 0) {
