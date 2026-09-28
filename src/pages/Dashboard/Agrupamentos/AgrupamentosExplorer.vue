@@ -16,7 +16,7 @@ import { getAllEmpresas } from '@/services/http/empresas'
 import { getPastas, postPasta, type IPasta } from '@/services/http/pastas'
 import {
   getArquivos,
-  postArquivo,
+  postArquivoOuSubstituir,
   type IDestinoArquivo,
   type IGetArquivosDataRes
 } from '@/services/http/arquivos'
@@ -28,6 +28,7 @@ import { getApiErrorMessage } from '@/utils/apiError'
 import { openArquivoRegistrado } from '@/utils/openFile'
 import { usePageFileDrop } from '@/composables/usePageFileDrop'
 import { useNightConfirm } from '@/composables/useNightConfirm'
+import { opcoesSubstituirArquivo } from '@/utils/substituirArquivo'
 import { useDropdownPlacement } from '@/composables/useDropdownPlacement'
 import UploadDropOverlay from '@/components/UploadDropOverlay/UploadDropOverlay.vue'
 import NightConfirmModal from '@/components/NightConfirmModal/NightConfirmModal.vue'
@@ -485,8 +486,11 @@ async function saveUpload(payload: ArquivoUploadPayload) {
     formData.append('ano', String(payload.ano))
     if (currentPastaId.value) formData.append('pasta_id', currentPastaId.value)
 
-    await postArquivo(formData)
-    toast.success('Arquivo enviado')
+    const res = await postArquivoOuSubstituir(formData, (nome) =>
+      askConfirm(opcoesSubstituirArquivo(nome))
+    )
+    if (!res) return
+    toast.success(res.substituido ? 'Arquivo substituído' : 'Arquivo enviado')
     closeUpload()
     await loadArquivos()
   } catch (error) {

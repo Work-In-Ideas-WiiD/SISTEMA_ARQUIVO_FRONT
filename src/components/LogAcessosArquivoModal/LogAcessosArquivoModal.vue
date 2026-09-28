@@ -30,12 +30,8 @@ const FILTROS: { id: Filtro; label: string }[] = [
 const ACOES: Record<string, string> = {
   visualizou: 'Visualizou',
   link_externo: 'Link externo',
-  permissoes: 'Permissões',
-  moveu: 'Moveu',
-  created: 'Enviou',
-  updated: 'Alterou',
-  deleted: 'Excluiu',
-  restored: 'Restaurou'
+  substituiu: 'Substituiu',
+  created: 'Enviou'
 }
 
 const dataHora = new Intl.DateTimeFormat('pt-BR', {
@@ -314,6 +310,11 @@ watch(
   &--alteracao {
     background: rgba(176, 141, 87, 0.2);
     color: #d9b77e;
+  }
+
+  &--envio {
+    background: rgba(110, 150, 220, 0.18);
+    color: #9fbcef;
   }
 }
 

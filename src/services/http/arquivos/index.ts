@@ -100,6 +100,29 @@ export async function postArquivo(
   return res
 }
 
+/**
+ * Envia o arquivo; se já existir um com o mesmo nome no local (409), pergunta e reenvia substituindo.
+ * Retorna null quando o usuário desiste da substituição.
+ */
+export async function postArquivoOuSubstituir(
+  formData: FormData,
+  confirmarSubstituicao: (nome: string) => Promise<boolean>,
+  onUploadProgress?: (percent: number) => void
+): Promise<{ data: IGetArquivosDataRes; substituido: boolean } | null> {
+  try {
+    const { data } = await postArquivo(formData, onUploadProgress)
+    return { data, substituido: false }
+  } catch (error: any) {
+    const res = error?.response
+    if (res?.status !== 409 || !res.data?.conflito) throw error
+    const ok = await confirmarSubstituicao(res.data.arquivo?.descricao || String(formData.get('descricao') || ''))
+    if (!ok) return null
+    formData.set('substituir', '1')
+    const { data } = await postArquivo(formData, onUploadProgress)
+    return { data, substituido: true }
+  }
+}
+
 export interface IDestinoArquivo {
   setor_id?: string | null
   funcao_id?: string | null
@@ -158,7 +181,7 @@ export async function abrirArquivo(id: string): Promise<AxiosResponse<{ url: str
 
 export interface IArquivoLogEvento {
   id: string
-  tipo: 'acesso' | 'alteracao'
+  tipo: 'acesso' | 'alteracao' | 'envio'
   acao: string
   nome: string | null
   email: string | null

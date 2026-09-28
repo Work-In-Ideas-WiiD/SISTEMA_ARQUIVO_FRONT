@@ -9,7 +9,10 @@ import UploadDropOverlay from '@/components/UploadDropOverlay/UploadDropOverlay.
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import iconChevronDown from '@/assets/imgs/administradores/icon-chevron-down.svg'
 import iconUpload from '@/assets/imgs/arquivos/Upload.svg'
-import { postArquivo } from '@/services/http/arquivos'
+import { postArquivoOuSubstituir } from '@/services/http/arquivos'
+import { useNightConfirm } from '@/composables/useNightConfirm'
+import { opcoesSubstituirArquivo } from '@/utils/substituirArquivo'
+import NightConfirmModal from '@/components/NightConfirmModal/NightConfirmModal.vue'
 import { getAllEmpresas } from '@/services/http/empresas'
 import { postAddEmpresaToArquivo } from '@/services/http/administradores'
 import { getAllSetores, type ISetor } from '@/services/http/setores'
@@ -41,6 +44,13 @@ function yearOptions(around = new Date().getFullYear()): number[] {
 
 const router = useRouter()
 const toast = useToast()
+const {
+  open: confirmOpen,
+  options: confirmOptions,
+  askConfirm,
+  onConfirm,
+  onCancel
+} = useNightConfirm()
 const authStore = useAuthStore()
 const uploadStore = useUploadProgressStore()
 
@@ -286,14 +296,22 @@ async function handleSubmit() {
       formData.append('funcoes[]', id)
     })
 
-    const { data: arquivoRes } = await postArquivo(formData, (percent) => {
-      uploadStore.setProgress(uploadId, percent)
-    })
+    const res = await postArquivoOuSubstituir(
+      formData,
+      (nome) => askConfirm(opcoesSubstituirArquivo(nome)),
+      (percent) => uploadStore.setProgress(uploadId, percent)
+    )
+    if (!res) {
+      uploadStore.removeUpload(uploadId)
+      return
+    }
 
-    await postAddEmpresaToArquivo([empresaId.value], arquivoRes.id)
+    if (!res.substituido) {
+      await postAddEmpresaToArquivo([empresaId.value], res.data.id)
+    }
 
     uploadStore.setSuccess(uploadId)
-    toast.success('Arquivo cadastrado')
+    toast.success(res.substituido ? 'Arquivo substituído' : 'Arquivo cadastrado')
     setTimeout(() => {
       router.push('/dashboard/arquivos')
     }, 1500)
@@ -317,6 +335,16 @@ function goBack() {
 <template>
   <section class="novo-arquivo">
     <UploadDropOverlay :visible="isDragging" />
+    <NightConfirmModal
+      :open="confirmOpen"
+      :title="confirmOptions.title"
+      :body="confirmOptions.body"
+      :confirm-label="confirmOptions.confirmLabel"
+      :cancel-label="confirmOptions.cancelLabel"
+      :danger="confirmOptions.danger"
+      @confirm="onConfirm"
+      @cancel="onCancel"
+    />
 
     <div class="novo-arquivo__heading">
       <button

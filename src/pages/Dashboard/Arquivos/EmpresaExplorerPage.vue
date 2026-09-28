@@ -13,7 +13,7 @@ import {
 import { getPastas, getPasta, postPasta, type IPasta } from '@/services/http/pastas'
 import {
   getArquivos,
-  postArquivo,
+  postArquivoOuSubstituir,
   type IDestinoArquivo,
   type IGetArquivosDataRes
 } from '@/services/http/arquivos'
@@ -28,6 +28,9 @@ import { openArquivoRegistrado } from '@/utils/openFile'
 import { usePageFileDrop } from '@/composables/usePageFileDrop'
 import { useDropdownPlacement } from '@/composables/useDropdownPlacement'
 import { useArquivoInteractions } from '@/composables/useArquivoInteractions'
+import { useNightConfirm } from '@/composables/useNightConfirm'
+import { opcoesSubstituirArquivo } from '@/utils/substituirArquivo'
+import NightConfirmModal from '@/components/NightConfirmModal/NightConfirmModal.vue'
 import UploadDropOverlay from '@/components/UploadDropOverlay/UploadDropOverlay.vue'
 import ArquivoContextMenu from '@/components/ArquivoContextMenu/ArquivoContextMenu.vue'
 import MoverArquivosModal from '@/components/MoverArquivosModal/MoverArquivosModal.vue'
@@ -78,6 +81,13 @@ const route = useRoute()
 const router = useRouter()
 const toast = useToast()
 const authStore = useAuthStore()
+const {
+  open: confirmOpen,
+  options: confirmOptions,
+  askConfirm,
+  onConfirm,
+  onCancel
+} = useNightConfirm()
 
 const empresaId = computed(() => String(route.params.empresaId || ''))
 const setorId = computed(() =>
@@ -674,15 +684,18 @@ async function saveUpload() {
     if (setorId.value) formData.append('setores[]', setorId.value)
     if (funcaoId.value) formData.append('funcoes[]', funcaoId.value)
 
-    const { data } = await postArquivo(formData)
-    if (authStore.userRole === 'administrador') {
+    const res = await postArquivoOuSubstituir(formData, (nome) =>
+      askConfirm(opcoesSubstituirArquivo(nome))
+    )
+    if (!res) return
+    if (authStore.userRole === 'administrador' && !res.substituido) {
       try {
-        await postAddEmpresaToArquivo([empresaId.value], data.id)
+        await postAddEmpresaToArquivo([empresaId.value], res.data.id)
       } catch {
         //
       }
     }
-    toast.success('Arquivo enviado')
+    toast.success(res.substituido ? 'Arquivo substituído' : 'Arquivo enviado')
     uploadModalOpen.value = false
     uploadFile.value = null
     await loadArquivos()
@@ -1207,6 +1220,16 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
       :open="compartilharOpen && alvo.length > 1"
       :arquivos="alvo"
       @close="compartilharOpen = false"
+    />
+    <NightConfirmModal
+      :open="confirmOpen"
+      :title="confirmOptions.title"
+      :body="confirmOptions.body"
+      :confirm-label="confirmOptions.confirmLabel"
+      :cancel-label="confirmOptions.cancelLabel"
+      :danger="confirmOptions.danger"
+      @confirm="onConfirm"
+      @cancel="onCancel"
     />
     <LogAcessosArquivoModal
       :open="logOpen && alvo.length === 1"
