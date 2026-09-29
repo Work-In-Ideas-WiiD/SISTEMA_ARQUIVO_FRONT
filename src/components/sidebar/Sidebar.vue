@@ -47,8 +47,20 @@ const menuItems: IMenuItem[] = [
   {
     title: 'Empresas',
     icon: 'building',
+    path: '/dashboard/minhas-empresas',
+    roles: ['empresa']
+  },
+  {
+    title: 'Clientes',
+    icon: 'clientes',
     path: '/dashboard/clientes',
-    roles: ['cliente', 'empresa']
+    roles: ['empresa']
+  },
+  {
+    title: 'Empresas',
+    icon: 'building',
+    path: '/dashboard/clientes',
+    roles: ['cliente']
   },
   {
     title: 'Setores',

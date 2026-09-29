@@ -6,6 +6,7 @@ import { postForgotPassword } from '@/services/http/auth'
 import { getApiErrorMessage } from '@/utils/apiError'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import iconPerson from '@/assets/imgs/login/icon-person.svg'
+import iconBuilding from '@/assets/imgs/login/icon-building.svg'
 import iconBackCircle from '@/assets/imgs/login/icon-back-circle.svg'
 import iconChevronLeft from '@/assets/imgs/login/icon-chevron-left.svg'
 
@@ -15,13 +16,17 @@ const toast = useToast()
 const email = ref('')
 const loading = ref(false)
 const target = route.params.target as string
+const isCliente = target === 'cliente'
+const primeiroAcesso = route.query.primeiro === '1'
+const idNaUrl = [route.query.empresa, route.query.empresa_id].find((v): v is string => typeof v === 'string')
+const empresaId = ref(idNaUrl?.trim() || '')
 
 const loginPath = computed(() => (target === 'cliente' ? '/cliente' : '/login'))
 
 async function handleSubmit() {
   try {
     loading.value = true
-    await postForgotPassword(email.value, target)
+    await postForgotPassword(email.value, target, isCliente ? empresaId.value.trim() : undefined)
     toast.success('Se o e-mail estiver cadastrado, você receberá as instruções para redefinir a senha.')
   } catch (error) {
     console.error(error)
@@ -39,15 +44,28 @@ async function handleSubmit() {
   </RouterLink>
 
   <form class="recover_form" @submit.prevent="handleSubmit">
-    <h1 class="recover_form__title">Recuperar a senha</h1>
+    <h1 class="recover_form__title">{{ primeiroAcesso ? 'Primeiro acesso' : 'Recuperar a senha' }}</h1>
     <p class="recover_form__subtitle">
       <span class="auth_subtitle-line auth_subtitle-line--desktop">
-        Informe seu e-mail para recuperar a senha.
+        {{ primeiroAcesso ? 'Informe seu e-mail para cadastrar sua senha.' : 'Informe seu e-mail para recuperar a senha.' }}
       </span>
       <span class="auth_subtitle-line auth_subtitle-line--mobile">
-        Informe seu e-mail para<br />recuperar a senha.
+        Informe seu e-mail para<br />{{ primeiroAcesso ? 'cadastrar sua senha.' : 'recuperar a senha.' }}
       </span>
     </p>
+
+    <label v-if="isCliente" class="recover_field">
+      <span class="recover_field__icon" aria-hidden="true">
+        <img :src="iconBuilding" alt="" width="11" height="13" />
+      </span>
+      <input
+        v-model="empresaId"
+        type="text"
+        placeholder="ID da empresa"
+        autocomplete="off"
+        maxlength="36"
+      />
+    </label>
 
     <label class="recover_field">
       <span class="recover_field__icon" aria-hidden="true">

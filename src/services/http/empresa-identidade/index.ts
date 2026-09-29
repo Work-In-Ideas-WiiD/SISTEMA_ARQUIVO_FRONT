@@ -3,10 +3,13 @@ import { api } from '../api'
 
 export interface IEmpresaIdentidade {
   id: string
+  codigo: string | null
   nome: string
   logo_versao: string | null
   pode_editar: boolean
 }
+
+export const NOME_EMPRESA_MAX = 40
 
 export async function getEmpresaIdentidade(): Promise<AxiosResponse<IEmpresaIdentidade | null>> {
   return api.get('/empresa-identidade')

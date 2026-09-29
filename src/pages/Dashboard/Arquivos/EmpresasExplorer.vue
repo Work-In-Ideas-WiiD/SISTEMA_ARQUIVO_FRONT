@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
 import { getEmpresas, type IGetEmpresasDataRes } from '@/services/http/empresas'
+import { getEmpresasConta } from '@/services/http/empresas-conta'
 import { getApiErrorMessage } from '@/utils/apiError'
 import iconBuilding from '@/assets/imgs/arquivos/icon-empresa-building.svg'
 
@@ -52,19 +53,9 @@ async function loadEmpresas() {
       return
     }
 
-    // CLIENTE-ADMIN: a "empresa" da conta é a própria (entrada do explorer).
     if (role === 'empresa') {
-      const me = authStore.me
-      if (me?.id) {
-        empresas.value = [
-          {
-            id: me.id,
-            label: (me.nome_empresa || me.nome || 'Minha empresa').trim()
-          }
-        ]
-      } else {
-        empresas.value = []
-      }
+      const { data } = await getEmpresasConta()
+      empresas.value = data.map((item) => ({ id: item.id, label: item.nome }))
       return
     }
 

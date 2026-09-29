@@ -34,8 +34,8 @@ export function postResetPassword(token: string, id: string, password: string, p
   })
 }
 
-export function postForgotPassword(email: string, target: string) {
-  return api.post('/auth/reset-password', { email, target })
+export function postForgotPassword(email: string, target: string, empresaId?: string) {
+  return api.post('/auth/reset-password', { email, target, ...(empresaId ? { empresa_id: empresaId } : {}) })
 }
 
 export function postVerifyToken(token: string) {

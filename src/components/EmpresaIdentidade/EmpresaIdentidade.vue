@@ -3,7 +3,7 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
 import { useEmpresaIdentidade } from '@/composables/useEmpresaIdentidade'
-import { postEmpresaIdentidade } from '@/services/http/empresa-identidade'
+import { NOME_EMPRESA_MAX, postEmpresaIdentidade } from '@/services/http/empresa-identidade'
 import { getApiErrorMessage } from '@/utils/apiError'
 
 withDefaults(defineProps<{ compact?: boolean }>(), { compact: false })
@@ -20,10 +20,12 @@ const iniciais = computed(() => {
   return ((partes[0]?.[0] || '') + (partes.length > 1 ? partes[partes.length - 1][0] : '')).toUpperCase() || '?'
 })
 
+const codigo = computed(() => identidade.value?.codigo || identidade.value?.id.slice(0, 6).toUpperCase() || '')
+
 async function copiarId() {
-  if (!identidade.value) return
+  if (!codigo.value) return
   try {
-    await navigator.clipboard.writeText(identidade.value.id)
+    await navigator.clipboard.writeText(codigo.value)
     toast.success('ID da empresa copiado')
   } catch {
     toast.error('Não foi possível copiar o ID')
@@ -45,7 +47,7 @@ function limparPreview() {
 
 function abrirEdicao() {
   if (!identidade.value?.pode_editar) return
-  nome.value = identidade.value.nome
+  nome.value = identidade.value.nome.slice(0, NOME_EMPRESA_MAX)
   novaFoto.value = null
   removerFoto.value = false
   limparPreview()
@@ -133,7 +135,7 @@ onBeforeUnmount(limparPreview)
     <div class="emp-id__texto">
       <p class="emp-id__nome" :title="identidade.nome">{{ identidade.nome }}</p>
       <button type="button" class="emp-id__codigo" title="Copiar ID da empresa" @click="copiarId">
-        ID: <span>{{ identidade.id }}</span>
+        ID: <span>{{ codigo }}</span>
       </button>
     </div>
 
@@ -194,10 +196,11 @@ onBeforeUnmount(limparPreview)
             v-model="nome"
             class="emp-id-modal__input"
             type="text"
-            maxlength="255"
+            :maxlength="NOME_EMPRESA_MAX"
             :disabled="salvando"
             @keydown.enter.prevent="salvar"
           />
+          <small class="emp-id-modal__contador">{{ nome.length }}/{{ NOME_EMPRESA_MAX }}</small>
 
           <div class="emp-id-modal__actions">
             <button type="button" class="emp-id-modal__btn" :disabled="salvando" @click="fecharEdicao">
@@ -293,9 +296,20 @@ onBeforeUnmount(limparPreview)
   color: #fffcff;
   font-size: 15px;
   font-weight: 700;
+  line-height: 1.25;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.emp-id-modal__contador {
+  display: block;
+  margin-top: 4px;
+  text-align: right;
+  color: rgba(255, 252, 255, 0.45);
+  font-size: 11px;
 }
 
 .emp-id__codigo {

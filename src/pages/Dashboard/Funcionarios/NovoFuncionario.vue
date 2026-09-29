@@ -9,6 +9,7 @@ import { postFuncionario, type IPostFuncionarioModel } from '@/services/http/fun
 import { getAllSetores, type ISetor } from '@/services/http/setores'
 import { getAllFuncoes, type IFuncao } from '@/services/http/funcoes'
 import { getAllEmpresas } from '@/services/http/empresas'
+import { getEmpresasConta, type IEmpresaConta } from '@/services/http/empresas-conta'
 import { isValidOptionalCpf, maskCpf } from '@/utils/formatCpfCnpj'
 import { maskPhone, stripDigits } from '@/utils/formatPhone'
 import NightDatePicker from '@/components/inputs/NightDatePicker/NightDatePicker.vue'
@@ -34,8 +35,36 @@ const form = ref({
   data_nascimento: '',
   setores: [] as string[],
   funcoes: [] as string[],
+  empresas: [] as string[],
   empresa_id: ''
 })
+
+const empresasConta = ref<IEmpresaConta[]>([])
+const multiEmpresa = computed(() => !isAdmin.value && empresasConta.value.length > 1)
+
+const setoresVisiveis = computed(() =>
+  multiEmpresa.value
+    ? setoresDisponiveis.value.filter((s) => form.value.empresas.includes(s.empresa_id))
+    : setoresDisponiveis.value
+)
+
+function nomeEmpresaConta(id?: string | null) {
+  return empresasConta.value.find((e) => e.id === id)?.nome
+}
+
+function toggleEmpresaConta(id: string) {
+  const index = form.value.empresas.indexOf(id)
+  if (index === -1) {
+    form.value.empresas.push(id)
+    return
+  }
+  form.value.empresas.splice(index, 1)
+  const daEmpresa = new Set(setoresDisponiveis.value.filter((s) => s.empresa_id === id).map((s) => s.id))
+  form.value.setores = form.value.setores.filter((sid) => !daEmpresa.has(sid))
+  form.value.funcoes = form.value.funcoes.filter(
+    (fid) => funcoesDisponiveis.value.find((f) => f.id === fid)?.empresa_id !== id
+  )
+}
 
 const isAdmin = computed(() => authStore.userRole === 'administrador')
 
@@ -85,7 +114,9 @@ onMounted(async () => {
       const { data } = await getAllEmpresas()
       empresas.value = data.data
     } else {
-      await loadSetoresFuncoes()
+      const [, empresasRes] = await Promise.all([loadSetoresFuncoes(), getEmpresasConta()])
+      empresasConta.value = empresasRes.data
+      form.value.empresas = empresasRes.data.filter((e) => e.principal).map((e) => e.id)
     }
   } catch (error) {
     console.error(error)
@@ -162,6 +193,11 @@ async function handleSubmit() {
     return
   }
 
+  if (multiEmpresa.value && !form.value.empresas.length) {
+    toast.error('Selecione ao menos uma empresa')
+    return
+  }
+
   if (!isValidOptionalCpf(form.value.cpf)) {
     toast.error('CPF inválido')
     return
@@ -183,7 +219,8 @@ async function handleSubmit() {
       ...(form.value.data_nascimento ? { data_nascimento: form.value.data_nascimento } : {}),
       ...(form.value.setores.length > 0 ? { setores: [...form.value.setores] } : {}),
       ...(form.value.funcoes.length > 0 ? { funcoes: [...form.value.funcoes] } : {}),
-      ...(isAdmin.value ? { empresa_id: form.value.empresa_id } : {})
+      ...(isAdmin.value ? { empresa_id: form.value.empresa_id } : {}),
+      ...(multiEmpresa.value ? { empresas: [...form.value.empresas] } : {})
     }
 
     await postFuncionario(payload)
@@ -343,6 +380,20 @@ function goBack() {
           />
         </div>
 
+        <div v-if="multiEmpresa" class="novo-funcionario__field">
+          <span class="novo-funcionario__label night-field-label">EMPRESAS*</span>
+          <div class="novo-funcionario__checks">
+            <label v-for="empresa in empresasConta" :key="empresa.id" class="novo-funcionario__check">
+              <input
+                type="checkbox"
+                :checked="form.empresas.includes(empresa.id)"
+                @change="toggleEmpresaConta(empresa.id)"
+              />
+              <span>{{ empresa.nome }}</span>
+            </label>
+          </div>
+        </div>
+
         <div class="novo-funcionario__field">
           <span class="novo-funcionario__label night-field-label">
             SETOR <span class="novo-funcionario__optional">(opcional)</span>
@@ -351,11 +402,14 @@ function goBack() {
             <div v-if="isAdmin && !form.empresa_id" class="novo-funcionario__checks-empty">
               Selecione uma empresa primeiro
             </div>
-            <div v-else-if="setoresDisponiveis.length === 0" class="novo-funcionario__checks-empty">
+            <div v-else-if="multiEmpresa && !form.empresas.length" class="novo-funcionario__checks-empty">
+              Selecione uma empresa primeiro
+            </div>
+            <div v-else-if="setoresVisiveis.length === 0" class="novo-funcionario__checks-empty">
               Nenhum setor cadastrado
             </div>
             <label
-              v-for="setor in setoresDisponiveis"
+              v-for="setor in setoresVisiveis"
               :key="setor.id"
               class="novo-funcionario__check"
             >
@@ -365,6 +419,9 @@ function goBack() {
                 @change="toggleSetor(setor.id)"
               />
               <span>{{ setor.nome }}</span>
+              <small v-if="form.empresas.length > 1" class="novo-funcionario__check-setor">
+                {{ nomeEmpresaConta(setor.empresa_id) }}
+              </small>
             </label>
           </div>
         </div>

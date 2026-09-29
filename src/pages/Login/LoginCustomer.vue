@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
@@ -26,6 +26,15 @@ const idNaUrl = [route.query.empresa, route.query.empresa_id, route.query.id].fi
 ) as string | undefined
 
 const companyId = ref(idNaUrl?.trim() || '')
+
+const linkRecuperar = computed(() => ({
+  path: '/recuperar/email/cliente',
+  query: companyId.value.trim() ? { empresa: companyId.value.trim() } : {}
+}))
+const linkPrimeiroAcesso = computed(() => ({
+  ...linkRecuperar.value,
+  query: { ...linkRecuperar.value.query, primeiro: '1' }
+}))
 const email = ref('')
 const password = ref('')
 
@@ -81,7 +90,7 @@ async function handleLogin() {
       </div>
 
       <div class="login_form__links">
-        <RouterLink class="login_form__link" to="/recuperar/email/cliente">
+        <RouterLink class="login_form__link" :to="linkRecuperar">
           Esqueci a senha.
         </RouterLink>
         <RouterLink class="login_form__link" to="/">
@@ -100,7 +109,7 @@ async function handleLogin() {
         </RouterLink>
       </div>
 
-      <RouterLink class="login_form__first_access" to="/primeiroacesso">
+      <RouterLink class="login_form__first_access" :to="linkPrimeiroAcesso">
         É seu primeiro acesso? <span>Cadastrar senha.</span>
       </RouterLink>
     </form>
