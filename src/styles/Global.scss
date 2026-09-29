@@ -327,6 +327,11 @@ a {
   color: white !important;
 }
 
+/* Avisos acima de qualquer modal/overlay (modais chegam a z-index 11000). */
+.Vue-Toastification__container {
+  z-index: 2147483000 !important;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

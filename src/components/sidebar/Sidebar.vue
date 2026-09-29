@@ -2,6 +2,7 @@
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import SidebarItem from './SidebarItem.vue'
+import EmpresaIdentidade from '@/components/EmpresaIdentidade/EmpresaIdentidade.vue'
 import type { TUserTypes } from '@/types/auth'
 import { isFeatureEnabled } from '@/config/features'
 import logoAkidocs from '@/assets/imgs/login/logo-akidocs-white.png'
@@ -138,6 +139,7 @@ function shouldShowItem(item: IMenuItem): boolean {
 <template>
   <aside class="sidebar">
     <img class="logo" :src="logoAkidocs" alt="Logotipo AkiDocs — Todos os seus documentos, Aki!" />
+    <EmpresaIdentidade />
     <nav class="sidebar__nav">
       <template v-for="item in menuItems" :key="item.path">
         <SidebarItem

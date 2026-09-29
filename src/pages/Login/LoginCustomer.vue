@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import logoAkidocs from '@/assets/imgs/login/logo-akidocs-white.png'
@@ -19,7 +19,13 @@ onMounted(() => {
   })
 })
 
-const companyId = ref('')
+// Link direto: /cliente?empresa=<ID> (também aceita empresa_id / id).
+const route = useRoute()
+const idNaUrl = [route.query.empresa, route.query.empresa_id, route.query.id].find(
+  (v) => typeof v === 'string' && v.trim()
+) as string | undefined
+
+const companyId = ref(idNaUrl?.trim() || '')
 const email = ref('')
 const password = ref('')
 

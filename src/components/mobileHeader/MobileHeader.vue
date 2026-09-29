@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { isFeatureEnabled } from '@/config/features'
+import EmpresaIdentidade from '@/components/EmpresaIdentidade/EmpresaIdentidade.vue'
 
 const authStore = useAuthStore()
 const isOpen = ref(false)
@@ -26,7 +27,8 @@ const isAdmin = authStore.userRole === 'administrador'
         <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
       </svg>
     </button>
-    
+    <EmpresaIdentidade compact class="mobile-header__empresa" />
+
     <div v-if="isOpen" class="mobile-menu">
       <nav>
         <RouterLink to="/dashboard/arquivos" @click="isOpen = false">Arquivos</RouterLink>
@@ -59,7 +61,14 @@ const isAdmin = authStore.userRole === 'administrador'
   border-bottom: 1px solid rgba(176, 141, 87, 0.15);
 
   @media (max-width: 900px) {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  &__empresa {
+    flex: 1;
+    min-width: 0;
   }
 
   .menu-button {

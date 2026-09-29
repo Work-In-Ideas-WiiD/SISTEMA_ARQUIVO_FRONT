@@ -16,8 +16,13 @@ export interface IFuncionario {
   user_id?: string
   setores?: ISetor[]
   funcoes?: IFuncao[]
+  empresa?: { id: string; nome: string; nome_empresa?: string | null } | null
   created_at?: string
   updated_at?: string
+}
+
+export async function getEmpresasFiltroFuncionarios(): Promise<AxiosResponse<{ id: string; nome: string }[]>> {
+  return api.get('/funcionarios/empresas')
 }
 
 export interface IGetFuncionariosRes {
