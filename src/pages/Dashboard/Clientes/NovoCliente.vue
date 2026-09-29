@@ -6,6 +6,8 @@ import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg
 import { postCliente } from '@/services/http/clientes'
 import { getApiErrorMessage } from '@/utils/apiError'
 import { maskCep, maskNumeroEndereco, maskUf, isValidCep } from '@/utils/formatCep'
+import { useBuscaCep } from '@/composables/useBuscaCep'
+import { camposFaltando } from '@/utils/camposObrigatorios'
 import { maskCpf, maskCnpj } from '@/utils/formatCpfCnpj'
 import { maskPhone } from '@/utils/formatPhone'
 
@@ -25,6 +27,7 @@ const cidade = ref('')
 const estado = ref('')
 const complemento = ref('')
 const cep = ref('')
+useBuscaCep(cep, { endereco, bairro, cidade, estado, complemento })
 const fetching = ref(false)
 
 watch(cep, (v) => {
@@ -60,8 +63,9 @@ async function handleSubmit() {
     return
   }
 
-  if (!nome.value || !email.value || !contato.value) {
-    toast.error('Preencha os campos obrigatórios')
+  const faltando = camposFaltando({ Nome: nome.value, 'E-mail': email.value, Contato: contato.value })
+  if (faltando) {
+    toast.error(faltando)
     return
   }
 
@@ -119,7 +123,7 @@ function goBack() {
       <form class="novo-cliente__form" @submit.prevent="handleSubmit">
         <div class="novo-cliente__row">
           <div class="novo-cliente__field novo-cliente__field--wide">
-            <label class="novo-cliente__label night-field-label" for="nome">NOME</label>
+            <label class="novo-cliente__label night-field-label" for="nome">NOME*</label>
             <input
               id="nome"
               v-model="nome"
@@ -171,7 +175,7 @@ function goBack() {
 
         <div class="novo-cliente__row">
           <div class="novo-cliente__field novo-cliente__field--wide">
-            <label class="novo-cliente__label night-field-label" for="email">E-MAIL</label>
+            <label class="novo-cliente__label night-field-label" for="email">E-MAIL*</label>
             <input
               id="email"
               v-model="email"
@@ -182,7 +186,7 @@ function goBack() {
             />
           </div>
           <div class="novo-cliente__field novo-cliente__field--narrow">
-            <label class="novo-cliente__label night-field-label" for="contato">CONTATO</label>
+            <label class="novo-cliente__label night-field-label" for="contato">CONTATO*</label>
             <input
               id="contato"
               v-model="contato"
@@ -195,6 +199,32 @@ function goBack() {
           </div>
         </div>
 
+        <div class="novo-cliente__row">
+          <div class="novo-cliente__field novo-cliente__field--narrow">
+            <label class="novo-cliente__label night-field-label" for="cep">CEP</label>
+            <input
+              id="cep"
+              v-model="cep"
+              maxlength="9"
+              inputmode="numeric"
+              autocomplete="postal-code"
+              type="text"
+              class="novo-cliente__input"
+              placeholder="00000-000"
+            />
+          </div>
+          <div class="novo-cliente__field novo-cliente__field--wide">
+            <label class="novo-cliente__label night-field-label" for="complemento">COMPLEMENTO</label>
+            <input
+              id="complemento"
+              v-model="complemento"
+              maxlength="255"
+              type="text"
+              class="novo-cliente__input"
+              placeholder="Complemento"
+            />
+          </div>
+        </div>
         <div class="novo-cliente__row">
           <div class="novo-cliente__field novo-cliente__field--wide">
             <label class="novo-cliente__label night-field-label" for="endereco">ENDEREÇO</label>
@@ -258,32 +288,6 @@ function goBack() {
           </div>
         </div>
 
-        <div class="novo-cliente__row">
-          <div class="novo-cliente__field novo-cliente__field--wide">
-            <label class="novo-cliente__label night-field-label" for="complemento">COMPLEMENTO</label>
-            <input
-              id="complemento"
-              v-model="complemento"
-              maxlength="255"
-              type="text"
-              class="novo-cliente__input"
-              placeholder="Complemento"
-            />
-          </div>
-          <div class="novo-cliente__field novo-cliente__field--narrow">
-            <label class="novo-cliente__label night-field-label" for="cep">CEP</label>
-            <input
-              id="cep"
-              v-model="cep"
-              maxlength="9"
-              inputmode="numeric"
-              autocomplete="postal-code"
-              type="text"
-              class="novo-cliente__input"
-              placeholder="00000-000"
-            />
-          </div>
-        </div>
 
         <button type="submit" class="novo-cliente__submit" :disabled="fetching">
           {{ fetching ? 'Salvando…' : 'SALVAR' }}

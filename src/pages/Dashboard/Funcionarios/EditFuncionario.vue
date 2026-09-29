@@ -14,6 +14,7 @@ import { isValidOptionalCpf, maskCpf } from '@/utils/formatCpfCnpj'
 import { maskPhone, stripDigits } from '@/utils/formatPhone'
 import NightDatePicker from '@/components/inputs/NightDatePicker/NightDatePicker.vue'
 import { getApiErrorMessage } from '@/utils/apiError'
+import { camposFaltando } from '@/utils/camposObrigatorios'
 
 const router = useRouter()
 const route = useRoute()
@@ -210,8 +211,9 @@ function toggleFuncao(id: string) {
 async function handleSubmit() {
   if (loading.value) return
 
-  if (!form.value.nome.trim()) {
-    toast.error('Nome é obrigatório')
+  const faltando = camposFaltando({ Nome: form.value.nome, 'E-mail': form.value.email })
+  if (faltando) {
+    toast.error(faltando)
     return
   }
 
@@ -400,7 +402,7 @@ function goBack() {
         </div>
 
         <div class="novo-funcionario__field">
-          <label class="novo-funcionario__label night-field-label" for="email">E-MAIL</label>
+          <label class="novo-funcionario__label night-field-label" for="email">E-MAIL*</label>
           <input
             id="email"
             v-model="form.email"

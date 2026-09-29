@@ -13,6 +13,8 @@ import {
 import { maskPhone, stripDigits } from '@/utils/formatPhone'
 import { getApiErrorMessage } from '@/utils/apiError'
 import { maskCep, maskNumeroEndereco, maskUf, isValidCep } from '@/utils/formatCep'
+import { useBuscaCep } from '@/composables/useBuscaCep'
+import { camposFaltando } from '@/utils/camposObrigatorios'
 
 const router = useRouter()
 const toast = useToast()
@@ -30,6 +32,7 @@ const cidade = ref('')
 const estado = ref('')
 const complemento = ref('')
 const cep = ref('')
+useBuscaCep(cep, { endereco, bairro, cidade, estado, complemento })
 const fetching = ref(false)
 
 watch(cep, (v) => {
@@ -69,8 +72,9 @@ async function handleSubmit() {
   const cnpjDigits = stripDigits(cnpj.value)
   const contatoDigits = stripDigits(contato.value)
 
-  if (!nome.value.trim() || !email.value.trim() || !contatoDigits) {
-    toast.error('Preencha os campos obrigatórios')
+  const faltando = camposFaltando({ Nome: nome.value, 'E-mail': email.value, Contato: contatoDigits })
+  if (faltando) {
+    toast.error(faltando)
     return
   }
 
@@ -144,7 +148,7 @@ function goBack() {
       <form class="nova-empresa__form" @submit.prevent="handleSubmit">
         <div class="nova-empresa__row">
           <div class="nova-empresa__field nova-empresa__field--wide">
-            <label class="nova-empresa__label night-field-label" for="nome">NOME</label>
+            <label class="nova-empresa__label night-field-label" for="nome">NOME*</label>
             <input
               id="nome"
               v-model="nome"
@@ -200,7 +204,7 @@ function goBack() {
 
         <div class="nova-empresa__row">
           <div class="nova-empresa__field nova-empresa__field--wide">
-            <label class="nova-empresa__label night-field-label" for="email">E-MAIL</label>
+            <label class="nova-empresa__label night-field-label" for="email">E-MAIL*</label>
             <input
               id="email"
               v-model="email"
@@ -211,7 +215,7 @@ function goBack() {
             />
           </div>
           <div class="nova-empresa__field nova-empresa__field--narrow">
-            <label class="nova-empresa__label night-field-label" for="contato">CONTATO</label>
+            <label class="nova-empresa__label night-field-label" for="contato">CONTATO*</label>
             <input
               id="contato"
               v-model="contato"
@@ -226,6 +230,32 @@ function goBack() {
           </div>
         </div>
 
+        <div class="nova-empresa__row">
+          <div class="nova-empresa__field nova-empresa__field--narrow">
+            <label class="nova-empresa__label night-field-label" for="cep">CEP</label>
+            <input
+              id="cep"
+              v-model="cep"
+              maxlength="9"
+              inputmode="numeric"
+              autocomplete="postal-code"
+              type="text"
+              class="nova-empresa__input"
+              placeholder="00000-000"
+            />
+          </div>
+          <div class="nova-empresa__field nova-empresa__field--wide">
+            <label class="nova-empresa__label night-field-label" for="complemento">COMPLEMENTO</label>
+            <input
+              id="complemento"
+              v-model="complemento"
+              maxlength="255"
+              type="text"
+              class="nova-empresa__input"
+              placeholder="Complemento"
+            />
+          </div>
+        </div>
         <div class="nova-empresa__row">
           <div class="nova-empresa__field nova-empresa__field--wide">
             <label class="nova-empresa__label night-field-label" for="endereco">ENDEREÇO</label>
@@ -289,32 +319,6 @@ function goBack() {
           </div>
         </div>
 
-        <div class="nova-empresa__row">
-          <div class="nova-empresa__field nova-empresa__field--wide">
-            <label class="nova-empresa__label night-field-label" for="complemento">COMPLEMENTO</label>
-            <input
-              id="complemento"
-              v-model="complemento"
-              maxlength="255"
-              type="text"
-              class="nova-empresa__input"
-              placeholder="Complemento"
-            />
-          </div>
-          <div class="nova-empresa__field nova-empresa__field--narrow">
-            <label class="nova-empresa__label night-field-label" for="cep">CEP</label>
-            <input
-              id="cep"
-              v-model="cep"
-              maxlength="9"
-              inputmode="numeric"
-              autocomplete="postal-code"
-              type="text"
-              class="nova-empresa__input"
-              placeholder="00000-000"
-            />
-          </div>
-        </div>
 
         <button type="submit" class="nova-empresa__submit" :disabled="fetching">
           {{ fetching ? 'Salvando…' : 'ADICIONAR EMPRESA' }}
