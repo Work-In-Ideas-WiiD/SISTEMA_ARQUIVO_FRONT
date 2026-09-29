@@ -156,8 +156,8 @@ const acessoUploadLabel = computed(() => {
 })
 
 const uploadCategoriaLabel = computed(() => {
-  if (!uploadCategoriaId.value) return 'Selecione a categoria'
-  return categorias.value.find((c) => c.id === uploadCategoriaId.value)?.nome || 'Selecione a categoria'
+  if (!uploadCategoriaId.value) return 'Sem categoria'
+  return categorias.value.find((c) => c.id === uploadCategoriaId.value)?.nome || 'Sem categoria'
 })
 
 const uploadMesLabel = computed(
@@ -524,14 +524,8 @@ function openUploadModal() {
 }
 
 function applyFileToUpload(file: File) {
-  const nomeAnteriorDoArquivo = uploadFile.value
-    ? uploadFile.value.name.replace(/\.[^.]+$/, '')
-    : ''
   uploadFile.value = file
-  // Atualiza o nome se estiver vazio ou ainda for o do arquivo anterior (troca de arquivo).
-  if (!uploadNome.value.trim() || uploadNome.value.trim() === nomeAnteriorDoArquivo) {
-    uploadNome.value = file.name.replace(/\.[^.]+$/, '')
-  }
+  uploadNome.value = file.name.replace(/\.[^.]+$/, '')
   const { mes, ano } = dateFromFile(file)
   uploadMes.value = mes
   uploadAno.value = ano
@@ -659,10 +653,6 @@ async function saveUpload() {
     toast.error('Selecione um arquivo')
     return
   }
-  if (!uploadCategoriaId.value) {
-    toast.error('Selecione a categoria')
-    return
-  }
   if (!uploadMes.value || !uploadAno.value) {
     toast.error('Selecione mês e ano')
     return
@@ -677,7 +667,7 @@ async function saveUpload() {
       (uploadNome.value || uploadFile.value.name.replace(/\.[^.]+$/, '')).trim() || 'Arquivo'
     )
     formData.append('empresa_id', empresaId.value)
-    formData.append('categoria_id', uploadCategoriaId.value)
+    if (uploadCategoriaId.value) formData.append('categoria_id', uploadCategoriaId.value)
     formData.append('mes', String(uploadMes.value))
     formData.append('ano', String(uploadAno.value))
     if (pastaId.value) formData.append('pasta_id', pastaId.value)
@@ -1494,7 +1484,7 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
             </div>
           </div>
 
-          <label class="night-confirm__label">Selecione a categoria</label>
+          <label class="night-confirm__label">Categoria (opcional)</label>
           <div
             class="night-select"
             :class="{ 'is-open': uploadSelectOpen === 'categoria' }"
@@ -1517,7 +1507,17 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
               />
             </button>
             <ul v-if="uploadSelectOpen === 'categoria'" class="night-select__menu" role="listbox">
-              <li v-if="!categorias.length" class="night-select__empty">Nenhuma categoria</li>
+              <li>
+                <button
+                  type="button"
+                  class="night-select__option"
+                  :class="{ 'is-active': !uploadCategoriaId }"
+                  role="option"
+                  @click="selectUploadCategoria('')"
+                >
+                  Sem categoria
+                </button>
+              </li>
               <li v-for="cat in categorias" :key="cat.id">
                 <button
                   type="button"

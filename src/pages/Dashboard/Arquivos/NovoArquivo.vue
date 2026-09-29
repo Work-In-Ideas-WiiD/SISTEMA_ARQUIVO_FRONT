@@ -182,9 +182,7 @@ function applySelectedFile(file: File, autoUpload: boolean) {
   const d = new Date(file.lastModified || Date.now())
   mes.value = d.getMonth() + 1
   ano.value = d.getFullYear()
-  if (!nome.value.trim()) {
-    nome.value = file.name.replace(/\.[^.]+$/, '')
-  }
+  nome.value = file.name.replace(/\.[^.]+$/, '')
 
   if (!autoUpload) return
 
@@ -196,11 +194,6 @@ function applySelectedFile(file: File, autoUpload: boolean) {
 
   if (isAdmin.value && !empresaId.value) {
     toast.error('Arquivo anexado. Selecione uma empresa para enviar.')
-    return
-  }
-
-  if (!categoriaId.value) {
-    toast.error('Arquivo anexado. Selecione a categoria para enviar.')
     return
   }
 
@@ -266,11 +259,6 @@ async function handleSubmit() {
     return
   }
 
-  if (!categoriaId.value) {
-    toast.error('Selecione a categoria')
-    return
-  }
-
   const validation = validateUploadFile(arquivo.value, 'arquivo')
   if (!validation.ok) {
     toast.error(validation.message)
@@ -285,7 +273,7 @@ async function handleSubmit() {
     formData.append('descricao', nome.value)
     formData.append('file', arquivo.value)
     formData.append('empresa_id', empresaId.value)
-    formData.append('categoria_id', categoriaId.value)
+    if (categoriaId.value) formData.append('categoria_id', categoriaId.value)
     formData.append('mes', String(mes.value))
     formData.append('ano', String(ano.value))
 
@@ -430,14 +418,13 @@ function goBack() {
         </div>
 
         <div class="novo-arquivo__field">
-          <label class="novo-arquivo__label" for="categoria">CATEGORIA*</label>
+          <label class="novo-arquivo__label" for="categoria">CATEGORIA <span class="novo-arquivo__optional">(opcional)</span></label>
           <select
             id="categoria"
             v-model="categoriaId"
             class="novo-arquivo__input"
-            required
           >
-            <option value="" disabled>Selecione a categoria</option>
+            <option value="">Sem categoria</option>
             <option v-for="cat in categorias" :key="cat.id" :value="cat.id">
               {{ cat.nome }}
             </option>

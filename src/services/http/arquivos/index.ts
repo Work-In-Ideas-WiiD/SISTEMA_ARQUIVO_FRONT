@@ -167,7 +167,7 @@ export async function editarPermissoesArquivos(
 
 export async function patchArquivoCategoriaData(
   id: string,
-  data: { categoria_id: string; mes: number | null; ano: number | null }
+  data: { categoria_id: string | null; mes: number | null; ano: number | null }
 ): Promise<AxiosResponse<IGetArquivosDataRes>> {
   const res = await api.patch(`/arquivo/${id}`, data)
   return res

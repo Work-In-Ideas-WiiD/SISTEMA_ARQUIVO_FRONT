@@ -47,7 +47,7 @@ const aberto = ref<Campo | null>(null)
 const saving = ref(false)
 
 const categoriaLabel = computed(
-  () => categorias.value.find((c) => c.id === categoriaId.value)?.nome || 'Selecione a categoria'
+  () => categorias.value.find((c) => c.id === categoriaId.value)?.nome || 'Sem categoria'
 )
 const mesLabel = computed(() => MESES.find((m) => m.value === mes.value)?.label || 'Sem mês')
 
@@ -71,14 +71,10 @@ async function carregar() {
 
 async function salvar() {
   if (!props.arquivo) return
-  if (!categoriaId.value) {
-    toast.error('Selecione a categoria')
-    return
-  }
   saving.value = true
   try {
     await patchArquivoCategoriaData(props.arquivo.id, {
-      categoria_id: categoriaId.value,
+      categoria_id: categoriaId.value || null,
       mes: mes.value,
       ano: ano.value
     })
@@ -124,7 +120,17 @@ watch(
             <img class="cd-select__chevron" :src="iconChevronDown" width="14" height="14" alt="" />
           </button>
           <ul v-if="aberto === 'categoria'" class="cd-select__menu" role="listbox">
-            <li v-if="!categorias.length" class="cd-select__empty">Nenhuma categoria cadastrada</li>
+            <li>
+              <button
+                type="button"
+                class="cd-select__option"
+                :class="{ 'is-active': !categoriaId }"
+                role="option"
+                @click="categoriaId = ''; aberto = null"
+              >
+                Sem categoria
+              </button>
+            </li>
             <li v-for="c in categorias" :key="c.id">
               <button
                 type="button"

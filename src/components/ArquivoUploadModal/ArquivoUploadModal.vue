@@ -33,7 +33,7 @@ const categorias = ref<ICategoriaArquivo[]>([])
 const anos = yearOptions()
 
 const categoriaLabel = computed(
-  () => categorias.value.find((c) => c.id === categoriaId.value)?.nome || 'Selecione a categoria'
+  () => categorias.value.find((c) => c.id === categoriaId.value)?.nome || 'Sem categoria'
 )
 const mesLabel = computed(() => MESES.find((m) => m.value === mes.value)?.label || 'Mês')
 
@@ -59,12 +59,8 @@ function reset() {
 }
 
 function applyFile(novo: File) {
-  const nomeAnterior = file.value ? file.value.name.replace(/\.[^.]+$/, '') : ''
   file.value = novo
-  // Troca de arquivo: só sobrescreve o nome se estava vazio ou ainda era o do arquivo anterior.
-  if (!nome.value.trim() || nome.value.trim() === nomeAnterior) {
-    nome.value = novo.name.replace(/\.[^.]+$/, '')
-  }
+  nome.value = novo.name.replace(/\.[^.]+$/, '')
   const data = dateFromFile(novo)
   mes.value = data.mes
   ano.value = data.ano
@@ -86,7 +82,6 @@ function onModalClick(event: MouseEvent) {
 
 function submit() {
   if (!file.value) return emit('invalid', 'Selecione um arquivo')
-  if (!categoriaId.value) return emit('invalid', 'Selecione a categoria')
   if (!mes.value || !ano.value) return emit('invalid', 'Selecione mês e ano')
 
   emit('submit', {
@@ -229,7 +224,7 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <label class="night-confirm__label">Selecione a categoria</label>
+        <label class="night-confirm__label">Categoria (opcional)</label>
         <div class="night-select" :class="{ 'is-open': selectOpen === 'categoria' }">
           <button
             type="button"
@@ -248,7 +243,17 @@ onUnmounted(() => {
             />
           </button>
           <ul v-if="selectOpen === 'categoria'" class="night-select__menu" role="listbox">
-            <li v-if="!categorias.length" class="night-select__empty">Nenhuma categoria</li>
+            <li>
+              <button
+                type="button"
+                class="night-select__option"
+                :class="{ 'is-active': !categoriaId }"
+                role="option"
+                @click="categoriaId = ''; selectOpen = null"
+              >
+                Sem categoria
+              </button>
+            </li>
             <li v-for="cat in categorias" :key="cat.id">
               <button
                 type="button"

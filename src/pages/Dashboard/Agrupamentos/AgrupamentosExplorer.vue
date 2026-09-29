@@ -481,7 +481,7 @@ async function saveUpload(payload: ArquivoUploadPayload) {
     formData.append('descricao', payload.nome)
     formData.append('empresa_id', grupo.empresa_id)
     formData.append('agrupamento_id', grupo.id)
-    formData.append('categoria_id', payload.categoria_id)
+    if (payload.categoria_id) formData.append('categoria_id', payload.categoria_id)
     formData.append('mes', String(payload.mes))
     formData.append('ano', String(payload.ano))
     if (currentPastaId.value) formData.append('pasta_id', currentPastaId.value)
