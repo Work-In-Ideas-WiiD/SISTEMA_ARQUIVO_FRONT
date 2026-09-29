@@ -26,7 +26,7 @@ import iconFiles from '@/assets/imgs/dashboard/icon-menu-files.svg'
 
 const router = useRouter()
 const toast = useToast()
-const { identidade, carregar: recarregarIdentidade } = useEmpresaIdentidade()
+const { carregar: recarregarIdentidade } = useEmpresaIdentidade()
 const { open: confirmOpen, options: confirmOptions, askConfirm, onConfirm, onCancel } = useNightConfirm()
 
 const empresas = ref<IEmpresaConta[]>([])
@@ -151,11 +151,6 @@ function abrirArquivos(empresa: IEmpresaConta) {
         </button>
       </form>
 
-      <p class="emp-conta__dica">
-        Cada empresa tem seus próprios setores, funções, funcionários e arquivos. Todos entram pelo portal do cliente
-        com o ID da sua conta<template v-if="identidade?.codigo">: <strong>{{ identidade.codigo }}</strong></template>.
-        O sistema libera para cada pessoa só o que é da empresa dela.
-      </p>
 
       <div class="emp-conta__scroll">
         <table class="emp-conta__grid">
@@ -219,7 +214,6 @@ function abrirArquivos(empresa: IEmpresaConta) {
           <h3 id="emp-conta-modal-title" class="emp-conta-modal__title">
             {{ editando ? 'Editar empresa' : 'Nova empresa' }}
           </h3>
-          <p class="emp-conta-modal__sub">As pessoas dessa empresa entram com o ID da sua conta.</p>
 
           <label class="emp-conta-modal__label" for="emp-conta-nome">NOME DA EMPRESA</label>
           <input
@@ -319,7 +313,7 @@ function abrirArquivos(empresa: IEmpresaConta) {
     display: flex;
     align-items: center;
     gap: 15px;
-    padding: 30px 38px 12px;
+    padding: 30px 38px 18px;
   }
 
   &__search {
@@ -388,17 +382,6 @@ function abrirArquivos(empresa: IEmpresaConta) {
     }
   }
 
-  &__dica {
-    margin: 0;
-    padding: 0 38px 18px;
-    color: rgba(255, 252, 255, 0.6);
-    font-size: 13px;
-    line-height: 1.4;
-
-    strong {
-      color: #d9b77e;
-    }
-  }
 
   &__scroll {
     overflow-x: auto;
@@ -540,10 +523,6 @@ function abrirArquivos(empresa: IEmpresaConta) {
     padding: 24px 16px 12px;
   }
 
-  .emp-conta__dica {
-    padding: 0 16px 14px;
-  }
-
   .emp-conta__cta {
     height: 44px;
     padding: 0 14px;
@@ -581,13 +560,9 @@ function abrirArquivos(empresa: IEmpresaConta) {
     color: #fffcff;
     font-size: 18px;
     font-weight: 700;
+    margin-bottom: 8px;
   }
 
-  &__sub {
-    margin: 4px 0 18px;
-    color: rgba(255, 252, 255, 0.6);
-    font-size: 12px;
-  }
 
   &__label {
     display: block;
