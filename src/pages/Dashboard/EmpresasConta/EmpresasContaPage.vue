@@ -26,7 +26,7 @@ import iconFiles from '@/assets/imgs/dashboard/icon-menu-files.svg'
 
 const router = useRouter()
 const toast = useToast()
-const { carregar: recarregarIdentidade } = useEmpresaIdentidade()
+const { identidade, carregar: recarregarIdentidade } = useEmpresaIdentidade()
 const { open: confirmOpen, options: confirmOptions, askConfirm, onConfirm, onCancel } = useNightConfirm()
 
 const empresas = ref<IEmpresaConta[]>([])
@@ -55,16 +55,6 @@ function iniciais(nome: string) {
 
 function logo(e: IEmpresaConta) {
   return urlLogoEmpresa({ id: e.id, logo_versao: e.logo_versao ? String(e.logo_versao) : null })
-}
-
-async function copiarCodigo(codigo: string | null) {
-  if (!codigo) return
-  try {
-    await navigator.clipboard.writeText(codigo)
-    toast.success('ID da empresa copiado')
-  } catch {
-    toast.error('Não foi possível copiar o ID')
-  }
 }
 
 const modalAberto = ref(false)
@@ -152,7 +142,7 @@ function abrirArquivos(empresa: IEmpresaConta) {
           <button type="submit" class="emp-conta__search-btn" aria-label="Pesquisar">
             <img :src="iconSearch" width="18" height="18" alt="" />
           </button>
-          <input v-model="search" type="text" placeholder="Pesquisar por nome, ID ou CNPJ…" @input="debouncedSearch.schedule()" />
+          <input v-model="search" type="text" placeholder="Pesquisar por nome ou CNPJ…" @input="debouncedSearch.schedule()" />
         </label>
 
         <button type="button" class="emp-conta__cta" @click="abrirModal()">
@@ -162,8 +152,9 @@ function abrirArquivos(empresa: IEmpresaConta) {
       </form>
 
       <p class="emp-conta__dica">
-        Cada empresa tem seus próprios setores, funções, funcionários e arquivos. O funcionário entra pelo portal do
-        cliente usando o <strong>ID</strong> da empresa.
+        Cada empresa tem seus próprios setores, funções, funcionários e arquivos. Todos entram pelo portal do cliente
+        com o ID da sua conta<template v-if="identidade?.codigo">: <strong>{{ identidade.codigo }}</strong></template>.
+        O sistema libera para cada pessoa só o que é da empresa dela.
       </p>
 
       <div class="emp-conta__scroll">
@@ -171,7 +162,6 @@ function abrirArquivos(empresa: IEmpresaConta) {
           <thead>
             <tr>
               <th>Empresa</th>
-              <th>ID</th>
               <th>CNPJ</th>
               <th>Ações</th>
             </tr>
@@ -187,11 +177,6 @@ function abrirArquivos(empresa: IEmpresaConta) {
                   <span class="emp-conta__nome" :title="empresa.nome">{{ empresa.nome }}</span>
                   <span v-if="empresa.principal" class="emp-conta__tag">PRINCIPAL</span>
                 </div>
-              </td>
-              <td>
-                <button type="button" class="emp-conta__codigo" title="Copiar ID" @click="copiarCodigo(empresa.codigo)">
-                  {{ empresa.codigo || '—' }}
-                </button>
               </td>
               <td>{{ empresa.cnpj ? formatCnpjCpf(empresa.cnpj) : 'n/a' }}</td>
               <td>
@@ -234,7 +219,7 @@ function abrirArquivos(empresa: IEmpresaConta) {
           <h3 id="emp-conta-modal-title" class="emp-conta-modal__title">
             {{ editando ? 'Editar empresa' : 'Nova empresa' }}
           </h3>
-          <p class="emp-conta-modal__sub">O ID de acesso é gerado automaticamente.</p>
+          <p class="emp-conta-modal__sub">As pessoas dessa empresa entram com o ID da sua conta.</p>
 
           <label class="emp-conta-modal__label" for="emp-conta-nome">NOME DA EMPRESA</label>
           <input
@@ -423,7 +408,7 @@ function abrirArquivos(empresa: IEmpresaConta) {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
-    min-width: 760px;
+    min-width: 620px;
 
     th {
       padding: 20px 16px 16px;
@@ -449,14 +434,10 @@ function abrirArquivos(empresa: IEmpresaConta) {
     }
 
     th:nth-child(2) {
-      width: 110px;
-    }
-
-    th:nth-child(3) {
       width: 190px;
     }
 
-    td:nth-child(3) {
+    td:nth-child(2) {
       white-space: nowrap;
     }
 
@@ -521,20 +502,6 @@ function abrirArquivos(empresa: IEmpresaConta) {
     letter-spacing: 0.04em;
   }
 
-  &__codigo {
-    padding: 0;
-    border: 0;
-    background: none;
-    color: #f7f7f7;
-    font: inherit;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    cursor: copy;
-
-    &:hover {
-      color: #d9b77e;
-    }
-  }
 
   &__actions {
     display: flex;
