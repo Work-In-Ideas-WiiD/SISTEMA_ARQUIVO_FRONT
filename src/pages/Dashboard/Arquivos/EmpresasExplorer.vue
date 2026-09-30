@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LixeiraBotao from '@/components/LixeiraBotao/LixeiraBotao.vue'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
@@ -80,6 +81,7 @@ onMounted(loadEmpresas)
   <section class="empresas-explorer">
     <div class="empresas-explorer__heading">
       <h2 class="empresas-explorer__title dashboard_title">EMPRESAS</h2>
+      <LixeiraBotao />
     </div>
 
     <div class="empresas-explorer__panel">
@@ -128,6 +130,9 @@ onMounted(loadEmpresas)
 }
 
 .empresas-explorer__heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 18px;
   flex-shrink: 0;
 }

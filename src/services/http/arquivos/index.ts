@@ -200,6 +200,11 @@ export async function deleteArquivo(id: string): Promise<AxiosResponse<any>> {
   return res
 }
 
+/** Envia os arquivos para a lixeira. */
+export async function excluirArquivos(ids: string[]): Promise<AxiosResponse<{ excluidos: number }>> {
+  return api.post('/arquivos/excluir', { arquivos: ids })
+}
+
 export interface ICompartilhamentoRes {
   id: string
   email: string

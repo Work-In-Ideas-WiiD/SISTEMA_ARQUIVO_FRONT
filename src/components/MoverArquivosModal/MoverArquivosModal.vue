@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useToast } from 'vue-toastification'
-import { getPastas } from '@/services/http/pastas'
+import { getPastas, moverPasta } from '@/services/http/pastas'
 import { getAllSetores, type ISetor } from '@/services/http/setores'
 import { getAllFuncoes, type IFuncao } from '@/services/http/funcoes'
 import { getAllAgrupamentos } from '@/services/http/agrupamentos'
@@ -34,6 +34,8 @@ const props = defineProps<{
   empresaId: string
   empresaNome: string
   arquivoIds: string[]
+  /** Quando informado, move esta pasta (com o que tem dentro) em vez de arquivos. */
+  pasta?: { id: string; nome: string } | null
 }>()
 
 const emit = defineEmits<{
@@ -74,9 +76,10 @@ async function pastaNodes(parent: DestNode, parentPastaId: string | null): Promi
     props.empresaId,
     parentPastaId,
     1,
-    parent.ctx.agrupamento_id || null
+    parent.ctx.agrupamento_id || null,
+    { setor_id: parent.ctx.setor_id, funcao_id: parent.ctx.funcao_id }
   )
-  return (data.data || []).map((p) =>
+  return (data.data || []).filter((p) => p.id !== props.pasta?.id).map((p) =>
     node(
       `${parent.key}|p:${p.id}`,
       'pasta',
@@ -182,6 +185,13 @@ async function confirmar() {
   if (!alvo?.destino) return
   saving.value = true
   try {
+    if (props.pasta) {
+      await moverPasta(props.pasta.id, alvo.destino)
+      toast.success(`Pasta movida para ${alvo.label}`)
+      emit('moved', alvo.destino)
+      emit('close')
+      return
+    }
     const { data } = await moverArquivos(props.arquivoIds, props.empresaId, alvo.destino)
     toast.success(
       data.movidos === 1 ? `Arquivo movido para ${alvo.label}` : `${data.movidos} arquivos movidos para ${alvo.label}`
@@ -189,7 +199,7 @@ async function confirmar() {
     emit('moved', alvo.destino)
     emit('close')
   } catch (error) {
-    toast.error(getApiErrorMessage(error, 'Erro ao mover arquivos'))
+    toast.error(getApiErrorMessage(error, props.pasta ? 'Erro ao mover a pasta' : 'Erro ao mover arquivos'))
   } finally {
     saving.value = false
   }
@@ -216,7 +226,10 @@ watch(
     <div v-if="open" class="night-confirm" @click.self="emit('close')">
       <div class="night-confirm__modal mover-modal" role="dialog" aria-modal="true">
         <h3 class="night-confirm__title">
-          Mover {{ arquivoIds.length === 1 ? 'arquivo' : `${arquivoIds.length} arquivos` }}
+          <template v-if="pasta">Mover pasta “{{ pasta.nome }}”</template>
+          <template v-else>
+            Mover {{ arquivoIds.length === 1 ? 'arquivo' : `${arquivoIds.length} arquivos` }}
+          </template>
         </h3>
         <p class="mover-modal__sub">Escolha a pasta ou o nível de destino</p>
 

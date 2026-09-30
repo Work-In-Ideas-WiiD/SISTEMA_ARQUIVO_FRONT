@@ -1,6 +1,7 @@
 import { computed, ref, type Ref } from 'vue'
 import { useToast } from 'vue-toastification'
 import {
+  excluirArquivos,
   moverArquivos,
   type IDestinoArquivo,
   type IGetArquivosDataRes
@@ -15,8 +16,10 @@ import iconPermissoes from '@/assets/imgs/arquivos/menu-permissoes.svg'
 import iconCompartilhar from '@/assets/imgs/arquivos/share.svg'
 import iconLog from '@/assets/imgs/arquivos/menu-log.svg'
 import iconCategoriaData from '@/assets/imgs/arquivos/menu-categoria-data.svg'
+import iconExcluir from '@/assets/imgs/arquivos/menu-excluir.svg'
+import type { NightConfirmOptions } from '@/composables/useNightConfirm'
 
-type MenuKey = 'abrir' | 'mover' | 'permissoes' | 'compartilhar' | 'log' | 'categoriaData'
+type MenuKey = 'abrir' | 'mover' | 'permissoes' | 'compartilhar' | 'log' | 'categoriaData' | 'excluir'
 
 /**
  * Interações dos tiles de arquivo no explorer: seleção (clique, Shift/Ctrl, setas),
@@ -27,6 +30,8 @@ export function useArquivoInteractions(opts: {
   empresaId: Ref<string>
   abrir: (arquivo: IGetArquivosDataRes) => void
   recarregar: () => Promise<void> | void
+  /** Com confirmação disponível, o menu ganha "Excluir" (envia para a lixeira). */
+  confirmar?: (options: NightConfirmOptions) => Promise<boolean>
 }) {
   const toast = useToast()
   const selection = useFileSelection(opts.arquivos)
@@ -55,6 +60,7 @@ export function useArquivoInteractions(opts: {
       })
       itens.push({ key: 'log', label: 'Log de acessos', icon: iconLog })
     }
+    if (opts.confirmar) itens.push({ key: 'excluir', label: 'Excluir', icon: iconExcluir })
     return itens
   })
 
@@ -72,6 +78,28 @@ export function useArquivoInteractions(opts: {
       await opts.recarregar()
     } catch (error) {
       toast.error(getApiErrorMessage(error, 'Erro ao mover arquivos'))
+    }
+  }
+
+  async function excluir(arquivos: IGetArquivosDataRes[]) {
+    if (!opts.confirmar) return
+    const unico = arquivos.length === 1
+    const ok = await opts.confirmar({
+      title: unico ? 'Excluir arquivo' : `Excluir ${arquivos.length} arquivos`,
+      body: unico
+        ? `"${arquivos[0].descricao}" vai para a lixeira. Você pode restaurá-lo depois.`
+        : 'Os arquivos selecionados vão para a lixeira. Você pode restaurá-los depois.',
+      confirmLabel: 'EXCLUIR',
+      danger: true
+    })
+    if (!ok) return
+    try {
+      await excluirArquivos(arquivos.map((a) => a.id))
+      toast.success(unico ? 'Arquivo enviado para a lixeira' : 'Arquivos enviados para a lixeira')
+      selection.clear()
+      await opts.recarregar()
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, 'Erro ao excluir'))
     }
   }
 
@@ -140,6 +168,9 @@ export function useArquivoInteractions(opts: {
         break
       case 'categoriaData':
         categoriaDataOpen.value = true
+        break
+      case 'excluir':
+        void excluir(alvo.value)
         break
     }
   }

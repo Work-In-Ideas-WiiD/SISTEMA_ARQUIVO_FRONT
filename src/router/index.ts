@@ -218,8 +218,18 @@ const routes: RouteRecordRaw[] = [
             path: 'novo',
             name: 'arquivos-novo',
             component: () => import('@/pages/Dashboard/Arquivos/NovoArquivo.vue')
+          },
+          {
+            path: 'lixeira',
+            name: 'arquivos-lixeira',
+            component: () => import('@/pages/Dashboard/Arquivos/LixeiraPage.vue')
           }
         ]
+      },
+      {
+        path: 'relatorios/logs-arquivo',
+        name: 'relatorios-logs-arquivo',
+        component: () => import('@/pages/Dashboard/Relatorios/LogsArquivoPage.vue')
       },
       {
         path: 'assinaturas',

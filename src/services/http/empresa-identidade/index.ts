@@ -7,6 +7,8 @@ export interface IEmpresaIdentidade {
   nome: string
   logo_versao: string | null
   pode_editar: boolean
+  /** Espaço ocupado no plano (só para os gestores da conta). */
+  armazenamento?: { usado_bytes: number; limite_bytes: number | null } | null
 }
 
 export const NOME_EMPRESA_MAX = 40

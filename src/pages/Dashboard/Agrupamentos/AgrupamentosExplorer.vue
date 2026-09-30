@@ -13,7 +13,7 @@ import {
 } from '@/services/http/agrupamentos'
 import { getAllFuncionarios, type IFuncionario } from '@/services/http/funcionarios'
 import { getAllEmpresas } from '@/services/http/empresas'
-import { getPastas, postPasta, type IPasta } from '@/services/http/pastas'
+import { deletePasta, getPastas, postPasta, type IPasta } from '@/services/http/pastas'
 import {
   getArquivos,
   postArquivoOuSubstituir,
@@ -41,6 +41,14 @@ import CompartilharMultiplosModal from '@/components/CompartilharMultiplosModal/
 import LogAcessosArquivoModal from '@/components/LogAcessosArquivoModal/LogAcessosArquivoModal.vue'
 import EditarCategoriaDataModal from '@/components/EditarCategoriaDataModal/EditarCategoriaDataModal.vue'
 import { useArquivoInteractions } from '@/composables/useArquivoInteractions'
+import { useEmpresaIdentidade } from '@/composables/useEmpresaIdentidade'
+import PermissoesPastaModal from '@/components/PermissoesPastaModal/PermissoesPastaModal.vue'
+import LixeiraBotao from '@/components/LixeiraBotao/LixeiraBotao.vue'
+import type { ContextMenuItem } from '@/components/ArquivoContextMenu/types'
+import iconMenuAbrir from '@/assets/imgs/arquivos/menu-abrir.svg'
+import iconMenuMover from '@/assets/imgs/arquivos/menu-mover.svg'
+import iconMenuPermissoes from '@/assets/imgs/arquivos/menu-permissoes.svg'
+import iconMenuExcluir from '@/assets/imgs/arquivos/menu-excluir.svg'
 import {
   MESES,
   yearOptions,
@@ -63,6 +71,7 @@ type FilterKey = 'empresa' | 'categoria' | 'mes' | 'ano' | 'grupoEmpresa'
 
 const router = useRouter()
 const toast = useToast()
+const { carregar: recarregarIdentidade } = useEmpresaIdentidade()
 const authStore = useAuthStore()
 const isAdmin = computed(() => authStore.userRole === 'administrador')
 const {
@@ -270,6 +279,16 @@ function resetConteudo() {
   filterCategoriaId.value = ''
   filterMes.value = ''
   filterAno.value = ''
+}
+
+/** Tira os filtros para o arquivo recém-enviado aparecer; devolve se havia algum ativo. */
+function limparFiltros(): boolean {
+  const tinha = Boolean(filterCategoriaId.value || filterMes.value || filterAno.value)
+  filterCategoriaId.value = ''
+  filterMes.value = ''
+  filterAno.value = ''
+  selectOpen.value = null
+  return tinha
 }
 
 function clearSelection() {
@@ -492,7 +511,8 @@ async function saveUpload(payload: ArquivoUploadPayload) {
     if (!res) return
     toast.success(res.substituido ? 'Arquivo substituído' : 'Arquivo enviado')
     closeUpload()
-    await loadArquivos()
+    if (!limparFiltros()) await loadArquivos()
+    void recarregarIdentidade(true)
   } catch (error) {
     toast.error(getApiErrorMessage(error, 'Erro ao enviar arquivo'))
   } finally {
@@ -551,8 +571,69 @@ const {
   arquivos,
   empresaId: empresaIdAtual,
   abrir: openArquivo,
-  recarregar: loadArquivos
+  recarregar: loadArquivos,
+  confirmar: askConfirm
 })
+
+const pastaMenu = ref({ open: false, x: 0, y: 0 })
+const pastaAlvo = ref<IPasta | null>(null)
+const pastaMoverOpen = ref(false)
+const pastaPermissoesOpen = ref(false)
+
+const pastaMenuItems: ContextMenuItem[] = [
+  { key: 'abrir', label: 'Abrir', icon: iconMenuAbrir },
+  { key: 'mover', label: 'Mover', icon: iconMenuMover },
+  { key: 'permissoes', label: 'Editar permissões', icon: iconMenuPermissoes },
+  { key: 'excluir', label: 'Excluir', icon: iconMenuExcluir }
+]
+
+function abrirMenuPasta(pasta: IPasta, event: MouseEvent) {
+  closeMenu()
+  pastaAlvo.value = pasta
+  let { clientX: x, clientY: y } = event
+  if (!x && !y) {
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+    x = rect.left
+    y = rect.bottom
+  }
+  pastaMenu.value = { open: true, x, y }
+}
+
+function fecharMenuPasta() {
+  pastaMenu.value = { ...pastaMenu.value, open: false }
+}
+
+async function excluirPasta(pasta: IPasta) {
+  const ok = await askConfirm({
+    title: 'Excluir pasta',
+    body: `"${pasta.nome}" e tudo o que estiver dentro dela vão para a lixeira. Você pode restaurar depois.`,
+    confirmLabel: 'EXCLUIR',
+    danger: true
+  })
+  if (!ok) return
+  try {
+    await deletePasta(pasta.id)
+    toast.success('Pasta enviada para a lixeira')
+    await Promise.all([loadPastas(), loadArquivos()])
+  } catch (error) {
+    toast.error(getApiErrorMessage(error, 'Erro ao excluir a pasta'))
+  }
+}
+
+function onPastaMenuSelect(key: string) {
+  fecharMenuPasta()
+  const pasta = pastaAlvo.value
+  if (!pasta) return
+  if (key === 'abrir') void enterPasta(pasta)
+  else if (key === 'mover') pastaMoverOpen.value = true
+  else if (key === 'permissoes') pastaPermissoesOpen.value = true
+  else if (key === 'excluir') void excluirPasta(pasta)
+}
+
+async function onPastaMovida() {
+  pastaMoverOpen.value = false
+  await Promise.all([loadPastas(), loadArquivos()])
+}
 
 function destinoGrupo(grupoId: string, pastaId?: string): IDestinoArquivo {
   return { agrupamento_id: grupoId, ...(pastaId ? { pasta_id: pastaId } : {}) }
@@ -616,6 +697,7 @@ onUnmounted(() => {
           </button>
         </template>
       </nav>
+      <LixeiraBotao :empresa-id="selected?.empresa_id || null" />
     </div>
 
     <div class="agrup-explorer__body" :class="{ 'has-selection': !!selected }">
@@ -904,8 +986,14 @@ onUnmounted(() => {
                 <button
                   type="button"
                   class="agrup-explorer__tile"
-                  :class="{ 'is-drop-target': hoverKey === 'p:' + pasta.id }"
-                  @click.stop="enterPasta(pasta)"
+                  :class="{
+                    'is-drop-target': hoverKey === 'p:' + pasta.id,
+                    'is-selected': pastaMenu.open && pastaAlvo?.id === pasta.id
+                  }"
+                  :title="pasta.nome"
+                  aria-haspopup="menu"
+                  @click.stop="abrirMenuPasta(pasta, $event)"
+                  @dblclick.stop="fecharMenuPasta(); enterPasta(pasta)"
                   @dragover="dragOver($event, 'p:' + pasta.id)"
                   @dragleave="dragLeave('p:' + pasta.id)"
                   @drop="selected && dragDrop($event, destinoGrupo(selected.id, pasta.id))"
@@ -1112,6 +1200,30 @@ onUnmounted(() => {
       :title="menuTitle"
       @select="onMenuSelect"
       @close="closeMenu"
+    />
+    <ArquivoContextMenu
+      :open="pastaMenu.open"
+      :x="pastaMenu.x"
+      :y="pastaMenu.y"
+      :items="pastaMenuItems"
+      :title="pastaAlvo?.nome"
+      @select="onPastaMenuSelect"
+      @close="fecharMenuPasta"
+    />
+    <MoverArquivosModal
+      v-if="selected"
+      :open="pastaMoverOpen && !!pastaAlvo"
+      :empresa-id="selected.empresa_id"
+      :empresa-nome="empresaNome"
+      :arquivo-ids="[]"
+      :pasta="pastaAlvo ? { id: pastaAlvo.id, nome: pastaAlvo.nome } : null"
+      @close="pastaMoverOpen = false"
+      @moved="onPastaMovida"
+    />
+    <PermissoesPastaModal
+      :open="pastaPermissoesOpen && !!pastaAlvo"
+      :pasta="pastaAlvo ? { id: pastaAlvo.id, nome: pastaAlvo.nome } : null"
+      @close="pastaPermissoesOpen = false"
     />
     <MoverArquivosModal
       v-if="selected"

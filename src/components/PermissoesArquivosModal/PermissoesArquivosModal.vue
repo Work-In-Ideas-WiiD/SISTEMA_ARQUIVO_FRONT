@@ -99,6 +99,7 @@ const vazio = (): Record<TipoPermissao, Record<string, Estado>> => ({
 })
 const estado = ref(vazio())
 let estadoInicial = vazio()
+const versaoInicial = ref('')
 
 const expanded = ref(new Set<string>())
 const busca = ref('')
@@ -229,8 +230,35 @@ const arvore = computed<Record<Secao, No[]>>(() => {
   }
 })
 
+/** Grupo marcado que já dá acesso à pessoa (setor, função ou agrupamento). */
+function viaPessoa(id: string): string | undefined {
+  const f = funcionarios.value.find((p) => p.id === id)
+  if (f) {
+    const setor = f.setores?.find((v) => estado.value.setores[v.id] === 'on')
+    if (setor) return setor.nome
+    const funcao = f.funcoes?.find((v) => estado.value.funcoes[v.id] === 'on')
+    if (funcao) return funcao.nome
+  }
+  const grupo = agrupamentos.value.find(
+    (g) =>
+      (estado.value.agrupamentos[g.id] === 'on' || estadoLocal(g.id) === 'on') &&
+      membrosAgrupamento.value[g.id]?.some((m) => m.id === id)
+  )
+  if (grupo) return grupo.nome
+  return aindaLivre.value ? 'toda a empresa' : undefined
+}
+
+/** Arquivo na raiz sem restrição vale para a empresa inteira até alguém mudar as marcações. */
+const aindaLivre = computed(
+  () =>
+    props.arquivos.length > 0 &&
+    props.arquivos.every(ehLivre) &&
+    JSON.stringify(estado.value) === versaoInicial.value
+)
+
 function marcado(no: No) {
   if (no.tipo === 'agrupamentos' && estadoLocal(no.id) !== 'off') return true
+  if (no.tipo === 'funcionarios' && viaPessoa(no.id)) return true
   return (estado.value[no.tipo][no.id] || 'off') !== 'off'
 }
 
@@ -286,6 +314,7 @@ function alternar(linha: Linha) {
   if (!linha.tipo || linha.via || linha.local === 'on') return
   const mapa = estado.value[linha.tipo]
   mapa[linha.id] = mapa[linha.id] === 'on' ? 'off' : 'on'
+  if (linha.tipo === 'agrupamentos' && mapa[linha.id] === 'on') void carregarMembros(linha.id)
 }
 
 function combina(nome: string) {
@@ -319,7 +348,7 @@ function montar(nos: No[], depth: number, via: string | undefined, out: Linha[])
       expandable: ehGrupo,
       expanded: aberto,
       loading: no.lazy && carregandoAgrupamento.value.has(no.id),
-      via: no.tipo === 'funcionarios' ? via : undefined,
+      via: no.tipo === 'funcionarios' ? via ?? viaPessoa(no.id) : undefined,
       local,
       marcadosDentro: ehGrupo && !aberto ? contarMarcados(filhos) : 0
     })
@@ -396,11 +425,11 @@ function estadoDe(linha: Linha): Estado {
   return atual
 }
 
-const totalMarcados = computed(() =>
-  TIPOS.reduce(
-    (acc, t) => acc + Object.values(estado.value[t]).filter((v) => v !== 'off').length,
-    0
-  )
+const pessoasComAcesso = computed(
+  () =>
+    funcionarios.value.filter(
+      (f) => estado.value.funcionarios[f.id] === 'on' || Boolean(viaPessoa(f.id))
+    ).length
 )
 
 function expandirCaminhos() {
@@ -446,7 +475,13 @@ async function carregar() {
     for (const tipo of TIPOS) novo[tipo] = calcularEstado(tipo, ids[tipo])
     estado.value = novo
     estadoInicial = JSON.parse(JSON.stringify(novo))
+    versaoInicial.value = JSON.stringify(novo)
     expandirCaminhos()
+    await Promise.all(
+      agrupamentos.value
+        .filter((g) => novo.agrupamentos[g.id] !== 'off' || estadoLocal(g.id) !== 'off')
+        .map((g) => carregarMembros(g.id))
+    )
   } catch (error) {
     toast.error(getApiErrorMessage(error, 'Erro ao carregar permissões'))
   } finally {
@@ -605,7 +640,8 @@ watch(
         </div>
 
         <p class="perm-modal__count">
-          {{ totalMarcados }} {{ totalMarcados === 1 ? 'item marcado' : 'itens marcados' }}
+          {{ pessoasComAcesso }}
+          {{ pessoasComAcesso === 1 ? 'pessoa com acesso' : 'pessoas com acesso' }}
         </p>
 
         <div class="night-confirm__actions">

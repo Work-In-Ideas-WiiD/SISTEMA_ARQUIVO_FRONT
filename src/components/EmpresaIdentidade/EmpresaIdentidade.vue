@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useEmpresaIdentidade } from '@/composables/useEmpresaIdentidade'
 import { NOME_EMPRESA_MAX, postEmpresaIdentidade } from '@/services/http/empresa-identidade'
 import { getApiErrorMessage } from '@/utils/apiError'
+import { formatBytes } from '@/utils/formatBytes'
 
 withDefaults(defineProps<{ compact?: boolean }>(), { compact: false })
 
@@ -18,6 +19,18 @@ watch(logoUrl, () => (logoFalhou.value = false))
 const iniciais = computed(() => {
   const partes = (identidade.value?.nome || '').trim().split(/\s+/).filter(Boolean)
   return ((partes[0]?.[0] || '') + (partes.length > 1 ? partes[partes.length - 1][0] : '')).toUpperCase() || '?'
+})
+
+const disco = computed(() => {
+  const a = identidade.value?.armazenamento
+  if (!a) return null
+  const limite = a.limite_bytes || 0
+  const pct = limite ? Math.min(100, (a.usado_bytes / limite) * 100) : 0
+  return {
+    texto: limite ? `${formatBytes(a.usado_bytes)} de ${formatBytes(limite)}` : `${formatBytes(a.usado_bytes)} usados`,
+    pct,
+    nivel: pct >= 90 ? 'critico' : pct >= 75 ? 'alerta' : 'ok'
+  }
 })
 
 const codigo = computed(() => identidade.value?.codigo || identidade.value?.id.slice(0, 6).toUpperCase() || '')
@@ -137,6 +150,24 @@ onBeforeUnmount(limparPreview)
       <button type="button" class="emp-id__codigo" title="Copiar ID da empresa" @click="copiarId">
         ID: <span>{{ codigo }}</span>
       </button>
+      <div
+        v-if="disco && !compact"
+        class="emp-id__disco"
+        :class="`is-${disco.nivel}`"
+        :title="`Espaço ocupado no plano: ${disco.texto}`"
+      >
+        <div
+          class="emp-id__disco-barra"
+          role="progressbar"
+          :aria-valuenow="Math.round(disco.pct)"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-label="Espaço ocupado no plano"
+        >
+          <span :style="{ width: `${Math.max(disco.pct, disco.pct > 0 ? 2 : 0)}%` }" />
+        </div>
+        <span class="emp-id__disco-texto">{{ disco.texto }}</span>
+      </div>
     </div>
 
     <button
@@ -310,6 +341,43 @@ onBeforeUnmount(limparPreview)
   text-align: right;
   color: rgba(255, 252, 255, 0.45);
   font-size: 11px;
+}
+
+.emp-id__disco {
+  margin-top: 7px;
+
+  &-barra {
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    overflow: hidden;
+
+    span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: #b08d57;
+      transition: width 0.3s ease;
+    }
+  }
+
+  &-texto {
+    display: block;
+    margin-top: 4px;
+    color: rgba(255, 252, 255, 0.6);
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &.is-alerta .emp-id__disco-barra span {
+    background: #e0a84f;
+  }
+
+  &.is-critico .emp-id__disco-barra span {
+    background: #e57373;
+  }
 }
 
 .emp-id__codigo {

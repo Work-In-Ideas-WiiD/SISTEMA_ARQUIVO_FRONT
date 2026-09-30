@@ -10,7 +10,7 @@ import {
   postFuncionario,
   type IFuncionario
 } from '@/services/http/funcionarios'
-import { getPastas, getPasta, postPasta, type IPasta } from '@/services/http/pastas'
+import { deletePasta, getPastas, getPasta, postPasta, type IPasta } from '@/services/http/pastas'
 import {
   getArquivos,
   postArquivoOuSubstituir,
@@ -39,6 +39,14 @@ import CompartilharArquivoModal from '@/components/CompartilharArquivoModal/Comp
 import CompartilharMultiplosModal from '@/components/CompartilharMultiplosModal/CompartilharMultiplosModal.vue'
 import LogAcessosArquivoModal from '@/components/LogAcessosArquivoModal/LogAcessosArquivoModal.vue'
 import EditarCategoriaDataModal from '@/components/EditarCategoriaDataModal/EditarCategoriaDataModal.vue'
+import PermissoesPastaModal from '@/components/PermissoesPastaModal/PermissoesPastaModal.vue'
+import LixeiraBotao from '@/components/LixeiraBotao/LixeiraBotao.vue'
+import type { ContextMenuItem } from '@/components/ArquivoContextMenu/types'
+import { useEmpresaIdentidade } from '@/composables/useEmpresaIdentidade'
+import iconMenuAbrir from '@/assets/imgs/arquivos/menu-abrir.svg'
+import iconMenuMover from '@/assets/imgs/arquivos/menu-mover.svg'
+import iconMenuPermissoes from '@/assets/imgs/arquivos/menu-permissoes.svg'
+import iconMenuExcluir from '@/assets/imgs/arquivos/menu-excluir.svg'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import iconChevronDown from '@/assets/imgs/administradores/icon-chevron-down.svg'
 import iconNewFolder from '@/assets/imgs/administradores/icon-new-folder.svg'
@@ -81,6 +89,7 @@ const route = useRoute()
 const router = useRouter()
 const toast = useToast()
 const authStore = useAuthStore()
+const { carregar: recarregarIdentidade } = useEmpresaIdentidade()
 const {
   open: confirmOpen,
   options: confirmOptions,
@@ -357,7 +366,13 @@ async function loadHierarchyItems() {
 
 async function loadPastas() {
   try {
-    const { data } = await getPastas(empresaId.value, pastaId.value)
+    const { data } = await getPastas(
+      empresaId.value,
+      pastaId.value,
+      1,
+      null,
+      pastaId.value ? {} : { setor_id: setorId.value, funcao_id: funcaoId.value }
+    )
     pastas.value = data.data || []
   } catch (error) {
     toast.error(getApiErrorMessage(error, 'Erro ao carregar pastas'))
@@ -628,7 +643,8 @@ async function savePasta() {
     await postPasta({
       nome: pastaNome.value.trim(),
       empresa_id: empresaId.value,
-      parent_id: pastaId.value
+      parent_id: pastaId.value,
+      ...(pastaId.value ? {} : { setor_id: setorId.value, funcao_id: funcaoId.value })
     })
     toast.success('Pasta criada')
     pastaModalOpen.value = false
@@ -646,6 +662,16 @@ function arquivoExtensao(arquivo: IGetArquivosDataRes): string {
   const partes = nome.split('.')
   if (partes.length < 2) return ''
   return partes[partes.length - 1].toUpperCase()
+}
+
+/** Tira os filtros para o arquivo recém-enviado aparecer; devolve se havia algum ativo. */
+function limparFiltros(): boolean {
+  const tinha = Boolean(filterCategoriaId.value || filterMes.value || filterAno.value)
+  filterCategoriaId.value = ''
+  filterMes.value = ''
+  filterAno.value = ''
+  filterSelectOpen.value = null
+  return tinha
 }
 
 async function saveUpload() {
@@ -688,7 +714,8 @@ async function saveUpload() {
     toast.success(res.substituido ? 'Arquivo substituído' : 'Arquivo enviado')
     uploadModalOpen.value = false
     uploadFile.value = null
-    await loadArquivos()
+    if (!limparFiltros()) await loadArquivos()
+    void recarregarIdentidade(true)
   } catch (error) {
     toast.error(getApiErrorMessage(error, 'Erro ao enviar arquivo'))
   } finally {
@@ -728,8 +755,70 @@ const {
   arquivos,
   empresaId,
   abrir: openArquivo,
-  recarregar: loadArquivos
+  recarregar: loadArquivos,
+  confirmar: askConfirm
 })
+
+const pastaMenu = ref({ open: false, x: 0, y: 0 })
+const pastaAlvo = ref<IPasta | null>(null)
+const pastaMoverOpen = ref(false)
+const pastaPermissoesOpen = ref(false)
+
+const pastaMenuItems: ContextMenuItem[] = [
+  { key: 'abrir', label: 'Abrir', icon: iconMenuAbrir },
+  { key: 'mover', label: 'Mover', icon: iconMenuMover },
+  { key: 'permissoes', label: 'Editar permissões', icon: iconMenuPermissoes },
+  { key: 'excluir', label: 'Excluir', icon: iconMenuExcluir }
+]
+
+function abrirMenuPasta(pasta: IPasta, event: MouseEvent) {
+  clearSelection()
+  closeMenu()
+  pastaAlvo.value = pasta
+  let { clientX: x, clientY: y } = event
+  if (!x && !y) {
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+    x = rect.left
+    y = rect.bottom
+  }
+  pastaMenu.value = { open: true, x, y }
+}
+
+function fecharMenuPasta() {
+  pastaMenu.value = { ...pastaMenu.value, open: false }
+}
+
+async function excluirPasta(pasta: IPasta) {
+  const ok = await askConfirm({
+    title: 'Excluir pasta',
+    body: `"${pasta.nome}" e tudo o que estiver dentro dela vão para a lixeira. Você pode restaurar depois.`,
+    confirmLabel: 'EXCLUIR',
+    danger: true
+  })
+  if (!ok) return
+  try {
+    await deletePasta(pasta.id)
+    toast.success('Pasta enviada para a lixeira')
+    await Promise.all([loadPastas(), loadArquivos()])
+  } catch (error) {
+    toast.error(getApiErrorMessage(error, 'Erro ao excluir a pasta'))
+  }
+}
+
+function onPastaMenuSelect(key: string) {
+  fecharMenuPasta()
+  const pasta = pastaAlvo.value
+  if (!pasta) return
+  if (key === 'abrir') enterPasta(pasta)
+  else if (key === 'mover') pastaMoverOpen.value = true
+  else if (key === 'permissoes') pastaPermissoesOpen.value = true
+  else if (key === 'excluir') void excluirPasta(pasta)
+}
+
+async function onPastaMovida() {
+  pastaMoverOpen.value = false
+  await Promise.all([loadPastas(), loadArquivos()])
+}
 
 const destinoAtual = computed<IDestinoArquivo>(() => ({
   setor_id: setorId.value || undefined,
@@ -845,6 +934,7 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
           </button>
         </template>
       </nav>
+      <LixeiraBotao :empresa-id="empresaId" />
     </div>
 
     <p v-if="loading" class="empresa-explorer__status">Carregando…</p>
@@ -1123,8 +1213,14 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
               <button
                 type="button"
                 class="empresa-explorer__tile"
-                :class="{ 'is-drop-target': hoverKey === 'p:' + pasta.id }"
-                @click.stop="enterPasta(pasta)"
+                :class="{
+                  'is-drop-target': hoverKey === 'p:' + pasta.id,
+                  'is-selected': pastaMenu.open && pastaAlvo?.id === pasta.id
+                }"
+                :title="pasta.nome"
+                aria-haspopup="menu"
+                @click.stop="abrirMenuPasta(pasta, $event)"
+                @dblclick.stop="fecharMenuPasta(); enterPasta(pasta)"
                 @dragover="dragOver($event, 'p:' + pasta.id)"
                 @dragleave="dragLeave('p:' + pasta.id)"
                 @drop="dragDrop($event, destinoPasta(pasta.id))"
@@ -1184,6 +1280,29 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
       :title="menuTitle"
       @select="onMenuSelect"
       @close="closeMenu"
+    />
+    <ArquivoContextMenu
+      :open="pastaMenu.open"
+      :x="pastaMenu.x"
+      :y="pastaMenu.y"
+      :items="pastaMenuItems"
+      :title="pastaAlvo?.nome"
+      @select="onPastaMenuSelect"
+      @close="fecharMenuPasta"
+    />
+    <MoverArquivosModal
+      :open="pastaMoverOpen && !!pastaAlvo"
+      :empresa-id="empresaId"
+      :empresa-nome="empresaNome"
+      :arquivo-ids="[]"
+      :pasta="pastaAlvo ? { id: pastaAlvo.id, nome: pastaAlvo.nome } : null"
+      @close="pastaMoverOpen = false"
+      @moved="onPastaMovida"
+    />
+    <PermissoesPastaModal
+      :open="pastaPermissoesOpen && !!pastaAlvo"
+      :pasta="pastaAlvo ? { id: pastaAlvo.id, nome: pastaAlvo.nome } : null"
+      @close="pastaPermissoesOpen = false"
     />
     <MoverArquivosModal
       :open="moverOpen"
