@@ -30,6 +30,7 @@ function abrir() {
     @click="abrir"
   >
     <img :src="iconLixeira" width="20" height="20" alt="" />
+    <span>Lixeira</span>
   </button>
 </template>
 
@@ -37,11 +38,16 @@ function abrir() {
 .lixeira-btn {
   flex-shrink: 0;
   margin-left: auto;
-  width: 40px;
   height: 40px;
-  padding: 0;
-  display: grid;
-  place-items: center;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #d9b77e;
+  font-family: var(--night-font, 'Inter', sans-serif);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
   border-radius: 12px;
   border: 1px solid rgba(176, 141, 87, 0.45);
   background: rgba(176, 141, 87, 0.1);

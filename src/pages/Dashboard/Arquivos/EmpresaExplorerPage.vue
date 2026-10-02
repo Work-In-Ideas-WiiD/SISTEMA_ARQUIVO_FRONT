@@ -145,8 +145,8 @@ const uploadNome = ref('')
 const uploadFile = ref<File | null>(null)
 const uploadFileInputRef = ref<HTMLInputElement | null>(null)
 const uploadCategoriaId = ref('')
-const uploadMes = ref<number>(new Date().getMonth() + 1)
-const uploadAno = ref<number>(new Date().getFullYear())
+const uploadMes = ref<number | null>(new Date().getMonth() + 1)
+const uploadAno = ref<number | null>(new Date().getFullYear())
 const uploadSelectOpen = ref<'categoria' | 'mes' | 'ano' | null>(null)
 const filterSelectOpen = ref<'categoria' | 'mes' | 'ano' | null>(null)
 const categorias = ref<ICategoriaArquivo[]>([])
@@ -170,7 +170,7 @@ const uploadCategoriaLabel = computed(() => {
 })
 
 const uploadMesLabel = computed(
-  () => MESES.find((m) => m.value === uploadMes.value)?.label || 'Mês'
+  () => MESES.find((m) => m.value === uploadMes.value)?.label || 'Sem mês'
 )
 
 const filterCategoriaLabel = computed(() => {
@@ -679,10 +679,6 @@ async function saveUpload() {
     toast.error('Selecione um arquivo')
     return
   }
-  if (!uploadMes.value || !uploadAno.value) {
-    toast.error('Selecione mês e ano')
-    return
-  }
 
   saving.value = true
   try {
@@ -694,8 +690,8 @@ async function saveUpload() {
     )
     formData.append('empresa_id', empresaId.value)
     if (uploadCategoriaId.value) formData.append('categoria_id', uploadCategoriaId.value)
-    formData.append('mes', String(uploadMes.value))
-    formData.append('ano', String(uploadAno.value))
+    if (uploadMes.value) formData.append('mes', String(uploadMes.value))
+    if (uploadAno.value) formData.append('ano', String(uploadAno.value))
     if (pastaId.value) formData.append('pasta_id', pastaId.value)
     if (setorId.value) formData.append('setores[]', setorId.value)
     if (funcaoId.value) formData.append('funcoes[]', funcaoId.value)
@@ -1220,6 +1216,7 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
                 :title="pasta.nome"
                 aria-haspopup="menu"
                 @click.stop="abrirMenuPasta(pasta, $event)"
+                @contextmenu.prevent.stop
                 @dblclick.stop="fecharMenuPasta(); enterPasta(pasta)"
                 @dragover="dragOver($event, 'p:' + pasta.id)"
                 @dragleave="dragLeave('p:' + pasta.id)"
@@ -1527,7 +1524,7 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
                 <button
                   type="button"
                   class="night-select__trigger"
-                  :class="{ 'is-open': uploadSelectOpen === 'mes' }"
+                  :class="{ 'is-placeholder': !uploadMes, 'is-open': uploadSelectOpen === 'mes' }"
                   @click="toggleUploadSelect('mes')"
                 >
                   <span>{{ uploadMesLabel }}</span>
@@ -1539,6 +1536,16 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
                     height="14"
                     alt=""
                   />
+                </button>
+                <button
+                  v-if="uploadMes"
+                  type="button"
+                  class="night-select__clear"
+                  title="Deixar sem mês"
+                  aria-label="Deixar sem mês"
+                  @click.stop="uploadMes = null; uploadSelectOpen = null"
+                >
+                  ×
                 </button>
                 <ul
                   v-if="uploadSelectOpen === 'mes'"
@@ -1569,10 +1576,10 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
                 <button
                   type="button"
                   class="night-select__trigger"
-                  :class="{ 'is-open': uploadSelectOpen === 'ano' }"
+                  :class="{ 'is-placeholder': !uploadAno, 'is-open': uploadSelectOpen === 'ano' }"
                   @click="toggleUploadSelect('ano')"
                 >
-                  <span>{{ uploadAno }}</span>
+                  <span>{{ uploadAno || 'Sem ano' }}</span>
                   <img
                     class="night-select__chevron"
                     :class="{ 'is-open': uploadSelectOpen === 'ano' }"
@@ -1581,6 +1588,16 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
                     height="14"
                     alt=""
                   />
+                </button>
+                <button
+                  v-if="uploadAno"
+                  type="button"
+                  class="night-select__clear"
+                  title="Deixar sem ano"
+                  aria-label="Deixar sem ano"
+                  @click.stop="uploadAno = null; uploadSelectOpen = null"
+                >
+                  ×
                 </button>
                 <ul
                   v-if="uploadSelectOpen === 'ano'"
@@ -2165,6 +2182,32 @@ watch([filterCategoriaId, filterMes, filterAno], () => {
 
   &.is-open {
     border-color: rgba(176, 141, 87, 0.55);
+  }
+}
+
+.night-select__clear {
+  position: absolute;
+  top: 50%;
+  right: 32px;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 252, 255, 0.75);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(176, 141, 87, 0.35);
+    color: #fffcff;
   }
 }
 

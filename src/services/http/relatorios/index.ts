@@ -36,7 +36,7 @@ export const ACOES_LOG_ARQUIVO: { value: string; label: string }[] = [
   { value: 'substituiu', label: 'Substituiu' },
   { value: 'moveu', label: 'Moveu' },
   { value: 'permissoes', label: 'Alterou permissões' },
-  { value: 'excluiu', label: 'Enviou para a lixeira' },
+  { value: 'excluiu', label: 'Excluiu' },
   { value: 'restaurou', label: 'Restaurou' },
   { value: 'excluiu_definitivo', label: 'Excluiu definitivamente' },
   { value: 'esvaziou_lixeira', label: 'Esvaziou a lixeira' }

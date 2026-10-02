@@ -2,8 +2,8 @@ export interface ArquivoUploadPayload {
   file: File
   nome: string
   categoria_id: string
-  mes: number
-  ano: number
+  mes: number | null
+  ano: number | null
 }
 
 export const MESES = [

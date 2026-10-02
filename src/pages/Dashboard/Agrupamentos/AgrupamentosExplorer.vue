@@ -501,8 +501,8 @@ async function saveUpload(payload: ArquivoUploadPayload) {
     formData.append('empresa_id', grupo.empresa_id)
     formData.append('agrupamento_id', grupo.id)
     if (payload.categoria_id) formData.append('categoria_id', payload.categoria_id)
-    formData.append('mes', String(payload.mes))
-    formData.append('ano', String(payload.ano))
+    if (payload.mes) formData.append('mes', String(payload.mes))
+    if (payload.ano) formData.append('ano', String(payload.ano))
     if (currentPastaId.value) formData.append('pasta_id', currentPastaId.value)
 
     const res = await postArquivoOuSubstituir(formData, (nome) =>
@@ -993,6 +993,7 @@ onUnmounted(() => {
                   :title="pasta.nome"
                   aria-haspopup="menu"
                   @click.stop="abrirMenuPasta(pasta, $event)"
+                  @contextmenu.prevent.stop
                   @dblclick.stop="fecharMenuPasta(); enterPasta(pasta)"
                   @dragover="dragOver($event, 'p:' + pasta.id)"
                   @dragleave="dragLeave('p:' + pasta.id)"

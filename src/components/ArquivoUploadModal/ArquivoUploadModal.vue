@@ -26,8 +26,8 @@ const nome = ref('')
 const file = ref<File | null>(null)
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const categoriaId = ref('')
-const mes = ref<number>(new Date().getMonth() + 1)
-const ano = ref<number>(new Date().getFullYear())
+const mes = ref<number | null>(new Date().getMonth() + 1)
+const ano = ref<number | null>(new Date().getFullYear())
 const selectOpen = ref<'categoria' | 'mes' | 'ano' | null>(null)
 const categorias = ref<ICategoriaArquivo[]>([])
 const anos = yearOptions()
@@ -35,7 +35,7 @@ const anos = yearOptions()
 const categoriaLabel = computed(
   () => categorias.value.find((c) => c.id === categoriaId.value)?.nome || 'Sem categoria'
 )
-const mesLabel = computed(() => MESES.find((m) => m.value === mes.value)?.label || 'Mês')
+const mesLabel = computed(() => MESES.find((m) => m.value === mes.value)?.label || 'Sem mês')
 
 async function loadCategorias() {
   if (!props.empresaId) return
@@ -82,8 +82,6 @@ function onModalClick(event: MouseEvent) {
 
 function submit() {
   if (!file.value) return emit('invalid', 'Selecione um arquivo')
-  if (!mes.value || !ano.value) return emit('invalid', 'Selecione mês e ano')
-
   emit('submit', {
     file: file.value,
     nome: (nome.value || file.value.name.replace(/\.[^.]+$/, '')).trim() || 'Arquivo',
@@ -156,7 +154,7 @@ onUnmounted(() => {
               <button
                 type="button"
                 class="night-select__trigger"
-                :class="{ 'is-open': selectOpen === 'mes' }"
+                :class="{ 'is-placeholder': !mes, 'is-open': selectOpen === 'mes' }"
                 @click="toggleSelect('mes')"
               >
                 <span>{{ mesLabel }}</span>
@@ -168,6 +166,16 @@ onUnmounted(() => {
                   height="14"
                   alt=""
                 />
+              </button>
+              <button
+                v-if="mes"
+                type="button"
+                class="night-select__clear"
+                title="Deixar sem mês"
+                aria-label="Deixar sem mês"
+                @click.stop="mes = null; selectOpen = null"
+              >
+                ×
               </button>
               <ul v-if="selectOpen === 'mes'" class="night-select__menu" role="listbox">
                 <li v-for="m in MESES" :key="m.value">
@@ -190,10 +198,10 @@ onUnmounted(() => {
               <button
                 type="button"
                 class="night-select__trigger"
-                :class="{ 'is-open': selectOpen === 'ano' }"
+                :class="{ 'is-placeholder': !ano, 'is-open': selectOpen === 'ano' }"
                 @click="toggleSelect('ano')"
               >
-                <span>{{ ano }}</span>
+                <span>{{ ano || 'Sem ano' }}</span>
                 <img
                   class="night-select__chevron"
                   :class="{ 'is-open': selectOpen === 'ano' }"
@@ -202,6 +210,16 @@ onUnmounted(() => {
                   height="14"
                   alt=""
                 />
+              </button>
+              <button
+                v-if="ano"
+                type="button"
+                class="night-select__clear"
+                title="Deixar sem ano"
+                aria-label="Deixar sem ano"
+                @click.stop="ano = null; selectOpen = null"
+              >
+                ×
               </button>
               <ul
                 v-if="selectOpen === 'ano'"
@@ -375,6 +393,32 @@ onUnmounted(() => {
 
   &.is-open {
     border-color: rgba(176, 141, 87, 0.55);
+  }
+}
+
+.night-select__clear {
+  position: absolute;
+  top: 50%;
+  right: 32px;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 252, 255, 0.75);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(176, 141, 87, 0.35);
+    color: #fffcff;
   }
 }
 
