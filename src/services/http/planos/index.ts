@@ -25,6 +25,14 @@ export interface IPlanoPublico {
   valor_mensal_no_anual_centavos?: number
   /** Valor cobrado de uma vez na assinatura anual. */
   valor_anual_centavos?: number
+  /** Percentual de desconto do anual. */
+  desconto_anual?: number
+}
+
+export const DESCONTO_ANUAL_PADRAO = 20
+
+export function descontoAnualDosPlanos(planos: IPlanoPublico[]): number {
+  return planos.find((p) => typeof p.desconto_anual === 'number')?.desconto_anual ?? DESCONTO_ANUAL_PADRAO
 }
 
 export type TPeriodicidade = 'mensal' | 'anual'

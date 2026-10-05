@@ -7,7 +7,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import logoAkidocs from '@/assets/imgs/login/logo-akidocs-white.png'
 import iconBackCircle from '@/assets/imgs/login/icon-back-circle.svg'
 import iconChevronLeft from '@/assets/imgs/login/icon-chevron-left.svg'
-import { getPlanosPublicos, type IPlanoPublico, type TPeriodicidade } from '@/services/http/planos'
+import { getPlanosPublicos, descontoAnualDosPlanos, type IPlanoPublico, type TPeriodicidade } from '@/services/http/planos'
 import { getChavePublica, postContratacao } from '@/services/http/conta'
 import { getApiErrorMessage } from '@/utils/apiError'
 import { maskPhone, stripDigits } from '@/utils/formatPhone'
@@ -20,6 +20,7 @@ const toast = useToast()
 const authStore = useAuthStore()
 
 const planos = ref<IPlanoPublico[]>([])
+const descontoAnual = computed(() => descontoAnualDosPlanos(planos.value))
 const fetching = ref(true)
 const sucesso = ref(false)
 const processando = ref(false)
@@ -374,7 +375,7 @@ async function pagar() {
           :aria-pressed="periodicidade === 'anual'"
           @click="periodicidade = 'anual'"
         >
-          Anual <small>20% OFF</small>
+          Anual <small v-if="descontoAnual > 0">{{ descontoAnual }}% OFF</small>
         </button>
       </div>
 

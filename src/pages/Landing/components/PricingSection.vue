@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getPlanosPublicos, type IPlanoPublico } from '@/services/http/planos'
+import { getPlanosPublicos, descontoAnualDosPlanos, type IPlanoPublico } from '@/services/http/planos'
 import {
   saveSelectedPlan,
   trackPlanSelection,
@@ -15,6 +15,7 @@ const router = useRouter()
 const billingCycle = ref<'mensal' | 'anual'>('anual')
 const loading = ref(true)
 const apiPlanos = ref<IPlanoPublico[]>([])
+const descontoAnual = computed(() => descontoAnualDosPlanos(apiPlanos.value))
 
 // Fallback plans if API endpoint is empty or offline
 const fallbackPlanos: IPlanoPublico[] = [
@@ -72,7 +73,7 @@ function formatBRL(centavos: number): string {
 
 function getCalculatedPrice(plano: IPlanoPublico): number {
   if (billingCycle.value === 'anual') {
-    return plano.valor_mensal_no_anual_centavos ?? Math.round(plano.valor_mensal_centavos * 0.8)
+    return plano.valor_mensal_no_anual_centavos ?? Math.round(plano.valor_mensal_centavos * (100 - descontoAnual.value) / 100)
   }
   return plano.valor_mensal_centavos
 }
@@ -184,7 +185,7 @@ function onWhatsAppContactClick() {
             @click="billingCycle = 'anual'"
           >
             <span>Faturamento Anual</span>
-            <span class="discount_badge">20% OFF</span>
+            <span v-if="descontoAnual > 0" class="discount_badge">{{ descontoAnual }}% OFF</span>
           </button>
         </div>
       </div>
@@ -214,7 +215,7 @@ function onWhatsAppContactClick() {
           </div>
 
           <p v-if="billingCycle === 'anual'" class="annual_note">
-            {{ formatBRL(getCalculatedPrice(plano) * 12) }} cobrado por ano (economia de 20%)
+            {{ formatBRL(getCalculatedPrice(plano) * 12) }} cobrado por ano<template v-if="descontoAnual > 0"> (economia de {{ descontoAnual }}%)</template>
           </p>
           <p v-else class="annual_note">
             Cobrança mensal sem fidelidade
