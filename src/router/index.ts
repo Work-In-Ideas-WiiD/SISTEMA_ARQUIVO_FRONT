@@ -101,12 +101,12 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         name: 'dashboard-home',
-        component: () => import('@/pages/Dashboard/Home/HomePage.vue')
+        redirect: '/dashboard/arquivos'
       },
       {
         path: 'home',
         name: 'home',
-        component: () => import('@/pages/Dashboard/Home/HomePage.vue')
+        redirect: '/dashboard/arquivos'
       },
       {
         path: 'empresas',
@@ -129,6 +129,11 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/pages/Dashboard/Empresas/EditEmpresa.vue')
           }
         ]
+      },
+      {
+        path: 'minhas-empresas',
+        name: 'minhas-empresas',
+        component: () => import('@/pages/Dashboard/EmpresasConta/EmpresasContaPage.vue')
       },
       {
         path: 'admins',
@@ -177,14 +182,54 @@ const routes: RouteRecordRaw[] = [
           {
             path: '',
             name: 'arquivos-table',
-            component: () => import('@/pages/Dashboard/Arquivos/ArquivosTable.vue')
+            component: () => import('@/pages/Dashboard/Arquivos/ArquivosHome.vue')
+          },
+          {
+            path: 'empresa/:empresaId',
+            name: 'arquivos-empresa',
+            component: () => import('@/pages/Dashboard/Arquivos/EmpresaExplorerPage.vue')
+          },
+          {
+            path: 'empresa/:empresaId/pasta/:pastaId',
+            name: 'arquivos-empresa-pasta',
+            component: () => import('@/pages/Dashboard/Arquivos/EmpresaExplorerPage.vue')
+          },
+          {
+            path: 'empresa/:empresaId/setor/:setorId',
+            name: 'arquivos-empresa-setor',
+            component: () => import('@/pages/Dashboard/Arquivos/EmpresaExplorerPage.vue')
+          },
+          {
+            path: 'empresa/:empresaId/setor/:setorId/pasta/:pastaId',
+            name: 'arquivos-empresa-setor-pasta',
+            component: () => import('@/pages/Dashboard/Arquivos/EmpresaExplorerPage.vue')
+          },
+          {
+            path: 'empresa/:empresaId/setor/:setorId/funcao/:funcaoId',
+            name: 'arquivos-empresa-funcao',
+            component: () => import('@/pages/Dashboard/Arquivos/EmpresaExplorerPage.vue')
+          },
+          {
+            path: 'empresa/:empresaId/setor/:setorId/funcao/:funcaoId/pasta/:pastaId',
+            name: 'arquivos-empresa-funcao-pasta',
+            component: () => import('@/pages/Dashboard/Arquivos/EmpresaExplorerPage.vue')
           },
           {
             path: 'novo',
             name: 'arquivos-novo',
             component: () => import('@/pages/Dashboard/Arquivos/NovoArquivo.vue')
+          },
+          {
+            path: 'lixeira',
+            name: 'arquivos-lixeira',
+            component: () => import('@/pages/Dashboard/Arquivos/LixeiraPage.vue')
           }
         ]
+      },
+      {
+        path: 'relatorios/logs-arquivo',
+        name: 'relatorios-logs-arquivo',
+        component: () => import('@/pages/Dashboard/Relatorios/LogsArquivoPage.vue')
       },
       {
         path: 'assinaturas',
@@ -297,7 +342,7 @@ const routes: RouteRecordRaw[] = [
           {
             path: '',
             name: 'agrupamentos-table',
-            component: () => import('@/pages/Dashboard/Agrupamentos/AgrupamentosTable.vue')
+            component: () => import('@/pages/Dashboard/Agrupamentos/AgrupamentosExplorer.vue')
           },
           {
             path: 'novo',
@@ -308,6 +353,19 @@ const routes: RouteRecordRaw[] = [
             path: 'editar/:id',
             name: 'agrupamentos-editar',
             component: () => import('@/pages/Dashboard/Agrupamentos/EditAgrupamento.vue')
+          }
+        ]
+      },
+      {
+        path: 'categorias-arquivo',
+        name: 'categorias-arquivo',
+        component: () => import('@/pages/Dashboard/CategoriasArquivo/CategoriasArquivoPage.vue'),
+        children: [
+          {
+            path: '',
+            name: 'categorias-arquivo-table',
+            component: () =>
+              import('@/pages/Dashboard/CategoriasArquivo/CategoriasArquivoTable.vue')
           }
         ]
       },

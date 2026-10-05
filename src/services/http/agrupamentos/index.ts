@@ -9,6 +9,7 @@ export interface IAgrupamento {
   descricao?: string
   tipo: 'individual' | 'setor'
   empresa_id: string
+  empresa?: { id: string; nome?: string; nome_empresa?: string } | null
   funcionarios?: IFuncionario[]
   setores?: ISetor[]
   funcionarios_count?: number

@@ -6,7 +6,7 @@ import { RouterLink } from 'vue-router'
   <main class="error-page dashboard_padding">
     <h2 class="dashboard_title">Erro</h2>
     <p>Ocorreu um erro inesperado.</p>
-    <RouterLink to="/dashboard/home" class="back-link">
+    <RouterLink to="/dashboard/arquivos" class="back-link">
       Voltar para a Home
     </RouterLink>
   </main>

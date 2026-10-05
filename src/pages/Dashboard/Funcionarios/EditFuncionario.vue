@@ -9,10 +9,12 @@ import { getFuncionario, patchFuncionario, type IPostFuncionarioModel } from '@/
 import { getAllSetores, type ISetor } from '@/services/http/setores'
 import { getAllFuncoes, type IFuncao } from '@/services/http/funcoes'
 import { getAllEmpresas } from '@/services/http/empresas'
+import { getEmpresasConta, type IEmpresaConta } from '@/services/http/empresas-conta'
 import { isValidOptionalCpf, maskCpf } from '@/utils/formatCpfCnpj'
 import { maskPhone, stripDigits } from '@/utils/formatPhone'
 import NightDatePicker from '@/components/inputs/NightDatePicker/NightDatePicker.vue'
 import { getApiErrorMessage } from '@/utils/apiError'
+import { camposFaltando } from '@/utils/camposObrigatorios'
 
 const router = useRouter()
 const route = useRoute()
@@ -36,8 +38,36 @@ const form = ref({
   data_nascimento: '',
   setores: [] as string[],
   funcoes: [] as string[],
+  empresas: [] as string[],
   empresa_id: ''
 })
+
+const empresasConta = ref<IEmpresaConta[]>([])
+const multiEmpresa = computed(() => !isAdmin.value && empresasConta.value.length > 1)
+
+const setoresVisiveis = computed(() =>
+  multiEmpresa.value
+    ? setoresDisponiveis.value.filter((s) => form.value.empresas.includes(s.empresa_id))
+    : setoresDisponiveis.value
+)
+
+function nomeEmpresaConta(id?: string | null) {
+  return empresasConta.value.find((e) => e.id === id)?.nome
+}
+
+function toggleEmpresaConta(id: string) {
+  const index = form.value.empresas.indexOf(id)
+  if (index === -1) {
+    form.value.empresas.push(id)
+    return
+  }
+  form.value.empresas.splice(index, 1)
+  const daEmpresa = new Set(setoresDisponiveis.value.filter((s) => s.empresa_id === id).map((s) => s.id))
+  form.value.setores = form.value.setores.filter((sid) => !daEmpresa.has(sid))
+  form.value.funcoes = form.value.funcoes.filter(
+    (fid) => funcoesDisponiveis.value.find((f) => f.id === fid)?.empresa_id !== id
+  )
+}
 
 const isAdmin = computed(() => authStore.userRole === 'administrador')
 
@@ -93,6 +123,9 @@ onMounted(async () => {
     if (isAdmin.value) {
       const { data } = await getAllEmpresas()
       empresas.value = data.data
+    } else {
+      const { data } = await getEmpresasConta()
+      empresasConta.value = data
     }
 
     const { data: funcionario } = await getFuncionario(route.params.id as string)
@@ -106,6 +139,9 @@ onMounted(async () => {
     form.value.empresa_id = empresaId
     form.value.setores = funcionario.setores?.map((s: ISetor) => s.id) || []
     form.value.funcoes = funcionario.funcoes?.map((f: IFuncao) => f.id) || []
+    form.value.empresas = funcionario.empresas?.length
+      ? funcionario.empresas.map((e) => e.id)
+      : [empresaId].filter(Boolean)
 
     await loadSetoresFuncoes(isAdmin.value ? empresaId || undefined : undefined)
   } catch (error) {
@@ -143,9 +179,24 @@ function toggleSetor(id: string) {
   const index = form.value.setores.indexOf(id)
   if (index > -1) {
     form.value.setores.splice(index, 1)
+    const doSetor = new Set(
+      funcoesDisponiveis.value.filter((f) => f.setor_id === id).map((f) => f.id)
+    )
+    form.value.funcoes = form.value.funcoes.filter((fid) => !doSetor.has(fid))
   } else {
     form.value.setores.push(id)
   }
+}
+
+/** Função pertence a um setor: só aparecem as dos setores marcados. */
+const funcoesDoSetor = computed(() =>
+  funcoesDisponiveis.value.filter(
+    (f) => !f.setor_id || form.value.setores.includes(f.setor_id)
+  )
+)
+
+function nomeSetor(id?: string | null) {
+  return setoresDisponiveis.value.find((s) => s.id === id)?.nome
 }
 
 function toggleFuncao(id: string) {
@@ -160,13 +211,19 @@ function toggleFuncao(id: string) {
 async function handleSubmit() {
   if (loading.value) return
 
-  if (!form.value.nome.trim()) {
-    toast.error('Nome é obrigatório')
+  const faltando = camposFaltando({ Nome: form.value.nome, 'E-mail': form.value.email })
+  if (faltando) {
+    toast.error(faltando)
     return
   }
 
   if (isAdmin.value && !form.value.empresa_id) {
     toast.error('Selecione uma empresa')
+    return
+  }
+
+  if (multiEmpresa.value && !form.value.empresas.length) {
+    toast.error('Selecione ao menos uma empresa')
     return
   }
 
@@ -194,7 +251,8 @@ async function handleSubmit() {
       ...(form.value.data_nascimento ? { data_nascimento: form.value.data_nascimento } : {}),
       setores: [...form.value.setores],
       funcoes: [...form.value.funcoes],
-      ...(isAdmin.value ? { empresa_id: form.value.empresa_id } : {})
+      ...(isAdmin.value ? { empresa_id: form.value.empresa_id } : {}),
+      ...(multiEmpresa.value ? { empresas: [...form.value.empresas] } : {})
     }
 
     await patchFuncionario(payload, route.params.id as string)
@@ -344,7 +402,7 @@ function goBack() {
         </div>
 
         <div class="novo-funcionario__field">
-          <label class="novo-funcionario__label night-field-label" for="email">E-MAIL</label>
+          <label class="novo-funcionario__label night-field-label" for="email">E-MAIL*</label>
           <input
             id="email"
             v-model="form.email"
@@ -352,6 +410,20 @@ function goBack() {
             class="novo-funcionario__input"
             placeholder="email@exemplo.com"
           />
+        </div>
+
+        <div v-if="multiEmpresa" class="novo-funcionario__field">
+          <span class="novo-funcionario__label night-field-label">EMPRESAS*</span>
+          <div class="novo-funcionario__checks">
+            <label v-for="empresa in empresasConta" :key="empresa.id" class="novo-funcionario__check">
+              <input
+                type="checkbox"
+                :checked="form.empresas.includes(empresa.id)"
+                @change="toggleEmpresaConta(empresa.id)"
+              />
+              <span>{{ empresa.nome }}</span>
+            </label>
+          </div>
         </div>
 
         <div class="novo-funcionario__field">
@@ -362,11 +434,14 @@ function goBack() {
             <div v-if="isAdmin && !form.empresa_id" class="novo-funcionario__checks-empty">
               Selecione uma empresa primeiro
             </div>
-            <div v-else-if="setoresDisponiveis.length === 0" class="novo-funcionario__checks-empty">
+            <div v-else-if="multiEmpresa && !form.empresas.length" class="novo-funcionario__checks-empty">
+              Selecione uma empresa primeiro
+            </div>
+            <div v-else-if="setoresVisiveis.length === 0" class="novo-funcionario__checks-empty">
               Nenhum setor cadastrado
             </div>
             <label
-              v-for="setor in setoresDisponiveis"
+              v-for="setor in setoresVisiveis"
               :key="setor.id"
               class="novo-funcionario__check"
             >
@@ -376,6 +451,9 @@ function goBack() {
                 @change="toggleSetor(setor.id)"
               />
               <span>{{ setor.nome }}</span>
+              <small v-if="form.empresas.length > 1" class="novo-funcionario__check-setor">
+                {{ nomeEmpresaConta(setor.empresa_id) }}
+              </small>
             </label>
           </div>
         </div>
@@ -388,11 +466,14 @@ function goBack() {
             <div v-if="isAdmin && !form.empresa_id" class="novo-funcionario__checks-empty">
               Selecione uma empresa primeiro
             </div>
-            <div v-else-if="funcoesDisponiveis.length === 0" class="novo-funcionario__checks-empty">
-              Nenhuma função cadastrada
+            <div v-else-if="!form.setores.length" class="novo-funcionario__checks-empty">
+              Selecione um setor para ver as funções
+            </div>
+            <div v-else-if="funcoesDoSetor.length === 0" class="novo-funcionario__checks-empty">
+              Nenhuma função nos setores selecionados
             </div>
             <label
-              v-for="funcao in funcoesDisponiveis"
+              v-for="funcao in funcoesDoSetor"
               :key="funcao.id"
               class="novo-funcionario__check"
             >
@@ -402,6 +483,9 @@ function goBack() {
                 @change="toggleFuncao(funcao.id)"
               />
               <span>{{ funcao.nome }}</span>
+              <small v-if="form.setores.length > 1 && nomeSetor(funcao.setor_id)" class="novo-funcionario__check-setor">
+                {{ nomeSetor(funcao.setor_id) }}
+              </small>
             </label>
           </div>
         </div>
@@ -687,6 +771,11 @@ function goBack() {
     color: #f7f7f7;
     opacity: 0.6;
     font-style: italic;
+  }
+
+  &__check-setor {
+    opacity: 0.55;
+    font-size: 11px;
   }
 
   &__check {

@@ -6,6 +6,7 @@ import { useAuthStore } from '@/stores/auth'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import iconChevronDown from '@/assets/imgs/administradores/icon-chevron-down.svg'
 import { getFuncao, patchFuncao, type IPostFuncaoModel } from '@/services/http/funcoes'
+import { getAllSetores, type ISetor } from '@/services/http/setores'
 import { getAllEmpresas } from '@/services/http/empresas'
 import { getApiErrorMessage } from '@/utils/apiError'
 
@@ -17,12 +18,16 @@ const authStore = useAuthStore()
 const loading = ref(false)
 const fetching = ref(true)
 const empresas = ref<{ id: string; nome: string }[]>([])
+const setores = ref<ISetor[]>([])
 const empresaOpen = ref(false)
+const setorOpen = ref(false)
 const empresaFilterRef = ref<HTMLElement | null>(null)
+const setorFilterRef = ref<HTMLElement | null>(null)
 const form = ref({
   nome: '',
   descricao: '',
-  empresa_id: ''
+  empresa_id: '',
+  setor_id: ''
 })
 
 const isAdmin = computed(() => authStore.userRole === 'administrador')
@@ -32,10 +37,33 @@ const empresaLabel = computed(() => {
   return empresas.value.find((e) => e.id === form.value.empresa_id)?.nome ?? 'Selecione uma empresa'
 })
 
+const setorLabel = computed(
+  () => setores.value.find((s) => s.id === form.value.setor_id)?.nome ?? 'Selecione um setor'
+)
+
 function onDocumentClick(event: MouseEvent) {
-  if (empresaFilterRef.value && !empresaFilterRef.value.contains(event.target as Node)) {
+  const alvo = event.target as Node
+  if (empresaFilterRef.value && !empresaFilterRef.value.contains(alvo)) {
     empresaOpen.value = false
   }
+  if (setorFilterRef.value && !setorFilterRef.value.contains(alvo)) {
+    setorOpen.value = false
+  }
+}
+
+async function loadSetores() {
+  try {
+    const { data } = await getAllSetores(form.value.empresa_id || undefined)
+    setores.value = data || []
+    if (!setores.value.some((s) => s.id === form.value.setor_id)) form.value.setor_id = ''
+  } catch (error) {
+    toast.error(getApiErrorMessage(error, 'Erro ao carregar setores'))
+  }
+}
+
+function selectSetor(id: string) {
+  form.value.setor_id = id
+  setorOpen.value = false
 }
 
 onMounted(async () => {
@@ -51,6 +79,8 @@ onMounted(async () => {
     form.value.nome = data.nome
     form.value.descricao = data.descricao || ''
     form.value.empresa_id = data.empresa_id || ''
+    form.value.setor_id = data.setor_id || ''
+    await loadSetores()
   } catch (error) {
     console.error(error)
     toast.error(getApiErrorMessage(error, 'Erro ao carregar função'))
@@ -71,6 +101,7 @@ function toggleEmpresaMenu() {
 function selectEmpresa(id: string) {
   form.value.empresa_id = id
   empresaOpen.value = false
+  void loadSetores()
 }
 
 async function handleSubmit() {
@@ -86,10 +117,16 @@ async function handleSubmit() {
     return
   }
 
+  if (!form.value.setor_id) {
+    toast.error('Selecione o setor da função')
+    return
+  }
+
   try {
     loading.value = true
     const payload: Partial<IPostFuncaoModel> = {
       nome: form.value.nome.trim(),
+      setor_id: form.value.setor_id,
       descricao: form.value.descricao.trim() || undefined,
       ...(isAdmin.value ? { empresa_id: form.value.empresa_id } : {})
     }
@@ -181,6 +218,47 @@ function goBack() {
                   @click="selectEmpresa(empresa.id)"
                 >
                   {{ empresa.nome }}
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="edit-funcao__field edit-funcao__field--setor">
+          <span class="edit-funcao__label night-field-label" id="setor-label">SETOR*</span>
+          <div ref="setorFilterRef" class="edit-funcao__select">
+            <button
+              type="button"
+              class="edit-funcao__select-trigger"
+              :class="{ 'is-placeholder': !form.setor_id }"
+              aria-haspopup="listbox"
+              aria-labelledby="setor-label"
+              :aria-expanded="setorOpen"
+              @click.stop="setorOpen = !setorOpen"
+            >
+              <span>{{ setorLabel }}</span>
+              <img
+                class="edit-funcao__select-chevron"
+                :class="{ 'edit-funcao__select-chevron--open': setorOpen }"
+                :src="iconChevronDown"
+                width="16"
+                height="9"
+                alt=""
+              />
+            </button>
+
+            <ul v-if="setorOpen" class="edit-funcao__select-menu" role="listbox" aria-labelledby="setor-label">
+              <li v-if="!setores.length" class="edit-funcao__select-empty">Nenhum setor cadastrado</li>
+              <li v-for="setor in setores" :key="setor.id">
+                <button
+                  type="button"
+                  class="edit-funcao__select-option"
+                  role="option"
+                  :aria-selected="form.setor_id === setor.id"
+                  :class="{ 'is-active': form.setor_id === setor.id }"
+                  @click="selectSetor(setor.id)"
+                >
+                  {{ setor.nome }}
                 </button>
               </li>
             </ul>
@@ -354,6 +432,17 @@ function goBack() {
     position: relative;
     width: 100%;
     z-index: 5;
+  }
+
+  &__field--setor &__select {
+    z-index: 4;
+  }
+
+  &__select-empty {
+    padding: 10px 14px;
+    color: #f7f7f7;
+    opacity: 0.6;
+    font-size: 13px;
   }
 
   &__select-trigger {

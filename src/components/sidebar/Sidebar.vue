@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import SidebarItem from './SidebarItem.vue'
+import EmpresaIdentidade from '@/components/EmpresaIdentidade/EmpresaIdentidade.vue'
 import type { TUserTypes } from '@/types/auth'
 import { isFeatureEnabled } from '@/config/features'
 import logoAkidocs from '@/assets/imgs/login/logo-akidocs-white.png'
@@ -13,6 +15,8 @@ interface IMenuItem {
   classname?: string
   roles: TUserTypes[]
   featureFlag?: 'assinaturas' | 'envioParaAssinatura'
+  /** Item que abre um submenu (o path serve só para marcar a seção ativa). */
+  children?: IMenuItem[]
 }
 
 const route = useRoute()
@@ -20,21 +24,9 @@ const authStore = useAuthStore()
 
 const menuItems: IMenuItem[] = [
   {
-    title: 'Home',
-    icon: 'home',
-    path: '/dashboard/home',
-    roles: ['administrador', 'cliente', 'empresa']
-  },
-  {
     title: 'Administradores',
     icon: 'admin',
     path: '/dashboard/admins',
-    roles: ['administrador']
-  },
-  {
-    title: 'Empresas',
-    icon: 'building',
-    path: '/dashboard/empresas',
     roles: ['administrador']
   },
   {
@@ -44,10 +36,34 @@ const menuItems: IMenuItem[] = [
     roles: ['administrador', 'cliente', 'empresa']
   },
   {
+    title: 'Empresas',
+    icon: 'building',
+    path: '/dashboard/empresas',
+    roles: ['administrador']
+  },
+  {
     title: 'Clientes',
     icon: 'clientes',
     path: '/dashboard/clientes',
-    roles: ['administrador', 'cliente', 'empresa']
+    roles: ['administrador']
+  },
+  {
+    title: 'Empresas',
+    icon: 'building',
+    path: '/dashboard/minhas-empresas',
+    roles: ['empresa']
+  },
+  {
+    title: 'Clientes',
+    icon: 'clientes',
+    path: '/dashboard/clientes',
+    roles: ['empresa']
+  },
+  {
+    title: 'Empresas',
+    icon: 'building',
+    path: '/dashboard/clientes',
+    roles: ['cliente']
   },
   {
     title: 'Setores',
@@ -72,6 +88,26 @@ const menuItems: IMenuItem[] = [
     icon: 'agrupamentos',
     path: '/dashboard/agrupamentos',
     roles: ['administrador', 'empresa']
+  },
+  {
+    title: 'Categorias de arquivo',
+    icon: 'folder',
+    path: '/dashboard/categorias-arquivo',
+    roles: ['administrador', 'empresa']
+  },
+  {
+    title: 'Relatórios',
+    icon: 'report',
+    path: '/dashboard/relatorios',
+    roles: ['administrador', 'empresa'],
+    children: [
+      {
+        title: 'Logs de arquivo',
+        icon: 'document',
+        path: '/dashboard/relatorios/logs-arquivo',
+        roles: ['administrador', 'empresa']
+      }
+    ]
   },
   {
     title: 'Planos',
@@ -111,6 +147,30 @@ function isActive(path: string): boolean {
   return route.path === path || route.path.startsWith(path + '/')
 }
 
+const gruposAbertos = ref(new Set<string>())
+
+function grupoAberto(item: IMenuItem): boolean {
+  return gruposAbertos.value.has(item.path)
+}
+
+function alternarGrupo(item: IMenuItem) {
+  const next = new Set(gruposAbertos.value)
+  if (next.has(item.path)) next.delete(item.path)
+  else next.add(item.path)
+  gruposAbertos.value = next
+}
+
+watch(
+  () => route.path,
+  (path) => {
+    const ativo = menuItems.find((i) => i.children && (path === i.path || path.startsWith(i.path + '/')))
+    if (ativo && !gruposAbertos.value.has(ativo.path)) {
+      gruposAbertos.value = new Set([...gruposAbertos.value, ativo.path])
+    }
+  },
+  { immediate: true }
+)
+
 function handleClick(item: IMenuItem) {
   if (item.path === '/logout') {
     authStore.signOut()
@@ -132,10 +192,42 @@ function shouldShowItem(item: IMenuItem): boolean {
 <template>
   <aside class="sidebar">
     <img class="logo" :src="logoAkidocs" alt="Logotipo AkiDocs — Todos os seus documentos, Aki!" />
+    <EmpresaIdentidade />
     <nav class="sidebar__nav">
       <template v-for="item in menuItems" :key="item.path">
+        <template v-if="item.children && shouldShowItem(item)">
+          <button
+            type="button"
+            class="sidebar-group"
+            :class="{ 'is-open': grupoAberto(item), 'is-section-active': isActive(item.path) }"
+            :aria-expanded="grupoAberto(item)"
+            @click="alternarGrupo(item)"
+          >
+            <span class="sidebar-group__icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
+              </svg>
+            </span>
+            <span class="sidebar-group__title">{{ item.title }}</span>
+            <svg class="sidebar-group__chevron" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z" />
+            </svg>
+          </button>
+          <template v-if="grupoAberto(item)">
+            <template v-for="sub in item.children" :key="sub.path">
+              <SidebarItem
+                v-if="shouldShowItem(sub)"
+                class="sidebar-item--sub"
+                :title="sub.title"
+                :icon="sub.icon"
+                :path="sub.path"
+                :is-active="isActive(sub.path)"
+              />
+            </template>
+          </template>
+        </template>
         <SidebarItem
-          v-if="shouldShowItem(item)"
+          v-else-if="shouldShowItem(item)"
           :title="item.title"
           :icon="item.icon"
           :path="item.path"
@@ -224,6 +316,63 @@ function shouldShowItem(item: IMenuItem): boolean {
     flex-shrink: 0;
     width: 100%;
     padding: 16px 0 40px;
+  }
+
+  .sidebar-group {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    min-height: 50px;
+    width: 100%;
+    padding: 0 28px 0 var(--sidebar-nav-pad, 50px);
+    box-sizing: border-box;
+    flex-shrink: 0;
+    border: 0;
+    background: transparent;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+
+    &:hover,
+    &.is-section-active {
+      opacity: 0.95;
+    }
+  }
+
+  .sidebar-group__icon {
+    width: 32px;
+    min-width: 32px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sidebar-group__title {
+    flex: 1;
+    text-align: left;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  .sidebar-group__chevron {
+    flex-shrink: 0;
+    transition: transform 0.15s ease;
+  }
+
+  .sidebar-group.is-open .sidebar-group__chevron {
+    transform: rotate(180deg);
+  }
+
+  .sidebar-item--sub {
+    padding-left: calc(var(--sidebar-nav-pad, 50px) + 26px);
+
+    :deep(.title) {
+      font-size: 15px;
+    }
   }
 
   /* Full HD (1080p): comprime para caber sem scroll ou com scroll mínimo */

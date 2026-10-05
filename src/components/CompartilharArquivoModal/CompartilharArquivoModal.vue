@@ -400,7 +400,7 @@ function novoCompartilhamento() {
                     title="Copiar link"
                     @click="copyLink(share.link)"
                   >
-                    COPIAR
+                    LINK
                   </button>
                   <button
                     v-if="share.status === 'ativo'"

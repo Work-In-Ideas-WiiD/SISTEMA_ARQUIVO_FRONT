@@ -9,8 +9,27 @@ export function usePageFileDrop(onFileDropped: (file: File) => void): {
 } {
   const isDragging = ref(false)
   let dragDepth = 0
+  /**
+   * Arrastes iniciados dentro da página (imagens, tiles) também podem trazer "Files"
+   * no Chrome; só arquivos vindos do sistema operacional devem abrir o upload.
+   */
+  let internalDrag = false
+
+  function onDragStart() {
+    internalDrag = true
+  }
+
+  function onDragEnd() {
+    internalDrag = false
+  }
+
+  /** O tile de origem pode sair do DOM após o drop (sem dragend); limpa depois do drop. */
+  function onAnyDrop() {
+    setTimeout(onDragEnd, 0)
+  }
 
   function hasFiles(event: DragEvent): boolean {
+    if (internalDrag) return false
     const types = event.dataTransfer?.types
     if (!types) return false
     return Array.from(types).includes('Files')
@@ -41,6 +60,11 @@ export function usePageFileDrop(onFileDropped: (file: File) => void): {
   }
 
   function onDrop(event: DragEvent) {
+    if (internalDrag) {
+      event.preventDefault()
+      internalDrag = false
+      return
+    }
     if (!hasFiles(event)) return
     event.preventDefault()
     dragDepth = 0
@@ -54,6 +78,9 @@ export function usePageFileDrop(onFileDropped: (file: File) => void): {
   }
 
   onMounted(() => {
+    window.addEventListener('dragstart', onDragStart)
+    window.addEventListener('dragend', onDragEnd)
+    window.addEventListener('drop', onAnyDrop, true)
     window.addEventListener('dragenter', onDragEnter)
     window.addEventListener('dragover', onDragOver)
     window.addEventListener('dragleave', onDragLeave)
@@ -61,6 +88,9 @@ export function usePageFileDrop(onFileDropped: (file: File) => void): {
   })
 
   onBeforeUnmount(() => {
+    window.removeEventListener('dragstart', onDragStart)
+    window.removeEventListener('dragend', onDragEnd)
+    window.removeEventListener('drop', onAnyDrop, true)
     window.removeEventListener('dragenter', onDragEnter)
     window.removeEventListener('dragover', onDragOver)
     window.removeEventListener('dragleave', onDragLeave)

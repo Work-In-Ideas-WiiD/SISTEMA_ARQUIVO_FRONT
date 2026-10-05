@@ -1,26 +1,32 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
 import iconChevronLeft from '@/assets/imgs/administradores/icon-chevron-left.svg'
 import iconChevronDown from '@/assets/imgs/administradores/icon-chevron-down.svg'
 import { postFuncao, type IPostFuncaoModel } from '@/services/http/funcoes'
+import { getAllSetores, type ISetor } from '@/services/http/setores'
 import { getAllEmpresas } from '@/services/http/empresas'
 import { getApiErrorMessage } from '@/utils/apiError'
 
 const router = useRouter()
+const route = useRoute()
 const toast = useToast()
 const authStore = useAuthStore()
 
 const loading = ref(false)
 const empresas = ref<{ id: string; nome: string }[]>([])
+const setores = ref<ISetor[]>([])
 const empresaOpen = ref(false)
+const setorOpen = ref(false)
 const empresaFilterRef = ref<HTMLElement | null>(null)
+const setorFilterRef = ref<HTMLElement | null>(null)
 const form = ref({
   nome: '',
   descricao: '',
-  empresa_id: ''
+  empresa_id: '',
+  setor_id: typeof route.query.setor_id === 'string' ? route.query.setor_id : ''
 })
 
 const isAdmin = computed(() => authStore.userRole === 'administrador')
@@ -30,9 +36,31 @@ const empresaLabel = computed(() => {
   return empresas.value.find((e) => e.id === form.value.empresa_id)?.nome ?? 'Selecione uma empresa'
 })
 
+const setorLabel = computed(
+  () => setores.value.find((s) => s.id === form.value.setor_id)?.nome ?? 'Selecione um setor'
+)
+
 function onDocumentClick(event: MouseEvent) {
-  if (empresaFilterRef.value && !empresaFilterRef.value.contains(event.target as Node)) {
+  const alvo = event.target as Node
+  if (empresaFilterRef.value && !empresaFilterRef.value.contains(alvo)) {
     empresaOpen.value = false
+  }
+  if (setorFilterRef.value && !setorFilterRef.value.contains(alvo)) {
+    setorOpen.value = false
+  }
+}
+
+async function loadSetores() {
+  if (isAdmin.value && !form.value.empresa_id) {
+    setores.value = []
+    return
+  }
+  try {
+    const { data } = await getAllSetores(isAdmin.value ? form.value.empresa_id : undefined)
+    setores.value = data || []
+    if (!setores.value.some((s) => s.id === form.value.setor_id)) form.value.setor_id = ''
+  } catch (error) {
+    toast.error(getApiErrorMessage(error, 'Erro ao carregar setores'))
   }
 }
 
@@ -47,6 +75,7 @@ onMounted(async () => {
       console.error('Erro ao carregar empresas', error)
     }
   }
+  await loadSetores()
 })
 
 onUnmounted(() => {
@@ -60,6 +89,12 @@ function toggleEmpresaMenu() {
 function selectEmpresa(id: string) {
   form.value.empresa_id = id
   empresaOpen.value = false
+  void loadSetores()
+}
+
+function selectSetor(id: string) {
+  form.value.setor_id = id
+  setorOpen.value = false
 }
 
 async function handleSubmit() {
@@ -75,10 +110,16 @@ async function handleSubmit() {
     return
   }
 
+  if (!form.value.setor_id) {
+    toast.error('Selecione o setor da função')
+    return
+  }
+
   try {
     loading.value = true
     const payload: IPostFuncaoModel = {
       nome: form.value.nome.trim(),
+      setor_id: form.value.setor_id,
       ...(form.value.descricao.trim() ? { descricao: form.value.descricao.trim() } : {}),
       ...(isAdmin.value ? { empresa_id: form.value.empresa_id } : {})
     }
@@ -166,6 +207,48 @@ function goBack() {
                   @click="selectEmpresa(empresa.id)"
                 >
                   {{ empresa.nome }}
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="nova-funcao__field nova-funcao__field--setor">
+          <span class="nova-funcao__label night-field-label" id="setor-label">SETOR*</span>
+          <div ref="setorFilterRef" class="nova-funcao__select">
+            <button
+              type="button"
+              class="nova-funcao__select-trigger"
+              :class="{ 'is-placeholder': !form.setor_id }"
+              aria-haspopup="listbox"
+              aria-labelledby="setor-label"
+              :aria-expanded="setorOpen"
+              :disabled="isAdmin && !form.empresa_id"
+              @click.stop="setorOpen = !setorOpen"
+            >
+              <span>{{ isAdmin && !form.empresa_id ? 'Selecione a empresa primeiro' : setorLabel }}</span>
+              <img
+                class="nova-funcao__select-chevron"
+                :class="{ 'nova-funcao__select-chevron--open': setorOpen }"
+                :src="iconChevronDown"
+                width="16"
+                height="9"
+                alt=""
+              />
+            </button>
+
+            <ul v-if="setorOpen" class="nova-funcao__select-menu" role="listbox" aria-labelledby="setor-label">
+              <li v-if="!setores.length" class="nova-funcao__select-empty">Nenhum setor cadastrado</li>
+              <li v-for="setor in setores" :key="setor.id">
+                <button
+                  type="button"
+                  class="nova-funcao__select-option"
+                  role="option"
+                  :aria-selected="form.setor_id === setor.id"
+                  :class="{ 'is-active': form.setor_id === setor.id }"
+                  @click="selectSetor(setor.id)"
+                >
+                  {{ setor.nome }}
                 </button>
               </li>
             </ul>
@@ -325,6 +408,22 @@ function goBack() {
     position: relative;
     width: 100%;
     z-index: 5;
+  }
+
+  &__field--setor &__select {
+    z-index: 4;
+  }
+
+  &__select-empty {
+    padding: 10px 14px;
+    color: #f7f7f7;
+    opacity: 0.6;
+    font-size: 13px;
+  }
+
+  &__select-trigger:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 
   &__select-trigger {

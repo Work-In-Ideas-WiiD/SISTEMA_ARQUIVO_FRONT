@@ -33,6 +33,14 @@ export interface IGetArquivosDataRes {
   }[]
   setores?: IArquivoVinculo[]
   funcoes?: IArquivoVinculo[]
+  funcionarios?: IArquivoVinculo[]
+  agrupamentos_acesso?: IArquivoVinculo[]
+  categoria?: IArquivoVinculo | null
+  categoria_id?: string | null
+  mes?: number | null
+  ano?: number | null
+  pasta_id?: string | null
+  agrupamento_id?: string | null
   path: string
   tamanho_bytes?: number
   status: 'pendente' | 'assinado'
@@ -43,12 +51,34 @@ export interface IGetArquivosDataRes {
 
 export async function getArquivos(
   page: number = 1,
-  like: string = ''
+  like: string = '',
+  filters: {
+    empresa_id?: string
+    pasta_id?: string | null
+    agrupamento_id?: string | null
+    setor_id?: string | null
+    funcao_id?: string | null
+    todas_pastas?: boolean
+    somente_livres?: boolean
+    categoria_id?: string | null
+    mes?: number | null
+    ano?: number | null
+  } = {}
 ): Promise<AxiosResponse<IGetArquivosRes>> {
   const res = await api.get('/arquivo', {
     params: {
-      like: like,
-      page: page
+      page: page,
+      ...(like ? { like } : {}),
+      ...(filters.empresa_id ? { empresa_id: filters.empresa_id } : {}),
+      ...(filters.pasta_id ? { pasta_id: filters.pasta_id } : {}),
+      ...(filters.agrupamento_id ? { agrupamento_id: filters.agrupamento_id } : {}),
+      ...(filters.setor_id ? { setor_id: filters.setor_id } : {}),
+      ...(filters.funcao_id ? { funcao_id: filters.funcao_id } : {}),
+      ...(filters.todas_pastas ? { todas_pastas: 1 } : {}),
+      ...(filters.somente_livres ? { somente_livres: 1 } : {}),
+      ...(filters.categoria_id ? { categoria_id: filters.categoria_id } : {}),
+      ...(filters.mes ? { mes: filters.mes } : {}),
+      ...(filters.ano ? { ano: filters.ano } : {})
     }
   })
   return res
@@ -70,9 +100,109 @@ export async function postArquivo(
   return res
 }
 
+/**
+ * Envia o arquivo; se já existir um com o mesmo nome no local (409), pergunta e reenvia substituindo.
+ * Retorna null quando o usuário desiste da substituição.
+ */
+export async function postArquivoOuSubstituir(
+  formData: FormData,
+  confirmarSubstituicao: (nome: string) => Promise<boolean>,
+  onUploadProgress?: (percent: number) => void
+): Promise<{ data: IGetArquivosDataRes; substituido: boolean } | null> {
+  try {
+    const { data } = await postArquivo(formData, onUploadProgress)
+    return { data, substituido: false }
+  } catch (error: any) {
+    const res = error?.response
+    if (res?.status !== 409 || !res.data?.conflito) throw error
+    const ok = await confirmarSubstituicao(res.data.arquivo?.descricao || String(formData.get('descricao') || ''))
+    if (!ok) return null
+    formData.set('substituir', '1')
+    const { data } = await postArquivo(formData, onUploadProgress)
+    return { data, substituido: true }
+  }
+}
+
+export interface IDestinoArquivo {
+  setor_id?: string | null
+  funcao_id?: string | null
+  agrupamento_id?: string | null
+  pasta_id?: string | null
+}
+
+export async function moverArquivos(
+  arquivos: string[],
+  empresaId: string,
+  destino: IDestinoArquivo
+): Promise<AxiosResponse<{ movidos: number }>> {
+  const res = await api.post('/arquivos/mover', {
+    arquivos,
+    empresa_id: empresaId,
+    ...(destino.setor_id ? { setor_id: destino.setor_id } : {}),
+    ...(destino.funcao_id ? { funcao_id: destino.funcao_id } : {}),
+    ...(destino.agrupamento_id ? { agrupamento_id: destino.agrupamento_id } : {}),
+    ...(destino.pasta_id ? { pasta_id: destino.pasta_id } : {})
+  })
+  return res
+}
+
+export type TipoPermissao = 'setores' | 'funcoes' | 'agrupamentos' | 'funcionarios'
+
+export type IAlteracoesPermissao = Partial<
+  Record<`${TipoPermissao}_adicionar` | `${TipoPermissao}_remover`, string[]>
+>
+
+export async function editarPermissoesArquivos(
+  arquivos: string[],
+  empresaId: string,
+  alteracoes: IAlteracoesPermissao
+): Promise<AxiosResponse<IGetArquivosDataRes[]>> {
+  const res = await api.post('/arquivos/permissoes', {
+    arquivos,
+    empresa_id: empresaId,
+    ...alteracoes
+  })
+  return res
+}
+
+export async function patchArquivoCategoriaData(
+  id: string,
+  data: { categoria_id: string | null; mes: number | null; ano: number | null }
+): Promise<AxiosResponse<IGetArquivosDataRes>> {
+  const res = await api.patch(`/arquivo/${id}`, data)
+  return res
+}
+
+/** Link temporário do arquivo; a API registra a visualização no log de acessos. */
+export async function abrirArquivo(id: string): Promise<AxiosResponse<{ url: string }>> {
+  const res = await api.get(`/arquivo/${id}/abrir`)
+  return res
+}
+
+export interface IArquivoLogEvento {
+  id: string
+  tipo: 'acesso' | 'alteracao' | 'envio'
+  acao: string
+  nome: string | null
+  email: string | null
+  detalhe: string | null
+  ip: string | null
+  data: string
+}
+
+export async function getArquivoLog(id: string): Promise<AxiosResponse<IArquivoLogEvento[]>> {
+  const res = await api.get(`/arquivo/${id}/log`)
+  return res
+}
+
 export async function deleteArquivo(id: string): Promise<AxiosResponse<any>> {
   const res = await api.delete(`/arquivo/${id}`)
   return res
+}
+
+/** Envia os arquivos para a lixeira. */
+export async function excluirArquivos(ids: string[]): Promise<AxiosResponse<{ excluidos: number }>> {
+  return api.post('/arquivos/excluir', { arquivos: ids })
 }
 
 export interface ICompartilhamentoRes {

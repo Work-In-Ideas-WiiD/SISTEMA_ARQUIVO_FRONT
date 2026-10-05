@@ -1,10 +1,17 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import TableEmptyMessage from '@/components/TableEmptyMessage/TableEmptyMessage.vue'
 import TablePaginator from '@/components/TablePaginator/TablePaginator.vue'
-import { getFuncionarios, deleteFuncionario, type IFuncionario } from '@/services/http/funcionarios'
+import {
+  getFuncionarios,
+  deleteFuncionario,
+  getEmpresasFiltroFuncionarios,
+  type IFuncionario
+} from '@/services/http/funcionarios'
+import { getAllSetores, type ISetor } from '@/services/http/setores'
+import { getAllFuncoes, type IFuncao } from '@/services/http/funcoes'
 import { formatCnpjCpf } from '@/utils/formatCpfCnpj'
 import { useDebouncedSearch } from '@/composables/useDebouncedSearch'
 import iconSearch from '@/assets/imgs/administradores/icon-search.svg'
@@ -40,11 +47,75 @@ function updateSearchPlaceholder() {
     : 'Pesquisar por nome, e-mail ou CPF…'
 }
 
+const empresas = ref<{ id: string; nome: string }[]>([])
+const setores = ref<ISetor[]>([])
+const funcoes = ref<IFuncao[]>([])
+const filtroEmpresa = ref('')
+const filtroSetor = ref('')
+const filtroFuncao = ref('')
+
+const funcoesDoFiltro = computed(() =>
+  filtroSetor.value ? funcoes.value.filter((f) => f.setor_id === filtroSetor.value) : funcoes.value
+)
+
+async function carregarOpcoesFiltro() {
+  const empresaId = filtroEmpresa.value || undefined
+  try {
+    const [s, f] = await Promise.all([getAllSetores(empresaId), getAllFuncoes(empresaId)])
+    setores.value = s.data || []
+    funcoes.value = f.data || []
+  } catch {
+    setores.value = []
+    funcoes.value = []
+  }
+}
+
+async function carregarEmpresas() {
+  try {
+    const { data } = await getEmpresasFiltroFuncionarios()
+    empresas.value = data || []
+  } catch {
+    empresas.value = []
+  }
+}
+
+function aplicarFiltros() {
+  page.value = 1
+  getData(page.value, search.value)
+}
+
+function onEmpresaChange() {
+  filtroSetor.value = ''
+  filtroFuncao.value = ''
+  void carregarOpcoesFiltro()
+  aplicarFiltros()
+}
+
+function onSetorChange() {
+  if (filtroFuncao.value && !funcoesDoFiltro.value.some((f) => f.id === filtroFuncao.value)) {
+    filtroFuncao.value = ''
+  }
+  aplicarFiltros()
+}
+
+const temFiltro = computed(() => Boolean(filtroEmpresa.value || filtroSetor.value || filtroFuncao.value))
+
+function limparFiltros() {
+  const recarregarOpcoes = Boolean(filtroEmpresa.value)
+  filtroEmpresa.value = ''
+  filtroSetor.value = ''
+  filtroFuncao.value = ''
+  if (recarregarOpcoes) void carregarOpcoesFiltro()
+  aplicarFiltros()
+}
+
 onMounted(() => {
   searchPlaceholderMql = window.matchMedia('(max-width: 1200px)')
   updateSearchPlaceholder()
   searchPlaceholderMql.addEventListener('change', updateSearchPlaceholder)
   getData(page.value, search.value)
+  void carregarEmpresas()
+  void carregarOpcoesFiltro()
 })
 
 onUnmounted(() => {
@@ -53,7 +124,13 @@ onUnmounted(() => {
 
 async function getData(pageParam: number, likeParam: string = '') {
   try {
-    const { data } = await getFuncionarios(pageParam, likeParam)
+    const { data } = await getFuncionarios(
+      pageParam,
+      likeParam,
+      filtroEmpresa.value || undefined,
+      filtroSetor.value || undefined,
+      filtroFuncao.value || undefined
+    )
     pages.value = data.last_page
     funcionarios.value = data.data
     noContent.value = data.data.length === 0
@@ -130,7 +207,7 @@ function getFuncoesNomes(funcionario: IFuncionario): string {
         type="button"
         class="funcionarios-page__back"
         aria-label="Voltar para Home"
-        @click="router.push('/dashboard/home')"
+        @click="router.push('/dashboard/arquivos')"
       >
         <img :src="iconChevronLeft" width="24" height="24" alt="" />
       </button>
@@ -156,6 +233,33 @@ function getFuncoesNomes(funcionario: IFuncionario): string {
           <span>NOVO FUNCIONÁRIO</span>
         </button>
       </form>
+
+      <div class="funcionarios-filtros">
+        <label class="funcionarios-filtro">
+          <span>Empresa</span>
+          <select v-model="filtroEmpresa" :class="{ 'is-set': filtroEmpresa }" @change="onEmpresaChange">
+            <option value="">Todas</option>
+            <option v-for="e in empresas" :key="e.id" :value="e.id">{{ e.nome }}</option>
+          </select>
+        </label>
+        <label class="funcionarios-filtro">
+          <span>Setor</span>
+          <select v-model="filtroSetor" :class="{ 'is-set': filtroSetor }" @change="onSetorChange">
+            <option value="">Todos</option>
+            <option v-for="s in setores" :key="s.id" :value="s.id">{{ s.nome }}</option>
+          </select>
+        </label>
+        <label class="funcionarios-filtro">
+          <span>Função</span>
+          <select v-model="filtroFuncao" :class="{ 'is-set': filtroFuncao }" @change="aplicarFiltros">
+            <option value="">Todas</option>
+            <option v-for="f in funcoesDoFiltro" :key="f.id" :value="f.id">{{ f.nome }}</option>
+          </select>
+        </label>
+        <button v-if="temFiltro" type="button" class="funcionarios-filtros__limpar" @click="limparFiltros">
+          Limpar filtros
+        </button>
+      </div>
 
       <div class="funcionarios-scroll">
         <table class="funcionarios-grid">
@@ -354,6 +458,89 @@ function getFuncoesNomes(funcionario: IFuncionario): string {
   &:hover {
     background: #C29F68;
     box-shadow: 0 4px 12px rgba(176, 141, 87, 0.3);
+  }
+}
+
+.funcionarios-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 0 38px 18px;
+  margin-top: -10px;
+
+  &__limpar {
+    height: 40px;
+    padding: 0 6px;
+    border: 0;
+    background: none;
+    color: #d9b77e;
+    font-family: var(--night-font, 'Inter', sans-serif);
+    font-size: 13px;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.funcionarios-filtro {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 0 1 220px;
+  min-width: 150px;
+
+  span {
+    font-family: var(--night-font, 'Inter', sans-serif);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #f7f7f7;
+    opacity: 0.6;
+  }
+
+  select {
+    height: 40px;
+    padding: 0 34px 0 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.06)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")
+      no-repeat right 12px center;
+    appearance: none;
+    color: #ffffff;
+    font-family: var(--night-font, 'Inter', sans-serif);
+    font-size: 13px;
+    cursor: pointer;
+    text-overflow: ellipsis;
+
+    &:focus {
+      outline: none;
+      border-color: #b08d57;
+    }
+
+    &.is-set {
+      border-color: rgba(176, 141, 87, 0.7);
+      background-color: rgba(176, 141, 87, 0.14);
+    }
+
+    option {
+      background: #132438;
+      color: #ffffff;
+    }
+  }
+}
+
+@media (max-width: 1200px) {
+  .funcionarios-filtros {
+    padding: 0 16px 16px;
+  }
+
+  .funcionarios-filtro {
+    flex: 1 1 140px;
   }
 }
 

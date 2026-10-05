@@ -103,7 +103,7 @@ function getContato(item: IGetClientesDataRes): string {
         type="button"
         class="clientes-page__back"
         aria-label="Voltar para Home"
-        @click="router.push('/dashboard/home')"
+        @click="router.push('/dashboard/arquivos')"
       >
         <img :src="iconChevronLeft" width="24" height="24" alt="" />
       </button>

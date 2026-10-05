@@ -1,0 +1,261 @@
+<script setup lang="ts">
+import LixeiraBotao from '@/components/LixeiraBotao/LixeiraBotao.vue'
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
+import { useAuthStore } from '@/stores/auth'
+import { getEmpresas, type IGetEmpresasDataRes } from '@/services/http/empresas'
+import { getEmpresasConta } from '@/services/http/empresas-conta'
+import { getApiErrorMessage } from '@/utils/apiError'
+import iconBuilding from '@/assets/imgs/arquivos/icon-empresa-building.svg'
+
+interface EmpresaTile {
+  id: string
+  label: string
+}
+
+const router = useRouter()
+const toast = useToast()
+const authStore = useAuthStore()
+
+const loading = ref(true)
+const empresas = ref<EmpresaTile[]>([])
+
+function labelEmpresa(item: IGetEmpresasDataRes): string {
+  return (item.nome_empresa || item.nome || 'Empresa').trim()
+}
+
+async function collectPages<T>(
+  fetchPage: (page: number) => Promise<{ data: T[]; last_page: number }>
+): Promise<T[]> {
+  const collected: T[] = []
+  let page = 1
+  let lastPage = 1
+  do {
+    const data = await fetchPage(page)
+    collected.push(...data.data)
+    lastPage = data.last_page || 1
+    page += 1
+  } while (page <= lastPage)
+  return collected
+}
+
+async function loadEmpresas() {
+  loading.value = true
+  try {
+    const role = authStore.userRole
+
+    if (role === 'administrador') {
+      const rows = await collectPages(async (page) => {
+        const { data } = await getEmpresas(page, '')
+        return { data: data.data, last_page: data.last_page }
+      })
+      empresas.value = rows.map((item) => ({ id: item.id, label: labelEmpresa(item) }))
+      return
+    }
+
+    if (role === 'empresa') {
+      const { data } = await getEmpresasConta()
+      empresas.value = data.map((item) => ({ id: item.id, label: item.nome }))
+      return
+    }
+
+    empresas.value = []
+  } catch (error) {
+    console.error(error)
+    toast.error(getApiErrorMessage(error, 'Não foi possível carregar as empresas.'))
+    empresas.value = []
+  } finally {
+    loading.value = false
+  }
+}
+
+function openEmpresa(empresa: EmpresaTile) {
+  router.push({ name: 'arquivos-empresa', params: { empresaId: empresa.id } })
+}
+
+onMounted(loadEmpresas)
+</script>
+
+<template>
+  <section class="empresas-explorer">
+    <div class="empresas-explorer__heading">
+      <h2 class="empresas-explorer__title dashboard_title">EMPRESAS</h2>
+      <LixeiraBotao />
+    </div>
+
+    <div class="empresas-explorer__panel">
+      <p v-if="loading" class="empresas-explorer__status">Carregando…</p>
+      <p v-else-if="!empresas.length" class="empresas-explorer__status">
+        Nenhuma empresa cadastrada.
+      </p>
+      <div v-else class="empresas-explorer__scroll">
+        <ul class="empresas-explorer__grid" role="list">
+          <li v-for="empresa in empresas" :key="empresa.id">
+            <button
+              type="button"
+              class="empresas-explorer__tile"
+              :title="empresa.label"
+              @click="openEmpresa(empresa)"
+            >
+              <span class="empresas-explorer__box">
+                <img
+                  class="empresas-explorer__icon"
+                  :src="iconBuilding"
+                  width="40"
+                  height="46"
+                  alt=""
+                />
+              </span>
+              <span class="empresas-explorer__name">{{ empresa.label }}</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style lang="scss" scoped>
+.empresas-explorer {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.empresas-explorer__heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-shrink: 0;
+}
+
+.empresas-explorer__title {
+  margin: 0;
+}
+
+.empresas-explorer__panel {
+  background: var(--night-surface, #132438);
+  border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
+  border-radius: var(--night-radius, 20px);
+  padding: 30px 38px 36px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* 2 linhas de tiles (box 94 + gap 8 + nome ~3 linhas) + 1 gap entre linhas */
+.empresas-explorer__scroll {
+  --tile-row: calc(94px + 8px + (13px * 1.3 * 3));
+  max-height: calc(var(--tile-row) * 2 + 16px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(176, 141, 87, 0.45) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(176, 141, 87, 0.45);
+    border-radius: 6px;
+  }
+}
+
+.empresas-explorer__status {
+  margin: 0;
+  color: #f7f7f7;
+  opacity: 0.7;
+  font-family: var(--night-font, 'Inter', sans-serif);
+  font-size: 0.95rem;
+}
+
+.empresas-explorer__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 110px);
+  gap: 16px;
+  align-content: start;
+}
+
+.empresas-explorer__tile {
+  width: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+
+  &:hover .empresas-explorer__box,
+  &:focus-visible .empresas-explorer__box {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(176, 141, 87, 0.3);
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.empresas-explorer__box {
+  width: 110px;
+  height: 94px;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.empresas-explorer__icon {
+  display: block;
+  flex-shrink: 0;
+}
+
+.empresas-explorer__name {
+  width: 100%;
+  font-family: var(--night-font, 'Inter', sans-serif);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: #ffffff;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .empresas-explorer__panel {
+    padding: 20px 16px 28px;
+  }
+
+  .empresas-explorer__grid {
+    gap: 14px;
+  }
+
+  .empresas-explorer__scroll {
+    max-height: calc(var(--tile-row) * 2 + 14px);
+  }
+}
+</style>

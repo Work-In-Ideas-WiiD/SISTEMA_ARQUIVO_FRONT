@@ -5,6 +5,8 @@ import { useToast } from 'vue-toastification'
 import { getCliente, patchCliente } from '@/services/http/clientes'
 import { getApiErrorMessage } from '@/utils/apiError'
 import { maskCep, maskNumeroEndereco, maskUf, isValidCep } from '@/utils/formatCep'
+import { useBuscaCep } from '@/composables/useBuscaCep'
+import { camposFaltando } from '@/utils/camposObrigatorios'
 import { maskCpf, maskCnpj } from '@/utils/formatCpfCnpj'
 import { maskPhone } from '@/utils/formatPhone'
 
@@ -25,6 +27,7 @@ const cidade = ref('')
 const estado = ref('')
 const complemento = ref('')
 const cep = ref('')
+const { marcarCarregado } = useBuscaCep(cep, { endereco, bairro, cidade, estado, complemento })
 const fetching = ref(false)
 const loading = ref(true)
 
@@ -73,6 +76,7 @@ onMounted(async () => {
       estado.value = data.endereco.estado || ''
       complemento.value = data.endereco.complemento || ''
       cep.value = data.endereco.cep || ''
+      marcarCarregado(cep.value)
     }
   } catch (error) {
     toast.error(getApiErrorMessage(error, 'Erro ao carregar cliente'))
@@ -90,8 +94,9 @@ async function handleSubmit() {
     return
   }
   
-  if (!nome.value || !contato.value) {
-    toast.error('Preencha os campos obrigatórios')
+  const faltando = camposFaltando({ Nome: nome.value, Contato: contato.value })
+  if (faltando) {
+    toast.error(faltando)
     return
   }
   
@@ -149,7 +154,7 @@ function goBack() {
       <form @submit.prevent="handleSubmit">
         <div class="input_row">
           <div class="form_group flex_3">
-            <label>Nome</label>
+            <label>Nome*</label>
             <input v-model="nome" maxlength="255" type="text" />
           </div>
           <div class="form_group flex_1">
@@ -175,7 +180,7 @@ function goBack() {
             <input v-model="email" maxlength="255" type="email" />
           </div>
           <div class="form_group flex_1">
-            <label>Contato</label>
+            <label>Contato*</label>
             <input v-model="contato" maxlength="15" inputmode="tel" type="text" placeholder="(00) 00000-0000" />
           </div>
         </div>

@@ -102,7 +102,7 @@ async function handleSubmit() {
     await patchUser(payload, authStore.me.id)
     await authStore.refreshUserData()
     toast.success('Perfil atualizado')
-    setTimeout(() => router.push('/dashboard/home'), 1500)
+    setTimeout(() => router.push('/dashboard/arquivos'), 1500)
   } catch (error) {
     toast.error(getApiErrorMessage(error, 'Erro ao editar perfil'))
     console.error(error)
@@ -112,7 +112,7 @@ async function handleSubmit() {
 }
 
 function goBack() {
-  router.push('/dashboard/home')
+  router.push('/dashboard/arquivos')
 }
 </script>
 
