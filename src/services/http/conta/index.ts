@@ -16,6 +16,8 @@ export interface IRegistroRes {
   access_token: string
   token_type: string
   conta_id: string
+  /** A conta nova ganhou o teste grátis (entra direto no sistema). */
+  teste_gratis?: boolean
 }
 
 // Contratação de um plano (cartão tokenizado). O valor é definido pelo servidor.

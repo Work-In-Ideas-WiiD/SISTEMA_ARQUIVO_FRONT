@@ -163,8 +163,8 @@ export const useAuthStore = defineStore('auth', () => {
 
       handleFetching(false)
       trackSignUp('email')
-      // Conta recém-criada não tem assinatura ativa -> vai para a contratação.
-      router.push('/contratar')
+      // Com teste grátis entra direto; sem teste (documento já usado) vai para a contratação.
+      router.push(data.teste_gratis ? '/dashboard/arquivos' : '/contratar')
     } catch (err: any) {
       handleFetching(false)
       const errors = err?.response?.data?.errors

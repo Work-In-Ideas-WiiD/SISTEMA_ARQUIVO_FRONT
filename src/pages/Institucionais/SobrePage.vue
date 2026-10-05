@@ -115,7 +115,7 @@ onMounted(() => {
         <div class="page_cta">
           <h2>Pronto para organizar seus documentos?</h2>
           <p>Experimente o AkiDocs gratuitamente por 8 dias com todos os recursos liberados, sem compromisso.</p>
-          <RouterLink to="/contratar" class="cta_btn" @click="trackCtaClick('testar_gratis', 'sobre_nos')">TESTAR GRÁTIS POR 8 DIAS</RouterLink>
+          <RouterLink to="/cadastro" class="cta_btn" @click="trackCtaClick('testar_gratis', 'sobre_nos')">TESTAR GRÁTIS POR 8 DIAS</RouterLink>
         </div>
       </div>
     </main>

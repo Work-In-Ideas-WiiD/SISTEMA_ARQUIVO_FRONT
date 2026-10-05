@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import Cookies from 'js-cookie'
@@ -66,6 +66,8 @@ onMounted(async () => {
     return
   }
 
+  authStore.checkAuth()
+
   // Pré-carrega o SDK (não bloqueia a listagem).
   carregarSdk().catch((e) => console.error(e))
 
@@ -130,7 +132,13 @@ function voltarParaPlanos() {
   limparCartao()
 }
 
+const emTeste = computed(() => !!authStore.me.teste_gratis)
+
 function voltarParaLogin() {
+  if (emTeste.value) {
+    router.push('/dashboard/arquivos')
+    return
+  }
   authStore.signOut()
 }
 
@@ -320,13 +328,24 @@ async function pagar() {
     </div>
 
     <div v-else class="contratar_shell">
-      <button type="button" class="back_btn" aria-label="Voltar ao login" @click="voltarParaLogin">
+      <button
+        type="button"
+        class="back_btn"
+        :aria-label="emTeste ? 'Voltar ao sistema' : 'Voltar ao login'"
+        @click="voltarParaLogin"
+      >
         <img class="back_btn__circle" :src="iconBackCircle" alt="Círculo do botão voltar" width="66" height="66" />
         <img class="back_btn__icon" :src="iconChevronLeft" alt="Ícone de seta para voltar" width="40" height="40" />
       </button>
 
       <img class="contratar_logo" :src="logoAkidocs" alt="Logotipo AkiDocs" />
       <h1 class="contratar_title">Escolha seu plano</h1>
+      <p v-if="authStore.me.teste_encerrado" class="contratar_subtitle contratar_subtitle--aviso">
+        Seu teste grátis terminou. Escolha um plano para continuar usando o AkiDocs.
+      </p>
+      <p v-else-if="authStore.me.teste_gratis" class="contratar_subtitle contratar_subtitle--aviso">
+        Você está no teste grátis. Contrate agora e continue sem interrupção.
+      </p>
 
       <p v-if="fetching" class="contratar_loading">Carregando planos...</p>
       <p v-else-if="planos.length === 0" class="contratar_loading">Nenhum plano disponível no momento.</p>
@@ -441,6 +460,12 @@ async function pagar() {
   span {
     font-weight: 700;
     color: #f7f7f7;
+  }
+
+  &--aviso {
+    max-width: 520px;
+    margin-bottom: 20px;
+    color: #d9b77e;
   }
 }
 

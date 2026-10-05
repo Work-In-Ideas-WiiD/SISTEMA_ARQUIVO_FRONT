@@ -27,6 +27,14 @@ export interface IUserProps {
   created_at: string
   updated_at: string
   endereco: IEndereco
+  /** Teste grátis em andamento (sem plano contratado). */
+  teste_gratis?: ITesteGratis | null
+  teste_encerrado?: boolean
+}
+
+export interface ITesteGratis {
+  ate: string
+  dias_restantes: number
 }
 
 export interface ILoginResponse {

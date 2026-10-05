@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { RouterLink } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
 import { useEmpresaIdentidade } from '@/composables/useEmpresaIdentidade'
@@ -31,6 +32,12 @@ const disco = computed(() => {
     pct,
     nivel: pct >= 90 ? 'critico' : pct >= 75 ? 'alerta' : 'ok'
   }
+})
+
+const teste = computed(() => {
+  const dias = identidade.value?.teste_gratis?.dias_restantes
+  if (!dias) return null
+  return dias === 1 ? 'último dia' : `${dias} dias`
 })
 
 const codigo = computed(() => identidade.value?.codigo || identidade.value?.id.slice(0, 6).toUpperCase() || '')
@@ -186,6 +193,11 @@ onBeforeUnmount(limparPreview)
       </svg>
     </button>
 
+    <div v-if="teste && !compact" class="emp-id__teste">
+      <span>Teste grátis: {{ teste }}</span>
+      <RouterLink to="/contratar">Contratar</RouterLink>
+    </div>
+
     <Teleport to="body">
       <div v-if="editando" class="emp-id-overlay" @click.self="fecharEdicao">
         <div class="emp-id-modal" role="dialog" aria-modal="true" aria-labelledby="emp-id-modal-title">
@@ -255,6 +267,7 @@ onBeforeUnmount(limparPreview)
 <style lang="scss" scoped>
 .emp-id {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
   margin: 0 var(--sidebar-nav-pad, 40px) 22px;
@@ -377,6 +390,33 @@ onBeforeUnmount(limparPreview)
 
   &.is-critico .emp-id__disco-barra span {
     background: #e57373;
+  }
+}
+
+.emp-id__teste {
+  flex-basis: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 11px;
+  white-space: nowrap;
+
+  span {
+    color: #d9b77e;
+    font-weight: 600;
+  }
+
+  a {
+    color: #fffcff;
+    font-weight: 600;
+    text-decoration: underline;
+
+    &:hover {
+      color: #d9b77e;
+    }
   }
 }
 
