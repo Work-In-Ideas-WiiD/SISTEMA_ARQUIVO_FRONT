@@ -45,3 +45,29 @@ export function isValidOptionalCnpj(value: string): boolean {
   const digits = value.replace(/\D/g, '')
   return digits.length === 0 || digits.length === 14
 }
+
+/** CPF completo com dígitos verificadores corretos. */
+export function isValidCpf(value: string): boolean {
+  const cpf = value.replace(/\D/g, '')
+  if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false
+  for (let t = 9; t < 11; t++) {
+    let soma = 0
+    for (let i = 0; i < t; i++) soma += Number(cpf[i]) * (t + 1 - i)
+    if (Number(cpf[t]) !== ((10 * soma) % 11) % 10) return false
+  }
+  return true
+}
+
+/** CNPJ completo com dígitos verificadores corretos. */
+export function isValidCnpj(value: string): boolean {
+  const cnpj = value.replace(/\D/g, '')
+  if (cnpj.length !== 14 || /^(\d)\1{13}$/.test(cnpj)) return false
+  for (const t of [12, 13]) {
+    const pesos = t === 12 ? [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2] : [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+    let soma = 0
+    for (let i = 0; i < t; i++) soma += Number(cnpj[i]) * pesos[i]
+    const resto = soma % 11
+    if (Number(cnpj[t]) !== (resto < 2 ? 0 : 11 - resto)) return false
+  }
+  return true
+}

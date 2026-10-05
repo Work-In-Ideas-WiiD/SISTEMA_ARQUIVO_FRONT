@@ -394,13 +394,15 @@ async function pagar() {
 .contratar_shell {
   position: relative;
   z-index: 2;
-  width: min(100%, 820px);
+  width: min(100%, 940px);
   max-height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: clamp(24px, 4vh, 48px) 18px;
   box-sizing: border-box;
+  overflow-y: auto;
+  scrollbar-width: none;
 
   &--pay {
     width: min(100%, 358px);
@@ -460,7 +462,7 @@ async function pagar() {
 }
 
 .plano_card {
-  width: 280px;
+  width: 270px;
   max-width: 100%;
   padding: 28px 24px;
   border-radius: 24px;
