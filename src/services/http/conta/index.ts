@@ -60,12 +60,14 @@ export async function postContratacao(
   plano_id: string,
   encrypted: string,
   security_code: string,
-  telefone?: string
+  telefone?: string,
+  periodicidade: 'mensal' | 'anual' = 'mensal'
 ): Promise<AxiosResponse<IContratacaoRes>> {
   const res = await api.post('/contratacao', {
     plano_id,
     encrypted,
     security_code,
+    periodicidade,
     ...(telefone ? { telefone } : {})
   })
   return res

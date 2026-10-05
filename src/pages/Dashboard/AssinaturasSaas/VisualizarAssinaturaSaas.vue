@@ -181,12 +181,19 @@ function statusClass(s?: string | null) {
         <div class="view-saas__row view-saas__row--thirds">
           <div class="view-saas__field">
             <span class="view-saas__label night-field-label">PLANO</span>
-            <input :value="item.plano?.nome || '—'" type="text" class="view-saas__input" disabled />
+            <input
+              :value="item.plano ? `${item.plano.nome} (${item.periodicidade === 'anual' ? 'Anual' : 'Mensal'})` : '—'"
+              type="text"
+              class="view-saas__input"
+              disabled
+            />
           </div>
           <div class="view-saas__field">
-            <span class="view-saas__label night-field-label">VALOR MENSAL</span>
+            <span class="view-saas__label night-field-label">
+              {{ item.periodicidade === 'anual' ? 'VALOR ANUAL' : 'VALOR MENSAL' }}
+            </span>
             <input
-              :value="formatBRL(item.plano?.valor_mensal_centavos)"
+              :value="formatBRL(item.valor_centavos ?? item.plano?.valor_mensal_centavos)"
               type="text"
               class="view-saas__input"
               disabled

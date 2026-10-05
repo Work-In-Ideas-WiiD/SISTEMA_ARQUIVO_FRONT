@@ -66,12 +66,15 @@ function formatGB(bytes: number): string {
   return `${gb.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} GB`
 }
 
-function getCalculatedPrice(valorMensalCentavos: number): number {
+function formatBRL(centavos: number): string {
+  return (centavos / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+}
+
+function getCalculatedPrice(plano: IPlanoPublico): number {
   if (billingCycle.value === 'anual') {
-    // 20% discount on annual billing
-    return Math.round(valorMensalCentavos * 0.8)
+    return plano.valor_mensal_no_anual_centavos ?? Math.round(plano.valor_mensal_centavos * 0.8)
   }
-  return valorMensalCentavos
+  return plano.valor_mensal_centavos
 }
 
 function getFeaturesForPlan(plano: IPlanoPublico): string[] {
@@ -105,7 +108,7 @@ function handleSelectPlan(plano: IPlanoPublico) {
   const selectedPlanData = {
     id: plano.id,
     nome: plano.nome,
-    valor_mensal_centavos: getCalculatedPrice(plano.valor_mensal_centavos),
+    valor_mensal_centavos: getCalculatedPrice(plano),
     periodicidade: billingCycle.value
   }
 
@@ -205,13 +208,13 @@ function onWhatsAppContactClick() {
           <div class="card_price">
             <span class="currency">R$</span>
             <span class="amount">
-              {{ (getCalculatedPrice(plano.valor_mensal_centavos) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+              {{ (getCalculatedPrice(plano) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
             </span>
             <span class="period">/mês</span>
           </div>
 
           <p v-if="billingCycle === 'anual'" class="annual_note">
-            Cobrado anualmente (economia de 20%)
+            {{ formatBRL(getCalculatedPrice(plano) * 12) }} cobrado por ano (economia de 20%)
           </p>
           <p v-else class="annual_note">
             Cobrança mensal sem fidelidade

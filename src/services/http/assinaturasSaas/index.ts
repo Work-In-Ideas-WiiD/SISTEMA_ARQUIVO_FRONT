@@ -57,7 +57,12 @@ export interface IAssinaturaSaasHistorico {
 export interface IAssinaturaSaas {
   id: string
   conta_id: string
-  plano_id: string
+  plano_id: string | null
+  /** Linha de conta em teste grátis (sem assinatura). */
+  teste?: boolean
+  periodicidade?: 'mensal' | 'anual'
+  /** Valor cobrado por período (mês ou ano). */
+  valor_centavos?: number | null
   status: TAssinaturaSaasStatus | string
   gateway_subscription_id?: string | null
   gateway_customer_id?: string | null
@@ -140,7 +145,9 @@ export function labelStatusAssinatura(status?: string | null): string {
     cancelada: 'Cancelada',
     inadimplente: 'Inadimplente',
     expirada: 'Expirada',
-    pendente_acao: 'Pendente ação'
+    pendente_acao: 'Pendente ação',
+    teste: 'Teste grátis',
+    teste_encerrado: 'Teste encerrado'
   }
   return status ? map[status] || status : '—'
 }

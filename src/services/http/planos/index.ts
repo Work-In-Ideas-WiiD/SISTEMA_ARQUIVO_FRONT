@@ -21,7 +21,13 @@ export interface IPlanoPublico {
   valor_mensal_centavos: number
   max_usuarios: number
   armazenamento_bytes: number
+  /** Valor por mês na assinatura anual (com desconto). */
+  valor_mensal_no_anual_centavos?: number
+  /** Valor cobrado de uma vez na assinatura anual. */
+  valor_anual_centavos?: number
 }
+
+export type TPeriodicidade = 'mensal' | 'anual'
 
 export interface IGetPlanosRes {
   current_page: number

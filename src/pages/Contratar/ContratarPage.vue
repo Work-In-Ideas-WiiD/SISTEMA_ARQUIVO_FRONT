@@ -7,7 +7,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import logoAkidocs from '@/assets/imgs/login/logo-akidocs-white.png'
 import iconBackCircle from '@/assets/imgs/login/icon-back-circle.svg'
 import iconChevronLeft from '@/assets/imgs/login/icon-chevron-left.svg'
-import { getPlanosPublicos, type IPlanoPublico } from '@/services/http/planos'
+import { getPlanosPublicos, type IPlanoPublico, type TPeriodicidade } from '@/services/http/planos'
 import { getChavePublica, postContratacao } from '@/services/http/conta'
 import { getApiErrorMessage } from '@/utils/apiError'
 import { maskPhone, stripDigits } from '@/utils/formatPhone'
@@ -25,6 +25,28 @@ const sucesso = ref(false)
 const processando = ref(false)
 
 const planoSelecionado = ref<IPlanoPublico | null>(null)
+const periodicidade = ref<TPeriodicidade>(getSelectedPlan()?.periodicidade === 'anual' ? 'anual' : 'mensal')
+
+function valorPorMes(plano: IPlanoPublico): number {
+  return periodicidade.value === 'anual'
+    ? (plano.valor_mensal_no_anual_centavos ?? plano.valor_mensal_centavos)
+    : plano.valor_mensal_centavos
+}
+
+function valorCobrado(plano: IPlanoPublico): number {
+  return periodicidade.value === 'anual'
+    ? (plano.valor_anual_centavos ?? plano.valor_mensal_centavos * 12)
+    : plano.valor_mensal_centavos
+}
+
+function dadosTracking(plano: IPlanoPublico) {
+  return {
+    id: plano.id,
+    nome: plano.nome,
+    valor_mensal_centavos: valorPorMes(plano),
+    periodicidade: periodicidade.value
+  }
+}
 
 const card = ref({
   holder: '',
@@ -115,12 +137,7 @@ function onCardNumberInput(event: Event) {
 
 function selecionarPlano(plano: IPlanoPublico) {
   planoSelecionado.value = plano
-  trackBeginCheckout({
-    id: plano.id,
-    nome: plano.nome,
-    valor_mensal_centavos: plano.valor_mensal_centavos,
-    periodicidade: 'mensal'
-  })
+  trackBeginCheckout(dadosTracking(plano))
 }
 
 function limparCartao() {
@@ -191,7 +208,8 @@ async function pagar() {
       planoSelecionado.value.id,
       encryptResult.encryptedCard,
       card.value.cvv,
-      telefone.value.replace(/\D/g, '')
+      telefone.value.replace(/\D/g, ''),
+      periodicidade.value
     )
 
     // Limpa os dados do cartão do estado assim que possível.
@@ -202,23 +220,13 @@ async function pagar() {
       toast.success(data.message || 'Pagamento aprovado! Assinatura ativada.')
       trackPurchase({
         transactionId: data.pagamento?.id || data.assinatura?.id,
-        plano: {
-          id: planoSelecionado.value.id,
-          nome: planoSelecionado.value.nome,
-          valor_mensal_centavos: planoSelecionado.value.valor_mensal_centavos,
-          periodicidade: 'mensal'
-        }
+        plano: dadosTracking(planoSelecionado.value)
       })
     } else if (data.status === 'pendente') {
       toast.info(data.message || 'Assinatura criada. Aguardando confirmação do pagamento.')
       trackPurchase({
         transactionId: data.pagamento?.id || data.assinatura?.id,
-        plano: {
-          id: planoSelecionado.value.id,
-          nome: planoSelecionado.value.nome,
-          valor_mensal_centavos: planoSelecionado.value.valor_mensal_centavos,
-          periodicidade: 'mensal'
-        }
+        plano: dadosTracking(planoSelecionado.value)
       })
     } else {
       toast.error(data.message || 'Pagamento não autorizado. Tente outro cartão.')
@@ -257,7 +265,11 @@ async function pagar() {
       <h1 class="contratar_title">Pagamento</h1>
       <p class="contratar_subtitle">
         {{ planoSelecionado.nome }} —
-        <span>{{ formatBRL(planoSelecionado.valor_mensal_centavos) }}/mês</span>
+        <span v-if="periodicidade === 'anual'">{{ formatBRL(valorCobrado(planoSelecionado)) }}/ano</span>
+        <span v-else>{{ formatBRL(planoSelecionado.valor_mensal_centavos) }}/mês</span>
+        <template v-if="periodicidade === 'anual'">
+          <br />Cobrança única por ano, equivale a {{ formatBRL(valorPorMes(planoSelecionado)) }}/mês.
+        </template>
       </p>
 
       <form class="pay_form" @submit.prevent="pagar">
@@ -318,7 +330,7 @@ async function pagar() {
 
         <button type="submit" class="night_btn" :disabled="processando">
           <LoadingSpinner v-if="processando" />
-          <span v-else>PAGAR {{ formatBRL(planoSelecionado.valor_mensal_centavos) }}</span>
+          <span v-else>PAGAR {{ formatBRL(valorCobrado(planoSelecionado)) }}</span>
         </button>
       </form>
 
@@ -347,6 +359,25 @@ async function pagar() {
         Você está no teste grátis. Contrate agora e continue sem interrupção.
       </p>
 
+      <div v-if="!fetching && planos.length" class="periodo_toggle" role="group" aria-label="Forma de cobrança">
+        <button
+          type="button"
+          :class="{ 'is-ativo': periodicidade === 'mensal' }"
+          :aria-pressed="periodicidade === 'mensal'"
+          @click="periodicidade = 'mensal'"
+        >
+          Mensal
+        </button>
+        <button
+          type="button"
+          :class="{ 'is-ativo': periodicidade === 'anual' }"
+          :aria-pressed="periodicidade === 'anual'"
+          @click="periodicidade = 'anual'"
+        >
+          Anual <small>20% OFF</small>
+        </button>
+      </div>
+
       <p v-if="fetching" class="contratar_loading">Carregando planos...</p>
       <p v-else-if="planos.length === 0" class="contratar_loading">Nenhum plano disponível no momento.</p>
 
@@ -354,7 +385,14 @@ async function pagar() {
         <article v-for="plano in planos" :key="plano.id" class="plano_card">
           <h2 class="plano_card__nome">{{ plano.nome }}</h2>
           <p class="plano_card__valor">
-            {{ formatBRL(plano.valor_mensal_centavos) }}<span>/mês</span>
+            {{ formatBRL(valorPorMes(plano)) }}<span>/mês</span>
+          </p>
+          <p class="plano_card__cobranca">
+            {{
+              periodicidade === 'anual'
+                ? `${formatBRL(valorCobrado(plano))} cobrado por ano`
+                : 'Cobrança mensal sem fidelidade'
+            }}
           </p>
           <p v-if="plano.descricao" class="plano_card__desc">{{ plano.descricao }}</p>
           <ul class="plano_card__features">
@@ -478,6 +516,43 @@ async function pagar() {
   text-align: center;
 }
 
+.periodo_toggle {
+  display: inline-flex;
+  gap: 4px;
+  margin: 4px 0 20px;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+
+  button {
+    padding: 8px 18px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: rgba(255, 252, 255, 0.75);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+
+    small {
+      margin-left: 6px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(127, 200, 169, 0.2);
+      color: #7fc8a9;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    &.is-ativo {
+      background: #fffcff;
+      color: #0b1b2b;
+    }
+  }
+}
+
 .planos_grid {
   width: 100%;
   display: flex;
@@ -524,6 +599,14 @@ async function pagar() {
       color: #f7f7f7;
       opacity: 0.7;
     }
+  }
+
+  &__cobranca {
+    margin: -8px 0 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #7fc8a9;
+    text-align: center;
   }
 
   &__desc {

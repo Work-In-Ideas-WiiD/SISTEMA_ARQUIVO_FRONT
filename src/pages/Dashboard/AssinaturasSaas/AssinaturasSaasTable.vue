@@ -48,8 +48,11 @@ const statusOptions = [
   { value: 'suspensa', label: 'Suspensa' },
   { value: 'cancelada', label: 'Cancelada' },
   { value: 'expirada', label: 'Expirada' },
-  { value: 'pendente_acao', label: 'Pendente ação' }
+  { value: 'pendente_acao', label: 'Pendente ação' },
+  { value: 'teste', label: 'Teste grátis' }
 ]
+
+const filtroTeste = computed(() => status.value === 'teste')
 
 const statusLabel = computed(
   () => statusOptions.find((option) => option.value === status.value)?.label ?? 'Todos os status'
@@ -347,17 +350,26 @@ function statusClass(s?: string) {
               <th>Plano</th>
               <th>Status</th>
               <th>Criação</th>
-              <th>Próxima cobrança</th>
+              <th>{{ filtroTeste ? 'Fim do teste' : 'Próxima cobrança' }}</th>
               <th>Ações</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="item in itens" :key="item.id">
               <td :title="item.conta?.nome || '—'">{{ item.conta?.nome || '—' }}</td>
-              <td>
+              <td v-if="item.teste">
+                <div class="saas-plano" title="Teste grátis">
+                  <span>Teste grátis</span>
+                  <small>Sem cobrança</small>
+                </div>
+              </td>
+              <td v-else>
                 <div class="saas-plano" :title="item.plano?.nome || '—'">
                   <span>{{ item.plano?.nome || '—' }}</span>
-                  <small>{{ formatBRL(item.plano?.valor_mensal_centavos) }}</small>
+                  <small>
+                    {{ formatBRL(item.valor_centavos ?? item.plano?.valor_mensal_centavos) }}
+                    {{ item.periodicidade === 'anual' ? '/ano' : '/mês' }}
+                  </small>
                 </div>
               </td>
               <td>
@@ -366,12 +378,19 @@ function statusClass(s?: string) {
                 </span>
               </td>
               <td :title="formatDate(item.created_at)">{{ formatDate(item.created_at) }}</td>
-              <td :title="formatDate(item.proxima_cobranca_em)">
+              <td v-if="item.teste && !filtroTeste">
+                <div class="saas-plano" :title="formatDate(item.proxima_cobranca_em)">
+                  <span>{{ formatDate(item.proxima_cobranca_em) }}</span>
+                  <small>fim do teste</small>
+                </div>
+              </td>
+              <td v-else :title="formatDate(item.proxima_cobranca_em)">
                 {{ formatDate(item.proxima_cobranca_em) }}
               </td>
               <td>
                 <div class="saas-actions">
                   <button
+                    v-if="!item.teste"
                     type="button"
                     class="saas-action"
                     aria-label="Visualizar assinatura"
@@ -448,6 +467,8 @@ function statusClass(s?: string) {
   padding: 30px 38px 28px;
 
   &__top {
+    position: relative;
+    z-index: 20;
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
@@ -581,7 +602,7 @@ function statusClass(s?: string) {
     top: calc(100% + 8px);
     left: 0;
     width: max(100%, 200px);
-    max-height: 260px;
+    max-height: 400px;
     margin: 0;
     padding: 10px;
     list-style: none;
@@ -595,6 +616,10 @@ function statusClass(s?: string) {
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
     box-sizing: border-box;
     z-index: 10;
+
+    > li {
+      flex-shrink: 0;
+    }
   }
 
   &__option {
@@ -844,8 +869,14 @@ function statusClass(s?: string) {
     color: rgba(247, 247, 247, 0.8);
   }
 
+  &--teste {
+    background: rgba(199, 154, 84, 0.25);
+    color: #e3b877;
+  }
+
   &--cancelada,
   &--expirada,
+  &--teste_encerrado,
   &--desconhecido {
     background: rgba(255, 255, 255, 0.06);
     color: rgba(247, 247, 247, 0.65);
