@@ -136,6 +136,26 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/Dashboard/EmpresasConta/EmpresasContaPage.vue')
       },
       {
+        path: 'minhas-empresas/:id/editar',
+        name: 'minhas-empresas-editar',
+        component: () => import('@/pages/Dashboard/EmpresasConta/EditEmpresaConta.vue')
+      },
+      {
+        path: 'gestores',
+        name: 'gestores',
+        component: () => import('@/pages/Dashboard/Gestores/GestoresPage.vue')
+      },
+      {
+        path: 'gestores/novo',
+        name: 'gestores-novo',
+        component: () => import('@/pages/Dashboard/Gestores/GestorForm.vue')
+      },
+      {
+        path: 'gestores/:id/editar',
+        name: 'gestores-editar',
+        component: () => import('@/pages/Dashboard/Gestores/GestorForm.vue')
+      },
+      {
         path: 'admins',
         name: 'admins',
         component: () => import('@/pages/Dashboard/Administradores/AdministradoresPage.vue'),

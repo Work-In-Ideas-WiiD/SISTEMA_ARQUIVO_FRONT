@@ -185,7 +185,7 @@ function abrirArquivos(empresa: IEmpresaConta) {
                   >
                     <img :src="iconFiles" width="15" height="19" alt="" />
                   </button>
-                  <button type="button" class="emp-conta__action" aria-label="Editar empresa" @click="abrirModal(empresa)">
+                  <button type="button" class="emp-conta__action" aria-label="Editar empresa" @click="router.push(`/dashboard/minhas-empresas/${empresa.id}/editar`)">
                     <img :src="iconEdit" width="24" height="24" alt="" />
                   </button>
                   <button

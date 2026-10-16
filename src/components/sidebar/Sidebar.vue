@@ -15,6 +15,8 @@ interface IMenuItem {
   classname?: string
   roles: TUserTypes[]
   featureFlag?: 'assinaturas' | 'envioParaAssinatura'
+  /** Só quem contratou o plano (não os administradores que ele criou). */
+  somenteDono?: boolean
   /** Item que abre um submenu (o path serve só para marcar a seção ativa). */
   children?: IMenuItem[]
 }
@@ -54,10 +56,11 @@ const menuItems: IMenuItem[] = [
     roles: ['empresa']
   },
   {
-    title: 'Clientes',
-    icon: 'clientes',
-    path: '/dashboard/clientes',
-    roles: ['empresa']
+    title: 'Administradores',
+    icon: 'admin',
+    path: '/dashboard/gestores',
+    roles: ['empresa'],
+    somenteDono: true
   },
   {
     title: 'Empresas',
@@ -185,6 +188,10 @@ function shouldShowItem(item: IMenuItem): boolean {
     return false
   }
   
+  if (item.somenteDono && (authStore.me.empresa_id || authStore.me.empresa_principal_id)) {
+    return false
+  }
+
   return item.roles.includes(authStore.userRole)
 }
 </script>

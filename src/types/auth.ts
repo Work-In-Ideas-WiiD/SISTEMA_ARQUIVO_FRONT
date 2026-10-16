@@ -27,6 +27,8 @@ export interface IUserProps {
   created_at: string
   updated_at: string
   endereco: IEndereco
+  empresa_id?: string | null
+  empresa_principal_id?: string | null
   /** Teste grátis em andamento (sem plano contratado). */
   teste_gratis?: ITesteGratis | null
   teste_encerrado?: boolean

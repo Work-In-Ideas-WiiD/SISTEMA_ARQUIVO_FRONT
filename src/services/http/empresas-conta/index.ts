@@ -15,6 +15,44 @@ export interface IEmpresaContaPayload {
   cnpj?: string | null
 }
 
+export interface IEmpresaContaDetalhe extends IEmpresaConta {
+  nome_pessoa: string
+  nome_empresa: string
+  cpf: string | null
+  email: string
+  contato: string | null
+  endereco: {
+    cep?: string | null
+    rua?: string | null
+    numero?: string | number | null
+    bairro?: string | null
+    complemento?: string | null
+    cidade?: string | null
+    estado?: string | null
+  } | null
+}
+
+export interface IEmpresaContaDetalhePayload {
+  nome?: string
+  nome_empresa: string
+  cpf?: string | null
+  cnpj?: string | null
+  email?: string
+  contato?: string | null
+  endereco?: IEmpresaContaDetalhe['endereco']
+}
+
+export async function getEmpresaConta(id: string): Promise<AxiosResponse<IEmpresaContaDetalhe>> {
+  return api.get(`/empresas-conta/${id}`)
+}
+
+export async function putEmpresaContaDetalhe(
+  id: string,
+  data: IEmpresaContaDetalhePayload
+): Promise<AxiosResponse<IEmpresaContaDetalhe>> {
+  return api.put(`/empresas-conta/${id}`, data)
+}
+
 export async function getEmpresasConta(like = ''): Promise<AxiosResponse<IEmpresaConta[]>> {
   return api.get('/empresas-conta', { params: like ? { like } : {} })
 }
