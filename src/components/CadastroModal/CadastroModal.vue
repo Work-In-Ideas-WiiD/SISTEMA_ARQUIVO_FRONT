@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onUnmounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useCadastroModal } from '@/composables/useCadastroModal'
@@ -22,6 +22,7 @@ const enviando = ref(false)
 const erros = ref<Record<string, string>>({})
 
 watch(aberto, (visivel) => {
+  if (typeof document === 'undefined') return
   document.body.style.overflow = visivel ? 'hidden' : ''
   if (visivel) {
     trackEvent('cadastro_iniciado')
@@ -33,10 +34,13 @@ function onKey(event: KeyboardEvent) {
   if (event.key === 'Escape' && aberto.value) fecharModal()
 }
 
-window.addEventListener('keydown', onKey)
+onMounted(() => {
+  window.addEventListener('keydown', onKey)
+})
+
 onUnmounted(() => {
   window.removeEventListener('keydown', onKey)
-  document.body.style.overflow = ''
+  if (typeof document !== 'undefined') document.body.style.overflow = ''
 })
 
 function fecharModal() {
