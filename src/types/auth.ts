@@ -32,6 +32,8 @@ export interface IUserProps {
   /** Teste grátis em andamento (sem plano contratado). */
   teste_gratis?: ITesteGratis | null
   teste_encerrado?: boolean
+  /** Tour da primeira entrada, só para quem pediu o teste e ainda não viu. */
+  tour_pendente?: boolean
 }
 
 export interface ITesteGratis {

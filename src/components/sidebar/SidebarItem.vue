@@ -19,6 +19,7 @@ defineProps<{
   icon: string
   path: string
   isActive?: boolean
+  tour?: string
 }>()
 
 const emit = defineEmits<{
@@ -51,6 +52,7 @@ const figmaIcons: Record<string, { src: string; w: number; h: number }> = {
     v-if="path !== '/logout'"
     :to="path"
     :class="['sidebar-item', { active: isActive }]"
+    :data-tour="tour || undefined"
   >
     <div class="icon-wrapper">
       <img

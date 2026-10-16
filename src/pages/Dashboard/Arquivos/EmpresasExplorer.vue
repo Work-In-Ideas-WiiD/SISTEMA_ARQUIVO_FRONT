@@ -8,15 +8,18 @@ import { getEmpresas, type IGetEmpresasDataRes } from '@/services/http/empresas'
 import { getEmpresasConta } from '@/services/http/empresas-conta'
 import { getApiErrorMessage } from '@/utils/apiError'
 import iconBuilding from '@/assets/imgs/arquivos/icon-empresa-building.svg'
+import { useTour } from '@/composables/useTour'
 
 interface EmpresaTile {
   id: string
   label: string
+  principal: boolean
 }
 
 const router = useRouter()
 const toast = useToast()
 const authStore = useAuthStore()
+const tour = useTour()
 
 const loading = ref(true)
 const empresas = ref<EmpresaTile[]>([])
@@ -50,13 +53,13 @@ async function loadEmpresas() {
         const { data } = await getEmpresas(page, '')
         return { data: data.data, last_page: data.last_page }
       })
-      empresas.value = rows.map((item) => ({ id: item.id, label: labelEmpresa(item) }))
+      empresas.value = rows.map((item) => ({ id: item.id, label: labelEmpresa(item), principal: false }))
       return
     }
 
     if (role === 'empresa') {
       const { data } = await getEmpresasConta()
-      empresas.value = data.map((item) => ({ id: item.id, label: item.nome }))
+      empresas.value = data.map((item) => ({ id: item.id, label: item.nome, principal: item.principal }))
       return
     }
 
@@ -72,6 +75,17 @@ async function loadEmpresas() {
 
 function openEmpresa(empresa: EmpresaTile) {
   router.push({ name: 'arquivos-empresa', params: { empresaId: empresa.id } })
+}
+
+function cliqueEmpresa(empresa: EmpresaTile) {
+  if (tour.noUltimoPasso.value && empresa.principal) return
+  openEmpresa(empresa)
+}
+
+function duploCliqueEmpresa(empresa: EmpresaTile) {
+  if (!tour.noUltimoPasso.value || !empresa.principal) return
+  tour.encerrar()
+  openEmpresa(empresa)
 }
 
 onMounted(loadEmpresas)
@@ -95,8 +109,10 @@ onMounted(loadEmpresas)
             <button
               type="button"
               class="empresas-explorer__tile"
+              :data-tour="empresa.principal ? 'empresa-principal' : undefined"
               :title="empresa.label"
-              @click="openEmpresa(empresa)"
+              @click="cliqueEmpresa(empresa)"
+              @dblclick="duploCliqueEmpresa(empresa)"
             >
               <span class="empresas-explorer__box">
                 <img

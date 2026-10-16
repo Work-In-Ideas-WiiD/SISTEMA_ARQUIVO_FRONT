@@ -21,8 +21,11 @@ api.interceptors.response.use(
       Cookies.remove('ana_lucia.token')
     }
 
-    // Assinatura inativa/pendente (gate do backend) -> leva ao modo de pagamento.
-    if (
+    // Teste encerrado: o aviso abre em cima do sistema. O servidor continua negando o uso.
+    const statusAssinatura = error.response?.data?.assinatura_status
+    if (status === 402 && statusAssinatura === 'teste_encerrado' && typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('akidocs-teste-encerrado'))
+    } else if (
       status === 402 &&
       typeof window !== 'undefined' &&
       !window.location.pathname.startsWith('/contratar')

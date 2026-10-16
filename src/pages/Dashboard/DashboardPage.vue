@@ -6,6 +6,8 @@ import Sidebar from '@/components/sidebar/Sidebar.vue'
 import MobileHeader from '@/components/mobileHeader/MobileHeader.vue'
 import MobileBottomNav from '@/components/mobileBottomNav/MobileBottomNav.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import TourPrimeiroAcesso from '@/components/TourPrimeiroAcesso/TourPrimeiroAcesso.vue'
+import TesteEncerradoGate from '@/components/TesteEncerradoGate/TesteEncerradoGate.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -41,6 +43,8 @@ onMounted(async () => {
       <RouterView />
     </div>
     <MobileBottomNav />
+    <TourPrimeiroAcesso />
+    <TesteEncerradoGate />
   </main>
   <div v-else class="dashboard-loading dashboard-night">
     <LoadingSpinner theme="night" size="lg" />

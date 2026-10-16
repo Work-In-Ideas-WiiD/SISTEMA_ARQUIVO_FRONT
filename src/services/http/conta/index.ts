@@ -61,14 +61,17 @@ export async function postContratacao(
   encrypted: string,
   security_code: string,
   telefone?: string,
-  periodicidade: 'mensal' | 'anual' = 'mensal'
+  periodicidade: 'mensal' | 'anual' = 'mensal',
+  documento?: { cpf?: string; cnpj?: string }
 ): Promise<AxiosResponse<IContratacaoRes>> {
   const res = await api.post('/contratacao', {
     plano_id,
     encrypted,
     security_code,
     periodicidade,
-    ...(telefone ? { telefone } : {})
+    ...(telefone ? { telefone } : {}),
+    ...(documento?.cpf ? { cpf: documento.cpf } : {}),
+    ...(documento?.cnpj ? { cnpj: documento.cnpj } : {})
   })
   return res
 }

@@ -19,6 +19,8 @@ interface IMenuItem {
   somenteDono?: boolean
   /** Item que abre um submenu (o path serve só para marcar a seção ativa). */
   children?: IMenuItem[]
+  /** Alvo do tour da primeira entrada. */
+  tour?: string
 }
 
 const route = useRoute()
@@ -35,7 +37,8 @@ const menuItems: IMenuItem[] = [
     title: 'Arquivos',
     icon: 'files',
     path: '/dashboard/arquivos',
-    roles: ['administrador', 'cliente', 'empresa']
+    roles: ['administrador', 'cliente', 'empresa'],
+    tour: 'menu-arquivos'
   },
   {
     title: 'Empresas',
@@ -53,14 +56,16 @@ const menuItems: IMenuItem[] = [
     title: 'Empresas',
     icon: 'building',
     path: '/dashboard/minhas-empresas',
-    roles: ['empresa']
+    roles: ['empresa'],
+    tour: 'menu-controle'
   },
   {
     title: 'Administradores',
     icon: 'admin',
     path: '/dashboard/gestores',
     roles: ['empresa'],
-    somenteDono: true
+    somenteDono: true,
+    tour: 'menu-controle'
   },
   {
     title: 'Empresas',
@@ -72,25 +77,29 @@ const menuItems: IMenuItem[] = [
     title: 'Setores',
     icon: 'setores',
     path: '/dashboard/setores',
-    roles: ['administrador', 'empresa']
+    roles: ['administrador', 'empresa'],
+    tour: 'menu-controle'
   },
   {
     title: 'Funções',
     icon: 'funcoes',
     path: '/dashboard/funcoes',
-    roles: ['administrador', 'empresa']
+    roles: ['administrador', 'empresa'],
+    tour: 'menu-controle'
   },
   {
     title: 'Funcionários',
     icon: 'funcionarios',
     path: '/dashboard/funcionarios',
-    roles: ['administrador', 'empresa']
+    roles: ['administrador', 'empresa'],
+    tour: 'menu-controle'
   },
   {
     title: 'Agrupamentos',
     icon: 'agrupamentos',
     path: '/dashboard/agrupamentos',
-    roles: ['administrador', 'empresa']
+    roles: ['administrador', 'empresa'],
+    tour: 'menu-controle'
   },
   {
     title: 'Categorias de arquivo',
@@ -240,6 +249,7 @@ function shouldShowItem(item: IMenuItem): boolean {
           :path="item.path"
           :is-active="isActive(item.path)"
           :class="item.classname"
+          :tour="item.tour"
           @click="handleClick(item)"
         />
       </template>

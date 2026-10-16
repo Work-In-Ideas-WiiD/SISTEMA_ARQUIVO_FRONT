@@ -92,8 +92,8 @@ export const useAuthStore = defineStore('auth', () => {
       
       handleFetching(false)
       trackLogin('email')
-      // Assinatura pendente/vencida -> modo pagamento (não entra no sistema).
-      if (loginData.requires_payment) {
+      // Teste encerrado entra no sistema e o aviso trava o uso. Outros bloqueios vão para o pagamento.
+      if (loginData.requires_payment && loginData.assinatura_status !== 'teste_encerrado') {
         router.push('/contratar')
       } else {
         router.push('/dashboard/arquivos')
@@ -128,7 +128,7 @@ export const useAuthStore = defineStore('auth', () => {
       
       handleFetching(false)
       trackLogin('portal_cliente')
-      if (loginData.requires_payment) {
+      if (loginData.requires_payment && loginData.assinatura_status !== 'teste_encerrado') {
         router.push('/contratar')
       } else {
         // Cliente: pastas ficam em Arquivos (visual do Figma)

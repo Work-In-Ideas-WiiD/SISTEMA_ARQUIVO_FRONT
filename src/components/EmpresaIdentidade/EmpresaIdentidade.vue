@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { RouterLink } from 'vue-router'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
 import { useEmpresaIdentidade } from '@/composables/useEmpresaIdentidade'
@@ -8,11 +7,11 @@ import { NOME_EMPRESA_MAX, postEmpresaIdentidade } from '@/services/http/empresa
 import { getApiErrorMessage } from '@/utils/apiError'
 import { formatBytes } from '@/utils/formatBytes'
 
-withDefaults(defineProps<{ compact?: boolean }>(), { compact: false })
+const props = withDefaults(defineProps<{ compact?: boolean }>(), { compact: false })
 
 const toast = useToast()
 const authStore = useAuthStore()
-const { identidade, logoUrl, atualizar } = useEmpresaIdentidade()
+const { identidade, logoUrl, atualizar, carregar } = useEmpresaIdentidade()
 
 const logoFalhou = ref(false)
 watch(logoUrl, () => (logoFalhou.value = false))
@@ -34,11 +33,46 @@ const disco = computed(() => {
   }
 })
 
-const teste = computed(() => {
-  const dias = identidade.value?.teste_gratis?.dias_restantes
-  if (!dias) return null
-  return dias === 1 ? 'último dia' : `${dias} dias`
+const agora = ref(Date.now())
+let relogio: number | undefined
+
+onMounted(() => {
+  relogio = window.setInterval(() => {
+    agora.value = Date.now()
+  }, 1000)
 })
+
+onBeforeUnmount(() => {
+  if (relogio) window.clearInterval(relogio)
+})
+
+const contador = computed(() => {
+  const ate = identidade.value?.teste_gratis?.ate
+  if (!ate || props.compact) return null
+  const fim = new Date(ate).getTime()
+  if (Number.isNaN(fim)) return null
+  let seg = Math.max(0, Math.floor((fim - agora.value) / 1000))
+  const dias = Math.floor(seg / 86400)
+  seg -= dias * 86400
+  const horas = Math.floor(seg / 3600)
+  seg -= horas * 3600
+  const minutos = Math.floor(seg / 60)
+  const segundos = seg - minutos * 60
+  const dois = (n: number) => String(n).padStart(2, '0')
+  return {
+    texto: `${dias}d ${dois(horas)}:${dois(minutos)}:${dois(segundos)}`,
+    acabou: fim <= agora.value
+  }
+})
+
+watch(
+  () => contador.value?.acabou,
+  (acabou) => {
+    if (!acabou) return
+    void authStore.refreshUserData()
+    void carregar(true)
+  }
+)
 
 const codigo = computed(() => identidade.value?.codigo || identidade.value?.id.slice(0, 6).toUpperCase() || '')
 
@@ -139,7 +173,8 @@ onBeforeUnmount(limparPreview)
 </script>
 
 <template>
-  <div v-if="identidade" class="emp-id" :class="{ 'emp-id--compact': compact }">
+  <div v-if="identidade" class="emp-id-slot" :class="{ 'is-compact': compact }">
+  <div class="emp-id" :class="{ 'emp-id--compact': compact }">
     <button
       type="button"
       class="emp-id__foto"
@@ -192,11 +227,6 @@ onBeforeUnmount(limparPreview)
         />
       </svg>
     </button>
-
-    <div v-if="teste && !compact" class="emp-id__teste">
-      <span>Teste grátis: {{ teste }}</span>
-      <RouterLink to="/contratar">Contratar</RouterLink>
-    </div>
 
     <Teleport to="body">
       <div v-if="editando" class="emp-id-overlay" @click.self="fecharEdicao">
@@ -262,15 +292,50 @@ onBeforeUnmount(limparPreview)
       </div>
     </Teleport>
   </div>
+  <p v-if="contador && !contador.acabou" class="emp-id-contador">
+    <span>Teste grátis</span>
+    <strong>{{ contador.texto }}</strong>
+  </p>
+  </div>
 </template>
 
 <style lang="scss" scoped>
+.emp-id-slot {
+  margin: 0 var(--sidebar-nav-pad, 40px) 22px;
+  min-width: 0;
+  flex-shrink: 0;
+
+  &.is-compact {
+    margin: 0;
+  }
+}
+
+.emp-id-contador {
+  margin: 10px 0 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  color: #d9b77e;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+
+  strong {
+    color: #fffcff;
+    font-size: 13px;
+    font-weight: 700;
+  }
+}
+
 .emp-id {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
-  margin: 0 var(--sidebar-nav-pad, 40px) 22px;
+  margin: 0;
   padding: 10px 12px;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.04);
@@ -390,33 +455,6 @@ onBeforeUnmount(limparPreview)
 
   &.is-critico .emp-id__disco-barra span {
     background: #e57373;
-  }
-}
-
-.emp-id__teste {
-  flex-basis: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  font-size: 11px;
-  white-space: nowrap;
-
-  span {
-    color: #d9b77e;
-    font-weight: 600;
-  }
-
-  a {
-    color: #fffcff;
-    font-weight: 600;
-    text-decoration: underline;
-
-    &:hover {
-      color: #d9b77e;
-    }
   }
 }
 

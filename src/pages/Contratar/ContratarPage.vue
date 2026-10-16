@@ -11,6 +11,7 @@ import { getPlanosPublicos, descontoAnualDosPlanos, type IPlanoPublico, type TPe
 import { getChavePublica, postContratacao } from '@/services/http/conta'
 import { getApiErrorMessage } from '@/utils/apiError'
 import { maskPhone, stripDigits } from '@/utils/formatPhone'
+import { isValidCnpj, isValidCpf, maskCnpj, maskCpf } from '@/utils/formatCpfCnpj'
 import { useAuthStore } from '@/stores/auth'
 import { getSelectedPlan, trackBeginCheckout, trackPurchase } from '@/utils/tracking'
 import { setPageSeo } from '@/utils/seo'
@@ -58,6 +59,14 @@ const card = ref({
 })
 
 const telefone = ref('')
+const cpf = ref('')
+const cnpj = ref('')
+
+const faltaDocumento = computed(() => {
+  const docCpf = (authStore.me.cpf || '').replace(/\D/g, '')
+  const docCnpj = (authStore.me.cnpj || '').replace(/\D/g, '')
+  return docCpf.length !== 11 && docCnpj.length !== 14
+})
 
 const SDK_URL = 'https://assets.pagseguro.com.br/checkout-sdk-js/rc/dist/browser/pagseguro.min.js'
 
@@ -180,6 +189,15 @@ async function pagar() {
   if (!telefoneValido(telefone.value)) {
     return toast.error('Informe um telefone válido com DDD (ex.: 11999998888).')
   }
+  if (faltaDocumento.value && !isValidCpf(cpf.value) && !isValidCnpj(cnpj.value)) {
+    return toast.error('Informe um CPF ou um CNPJ válido para adquirir o plano.')
+  }
+  if (cpf.value && !isValidCpf(cpf.value)) {
+    return toast.error('CPF inválido.')
+  }
+  if (cnpj.value && !isValidCnpj(cnpj.value)) {
+    return toast.error('CNPJ inválido.')
+  }
 
   try {
     processando.value = true
@@ -210,7 +228,13 @@ async function pagar() {
       encryptResult.encryptedCard,
       card.value.cvv,
       telefone.value.replace(/\D/g, ''),
-      periodicidade.value
+      periodicidade.value,
+      faltaDocumento.value
+        ? {
+            cpf: cpf.value.replace(/\D/g, ''),
+            cnpj: cnpj.value.replace(/\D/g, '')
+          }
+        : undefined
     )
 
     // Limpa os dados do cartão do estado assim que possível.
@@ -274,6 +298,33 @@ async function pagar() {
       </p>
 
       <form class="pay_form" @submit.prevent="pagar">
+        <template v-if="faltaDocumento">
+          <p class="pay_form__aviso">Informe o CPF ou o CNPJ para concluir a compra. Um dos dois basta.</p>
+          <label class="night_field">
+            <span class="night_field__label">CPF</span>
+            <input
+              :value="cpf"
+              type="text"
+              inputmode="numeric"
+              maxlength="14"
+              placeholder="000.000.000-00"
+              autocomplete="off"
+              @input="cpf = maskCpf(($event.target as HTMLInputElement).value)"
+            />
+          </label>
+          <label class="night_field">
+            <span class="night_field__label">CNPJ</span>
+            <input
+              :value="cnpj"
+              type="text"
+              inputmode="numeric"
+              maxlength="18"
+              placeholder="00.000.000/0000-00"
+              autocomplete="off"
+              @input="cnpj = maskCnpj(($event.target as HTMLInputElement).value)"
+            />
+          </label>
+        </template>
         <label class="night_field">
           <span class="night_field__label">Telefone</span>
           <input
@@ -726,6 +777,15 @@ async function pagar() {
     width: 100%;
     display: flex;
     gap: 10px;
+  }
+
+  &__aviso {
+    width: 100%;
+    margin: 0;
+    color: #d9b77e;
+    font-size: 14px;
+    line-height: 1.4;
+    text-align: left;
   }
 }
 
