@@ -3,7 +3,7 @@ const steps = [
   {
     number: '01',
     title: 'Crie sua conta',
-    description: 'Cadastre sua empresa e comece seu teste gratuito de 8 dias.'
+    description: 'Cadastre sua empresa e comece seu teste gratuito de 15 dias.'
   },
   {
     number: '02',

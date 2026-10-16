@@ -15,7 +15,7 @@ function onTrialClick() {
         <div class="trial_badge">SEM COMPROMISSO</div>
 
         <h2 id="trial-highlight-title" class="trial_title">
-          Teste o AkiDocs grátis por 8 dias
+          Teste o AkiDocs grátis por 15 dias
         </h2>
 
         <p class="trial_text">

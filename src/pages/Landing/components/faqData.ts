@@ -77,7 +77,7 @@ export const faqs: IFaqItem[] = [
   {
     question: '15. Vocês podem fazer uma demonstração ou período de teste para eu validar upload, download, recuperação de arquivos, permissões e suporte antes de contratar?',
     answer:
-      'Sim. Você pode se cadastrar e utilizar a plataforma como quiser pelo período de 8 dias. Se quiser uma experiência mais personalizada, também pode agendar uma apresentação com o nosso time. Um de nossos consultores irá te apresentar a plataforma por completo antes da contratação, seus recursos e como ela pode ajudar na sua operação. Para agendar uma apresentação, entre em contato com o nosso time comercial através do <a href="https://wa.me/5562983398612" target="_blank" rel="noopener noreferrer" class="faq_inline_link">WhatsApp</a>.'
+      'Sim. Você pode se cadastrar e utilizar a plataforma como quiser pelo período de 15 dias. Se quiser uma experiência mais personalizada, também pode agendar uma apresentação com o nosso time. Um de nossos consultores irá te apresentar a plataforma por completo antes da contratação, seus recursos e como ela pode ajudar na sua operação. Para agendar uma apresentação, entre em contato com o nosso time comercial através do <a href="https://wa.me/5562983398612" target="_blank" rel="noopener noreferrer" class="faq_inline_link">WhatsApp</a>.'
   },
   {
     question: '16. O que pode fazer minha mensalidade aumentar depois da contratação e quais custos não estão incluídos na proposta?',

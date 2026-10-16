@@ -132,7 +132,7 @@ onMounted(() => {
       <!-- 9. FAQ -->
       <FAQSection />
 
-      <!-- 10. Teste o AkiDocs grátis por 8 dias -->
+      <!-- 10. Teste o AkiDocs grátis por 15 dias -->
       <FreeTrialHighlight />
 
       <!-- 11. Nova sessão de Compatibilidade & Integrações -->

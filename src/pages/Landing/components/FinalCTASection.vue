@@ -31,7 +31,7 @@ function onEmailClick() {
 
       <div class="cta_actions">
         <RouterLink to="/cadastro" class="cta_btn cta_btn--primary" @click="onStartClick">
-          <span>TESTAR GRÁTIS POR 8 DIAS</span>
+          <span>TESTE GRÁTIS POR 15 DIAS</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <line x1="5" y1="12" x2="19" y2="12"></line>
             <polyline points="12 5 19 12 12 19"></polyline>

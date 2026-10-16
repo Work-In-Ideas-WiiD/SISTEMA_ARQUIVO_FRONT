@@ -163,7 +163,7 @@ function onWhatsAppContactClick() {
           </div>
           <div class="spec_divider"></div>
           <div class="spec_item">
-            <strong>8 Dias</strong>
+            <strong>15 Dias</strong>
             <span>Teste 100% grátis</span>
           </div>
         </div>
@@ -227,7 +227,7 @@ function onWhatsAppContactClick() {
             :class="{ 'plan_cta_btn--popular': index === 1 }"
             @click="handleSelectPlan(plano)"
           >
-            TESTAR GRÁTIS POR 8 DIAS
+            TESTE GRÁTIS POR 15 DIAS
           </button>
 
           <div class="features_divider"></div>

@@ -90,7 +90,7 @@ function onStartClick(local: string = 'header') {
           LOGIN
         </RouterLink>
         <RouterLink to="/cadastro" class="header_btn header_btn--primary" @click="onStartClick('header')">
-          TESTAR GRÁTIS
+          TESTE GRÁTIS
         </RouterLink>
       </div>
 
@@ -125,7 +125,7 @@ function onStartClick(local: string = 'header') {
             LOGIN
           </RouterLink>
           <RouterLink to="/cadastro" class="mobile_btn mobile_btn--primary" @click="onStartClick('mobile_drawer')">
-            TESTAR GRÁTIS POR 8 DIAS
+            TESTE GRÁTIS POR 15 DIAS
           </RouterLink>
         </div>
       </div>
