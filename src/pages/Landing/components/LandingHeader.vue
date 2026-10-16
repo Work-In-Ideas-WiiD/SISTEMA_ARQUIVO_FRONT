@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
+import { useCadastroModal } from '@/composables/useCadastroModal'
 import logoAkidocs from '@/assets/imgs/login/logo-akidocs-white.png'
 import { trackLoginClick, trackCtaClick } from '@/utils/tracking'
 
 const route = useRoute()
 const router = useRouter()
+const { abrir: abrirCadastro } = useCadastroModal()
 const isScrolled = ref(false)
 const mobileMenuOpen = ref(false)
 
@@ -89,9 +91,9 @@ function onStartClick(local: string = 'header') {
         <RouterLink to="/login" class="header_btn header_btn--outline" @click="onLoginClick('header')">
           LOGIN
         </RouterLink>
-        <RouterLink to="/cadastro" class="header_btn header_btn--primary" @click="onStartClick('header')">
+        <button type="button" class="header_btn header_btn--primary" @click="onStartClick('header'); abrirCadastro()">
           TESTE GRÁTIS
-        </RouterLink>
+        </button>
       </div>
 
       <button
@@ -124,9 +126,9 @@ function onStartClick(local: string = 'header') {
           <RouterLink to="/login" class="mobile_btn mobile_btn--outline" @click="onLoginClick('mobile_drawer')">
             LOGIN
           </RouterLink>
-          <RouterLink to="/cadastro" class="mobile_btn mobile_btn--primary" @click="onStartClick('mobile_drawer')">
+          <button type="button" class="mobile_btn mobile_btn--primary" @click="onStartClick('mobile_drawer'); abrirCadastro()">
             TESTE GRÁTIS POR 15 DIAS
-          </RouterLink>
+          </button>
         </div>
       </div>
     </Transition>
@@ -277,6 +279,7 @@ function onStartClick(local: string = 'header') {
 
 .header_btn {
   font-family: 'Inter', sans-serif;
+  cursor: pointer;
   font-size: 12.5px;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -368,6 +371,7 @@ function onStartClick(local: string = 'header') {
 
 .mobile_btn {
   font-family: 'Inter', sans-serif;
+  cursor: pointer;
   font-size: 15px;
   font-weight: 700;
   text-decoration: none;

@@ -5,6 +5,9 @@ import LandingHeader from '@/pages/Landing/components/LandingHeader.vue'
 import LandingFooter from '@/pages/Landing/components/LandingFooter.vue'
 import { setPageSeo } from '@/utils/seo'
 import { trackContactClick, trackCtaClick } from '@/utils/tracking'
+import { useCadastroModal } from '@/composables/useCadastroModal'
+
+const { abrir: abrirTeste } = useCadastroModal()
 
 onMounted(() => {
   setPageSeo({
@@ -115,7 +118,7 @@ onMounted(() => {
         <div class="page_cta">
           <h2>Pronto para organizar seus documentos?</h2>
           <p>Experimente o AkiDocs gratuitamente por 15 dias com todos os recursos liberados, sem compromisso.</p>
-          <RouterLink to="/cadastro" class="cta_btn" @click="trackCtaClick('testar_gratis', 'sobre_nos')">TESTE GRÁTIS POR 15 DIAS</RouterLink>
+          <button type="button" class="cta_btn" @click="trackCtaClick('testar_gratis', 'sobre_nos'); abrirTeste()">TESTE GRÁTIS POR 15 DIAS</button>
         </div>
       </div>
     </main>
@@ -367,6 +370,8 @@ onMounted(() => {
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 700;
+  border: none;
+  cursor: pointer;
   border-radius: 30px;
   text-decoration: none;
   transition: all 0.2s ease;

@@ -6,7 +6,7 @@ export interface IRegistroModel {
   nome: string
   email: string
   password: string
-  password_confirmation: string
+  password_confirmation?: string
   nome_empresa: string
   cpf?: string
   cnpj?: string

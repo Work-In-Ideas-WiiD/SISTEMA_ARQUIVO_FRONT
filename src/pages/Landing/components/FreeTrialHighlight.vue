@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router'
 import { trackCtaClick } from '@/utils/tracking'
+import { useCadastroModal } from '@/composables/useCadastroModal'
+
+const { abrir } = useCadastroModal()
 
 function onTrialClick() {
   trackCtaClick('comecar_teste_gratis', 'free_trial_highlight')
@@ -23,13 +25,13 @@ function onTrialClick() {
         </p>
 
         <div class="trial_actions">
-          <RouterLink to="/cadastro" class="trial_btn" @click="onTrialClick">
+          <button type="button" class="trial_btn" @click="onTrialClick(); abrir()">
             <span>COMEÇAR TESTE GRÁTIS</span>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <line x1="5" y1="12" x2="19" y2="12"></line>
               <polyline points="12 5 19 12 12 19"></polyline>
             </svg>
-          </RouterLink>
+          </button>
         </div>
 
         <div class="trial_features">
@@ -130,6 +132,8 @@ function onTrialClick() {
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  border: none;
+  cursor: pointer;
   text-decoration: none;
   box-shadow: 0 4px 20px rgba(11, 27, 43, 0.6);
   transition: all 0.25s ease;

@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useCadastroModal } from '@/composables/useCadastroModal'
 import { getPlanosPublicos, descontoAnualDosPlanos, type IPlanoPublico } from '@/services/http/planos'
 import {
   saveSelectedPlan,
   trackPlanSelection,
   trackBeginCheckout,
-  trackContactClick,
-  getStoredUtmParams
+  trackContactClick
 } from '@/utils/tracking'
 
-const router = useRouter()
+const { abrir: abrirCadastro } = useCadastroModal()
 
 const billingCycle = ref<'mensal' | 'anual'>('anual')
 const loading = ref(true)
@@ -117,15 +116,7 @@ function handleSelectPlan(plano: IPlanoPublico) {
   trackBeginCheckout(selectedPlanData)
   saveSelectedPlan(selectedPlanData)
 
-  const utms = getStoredUtmParams()
-  router.push({
-    path: '/cadastro',
-    query: {
-      plano: plano.id,
-      billing: billingCycle.value,
-      ...utms
-    }
-  })
+  abrirCadastro()
 }
 
 function onWhatsAppContactClick() {
