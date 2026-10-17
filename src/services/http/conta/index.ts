@@ -10,14 +10,21 @@ export interface IRegistroModel {
   nome_empresa: string
   cpf?: string
   cnpj?: string
+  captcha_id?: string
+  captcha_resposta?: string
+  turnstile_token?: string
+  website?: string
 }
 
 export interface IRegistroRes {
-  access_token: string
-  token_type: string
+  access_token?: string
+  token_type?: string
   conta_id: string
-  /** A conta nova ganhou o teste grátis (entra direto no sistema). */
+  /** A conta nova ganhou o teste grátis (entra depois de confirmar o e-mail). */
   teste_gratis?: boolean
+  precisa_confirmar_email?: boolean
+  email_enviado?: boolean
+  message?: string
 }
 
 // Contratação de um plano (cartão tokenizado). O valor é definido pelo servidor.

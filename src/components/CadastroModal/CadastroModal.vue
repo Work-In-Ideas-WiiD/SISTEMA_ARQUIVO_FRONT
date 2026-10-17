@@ -4,6 +4,7 @@ import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useCadastroModal } from '@/composables/useCadastroModal'
 import { trackEvent } from '@/utils/tracking'
+import CaptchaCampo from '@/components/CaptchaCampo/CaptchaCampo.vue'
 import logoAkidocs from '@/assets/imgs/login/logo-akidocs-white.png'
 import iconPerson from '@/assets/imgs/login/icon-person.svg'
 import iconBuilding from '@/assets/imgs/login/icon-building.svg'
@@ -18,8 +19,19 @@ const nome = ref('')
 const nomeEmpresa = ref('')
 const email = ref('')
 const senha = ref('')
+const website = ref('')
 const enviando = ref(false)
+const enviado = ref(false)
+const mensagem = ref('')
 const erros = ref<Record<string, string>>({})
+const captcha = ref<InstanceType<typeof CaptchaCampo> | null>(null)
+
+watch(
+  () => route.path,
+  (path) => {
+    if (path.startsWith('/dashboard')) fechar()
+  }
+)
 
 watch(aberto, (visivel) => {
   if (typeof document === 'undefined') return
@@ -69,12 +81,16 @@ async function enviar() {
   if (Object.keys(erros.value).length) return
   enviando.value = true
   try {
-    await auth.signUp({
+    const data = await auth.signUp({
       nome: nome.value.trim(),
       nome_empresa: nomeEmpresa.value.trim(),
       email: email.value.trim(),
-      password: senha.value
+      password: senha.value,
+      website: website.value,
+      ...captcha.value?.dados()
     })
+    enviado.value = true
+    mensagem.value = data?.message || 'Enviamos um link para o seu e-mail. Confirme antes de entrar.'
   } catch (err: unknown) {
     const data = (err as { response?: { data?: { errors?: Record<string, string[]> } } })?.response?.data
     if (data?.errors) {
@@ -84,6 +100,7 @@ async function enviar() {
         if (destino) erros.value[destino] = msgs[0]
       }
     }
+    void captcha.value?.recarregar()
   } finally {
     enviando.value = false
   }
@@ -97,6 +114,13 @@ async function enviar() {
         <button type="button" class="cadastro-modal__fechar" aria-label="Fechar" @click="fecharModal">×</button>
         <h2 id="cadastro-titulo" class="sr-only">Cadastro</h2>
         <img class="cadastro-modal__logo" :src="logoAkidocs" alt="AkiDocs" />
+
+        <div v-if="enviado" class="cadastro-modal__aviso">
+          <h3>Confirme seu e-mail</h3>
+          <p>{{ mensagem }}</p>
+          <button type="button" class="cadastro-modal__enviar" @click="fechar(); router.push('/login')">Ir para o login</button>
+        </div>
+        <template v-else>
 
         <label class="cadastro-modal__campo" :class="{ 'is-erro': erros.nome }">
           <img :src="iconPerson" alt="" width="14" height="14" />
@@ -122,6 +146,9 @@ async function enviar() {
         </label>
         <small v-if="erros.senha">{{ erros.senha }}</small>
 
+        <input v-model="website" class="sr-only" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <CaptchaCampo ref="captcha" />
+
         <button type="submit" class="cadastro-modal__enviar" :disabled="enviando">
           {{ enviando ? 'Continuando…' : 'Continuar' }}
         </button>
@@ -130,12 +157,29 @@ async function enviar() {
           Já tem conta?
           <RouterLink to="/login" @click="fechar">Entrar.</RouterLink>
         </p>
+        </template>
       </form>
     </div>
   </Teleport>
 </template>
 
 <style lang="scss" scoped>
+.cadastro-modal__aviso {
+  text-align: center;
+  color: #fffcff;
+
+  h3 {
+    margin: 0 0 8px;
+    font-size: 20px;
+  }
+
+  p {
+    margin: 0 0 16px;
+    line-height: 1.45;
+    color: rgba(255, 252, 255, 0.88);
+  }
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

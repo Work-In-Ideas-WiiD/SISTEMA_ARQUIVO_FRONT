@@ -4,6 +4,7 @@ import { RouterLink } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import CaptchaCampo from '@/components/CaptchaCampo/CaptchaCampo.vue'
 import logoAkidocs from '@/assets/imgs/login/logo-akidocs-white.png'
 import iconPerson from '@/assets/imgs/login/icon-person.svg'
 import iconBuilding from '@/assets/imgs/login/icon-building.svg'
@@ -16,6 +17,10 @@ import { maskCpf, maskCnpj, isValidCpf, isValidCnpj } from '@/utils/formatCpfCnp
 
 const toast = useToast()
 const auth = useAuthStore()
+const enviado = ref(false)
+const mensagem = ref('')
+const website = ref('')
+const captcha = ref<InstanceType<typeof CaptchaCampo> | null>(null)
 
 onMounted(() => {
   trackEvent('cadastro_iniciado')
@@ -88,15 +93,21 @@ async function handleSubmit() {
   const cnpjDigits = form.value.cnpj.replace(/\D/g, '')
 
   try {
-    await auth.signUp({
+    const data = await auth.signUp({
       nome: form.value.nome.trim(),
       nome_empresa: form.value.nome_empresa.trim(),
       email: form.value.email.trim(),
       password: form.value.password,
       password_confirmation: form.value.password_confirmation,
       cpf: cpfDigits || undefined,
-      cnpj: cnpjDigits || undefined
+      cnpj: cnpjDigits || undefined,
+      website: website.value,
+      ...captcha.value?.dados()
     })
+    if (data?.precisa_confirmar_email) {
+      enviado.value = true
+      mensagem.value = data.message || 'Enviamos um link para o seu e-mail. Confirme antes de entrar.'
+    }
   } catch (err: any) {
     const doServidor = err?.response?.data?.errors as Record<string, string[]> | undefined
     if (doServidor) {
@@ -106,6 +117,7 @@ async function handleSubmit() {
       }
       erros.value = e
     }
+    void captcha.value?.recarregar()
   }
 }
 </script>
@@ -121,6 +133,13 @@ async function handleSubmit() {
     </RouterLink>
 
     <form class="login_form" novalidate @submit.prevent="handleSubmit">
+      <div v-if="enviado" class="login_form__fields">
+        <img class="login_form__logo" :src="logoAkidocs" alt="Logotipo AkiDocs" />
+        <h2 class="cadastro_confirma">Confirme seu e-mail</h2>
+        <p class="cadastro_confirma__texto">{{ mensagem }}</p>
+        <RouterLink class="login_btn login_btn--primary" to="/login">IR PARA O LOGIN</RouterLink>
+      </div>
+      <template v-else>
       <img class="login_form__logo" :src="logoAkidocs" alt="Logotipo AkiDocs" />
 
       <div class="login_form__fields">
@@ -251,6 +270,8 @@ async function handleSubmit() {
         </div>
 
         <p class="login_form__legenda">* Obrigatório &nbsp;·&nbsp; ** Preencha o CPF ou o CNPJ</p>
+        <input v-model="website" class="sr-only" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <CaptchaCampo ref="captcha" />
       </div>
 
       <div class="login_form__actions">
@@ -263,6 +284,7 @@ async function handleSubmit() {
       <RouterLink class="login_form__first_access" to="/login" @click="trackLoginClick('cadastro_page')">
         Já tem conta? <span>Entrar.</span>
       </RouterLink>
+      </template>
     </form>
   </main>
 </template>
@@ -548,6 +570,20 @@ async function handleSubmit() {
       font-size: 13px;
     }
   }
+}
+
+.cadastro_confirma {
+  margin: 0 0 8px;
+  color: #fffcff;
+  font-size: 22px;
+  text-align: center;
+}
+
+.cadastro_confirma__texto {
+  margin: 0 0 18px;
+  color: rgba(255, 252, 255, 0.9);
+  line-height: 1.5;
+  text-align: center;
 }
 
 @media (max-height: 820px) {

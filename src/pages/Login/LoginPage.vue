@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
+import { api } from '@/services/http/api'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import logoAkidocs from '@/assets/imgs/login/logo-akidocs-white.png'
 import iconPerson from '@/assets/imgs/login/icon-person.svg'
@@ -12,9 +14,11 @@ import { setPageSeo } from '@/utils/seo'
 import { trackCtaClick } from '@/utils/tracking'
 
 const authStore = useAuthStore()
+const toast = useToast()
 
 const email = ref('')
 const password = ref('')
+const pedirConfirmacao = ref(false)
 
 onMounted(() => {
   setPageSeo({
@@ -25,7 +29,12 @@ onMounted(() => {
 })
 
 async function handleLogin() {
-  await authStore.signIn(email.value, password.value)
+  pedirConfirmacao.value = (await authStore.signIn(email.value, password.value)) === 'confirmar'
+}
+
+async function reenviar() {
+  await api.post('/email/reenviar', { email: email.value })
+  toast.success('Se este e-mail estiver pendente, enviamos um novo link.')
 }
 </script>
 
@@ -67,6 +76,10 @@ async function handleLogin() {
           />
         </label>
       </div>
+
+      <p v-if="pedirConfirmacao" class="login_form__links">
+        <button type="button" class="login_form__link" @click="reenviar">Reenviar e-mail de confirmação</button>
+      </p>
 
       <div class="login_form__links">
         <RouterLink class="login_form__link" to="/recuperar/email/empresa">

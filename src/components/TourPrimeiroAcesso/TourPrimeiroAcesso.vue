@@ -36,6 +36,7 @@ const authStore = useAuthStore()
 const tour = useTour()
 
 const rect = ref<{ top: number; left: number; width: number; height: number } | null>(null)
+const etapa = ref<'boas-vindas' | 'mobile' | 'tour' | null>(null)
 let medindo = 0
 
 const passoAtual = computed(() => PASSOS[tour.passo.value] || PASSOS[0])
@@ -92,17 +93,29 @@ async function marcarVisto() {
   }
 }
 
-onMounted(async () => {
-  if (!authStore.me.tour_pendente) return
-  if (!route.path.startsWith('/dashboard/arquivos')) return
-  if (window.innerWidth <= 900) return
+function podeAbrir() {
+  return !!authStore.me.tour_pendente && route.path.startsWith('/dashboard/arquivos')
+}
+
+onMounted(() => {
+  if (!podeAbrir()) return
+  etapa.value = window.matchMedia('(max-width: 900px)').matches ? 'mobile' : 'boas-vindas'
+})
+
+async function comecar() {
+  etapa.value = 'tour'
   tour.iniciar()
   await nextTick()
   mostrarAlvo()
   medir()
   medindo = window.requestAnimationFrame(loop)
   void marcarVisto()
-})
+}
+
+function entendi() {
+  etapa.value = null
+  void marcarVisto()
+}
 
 function mostrarAlvo() {
   const alvo = passoAtual.value.alvo
@@ -129,7 +142,30 @@ onBeforeUnmount(() => {
 
 <template>
   <Teleport to="body">
-    <div v-if="tour.ativo.value" class="tour">
+    <div v-if="etapa === 'boas-vindas'" class="tour-intro" role="dialog" aria-modal="true" aria-labelledby="tour-bemvindo">
+      <div class="tour-intro__card">
+        <h2 id="tour-bemvindo">Seja Bem vindo(a)!</h2>
+        <p>
+          Esse é o AkiDocs, seu gerenciador de arquivos na nuvem. Aqui você pode guardar arquivos com segurança e
+          compartilhá-los com seus funcionários, membros, clientes e até com as equipes dos seus clientes. Tudo do jeito
+          que você já está acostumado a fazer.
+        </p>
+        <button type="button" @click="comecar">COMEÇAR</button>
+      </div>
+    </div>
+
+    <div v-else-if="etapa === 'mobile'" class="tour-intro" role="dialog" aria-modal="true" aria-labelledby="tour-mobile">
+      <div class="tour-intro__card">
+        <h2 id="tour-mobile">Use no computador</h2>
+        <p>
+          A experiência completa do AkiDocs existe na versão para computador. Em breve lançamos os aplicativos para
+          celular. No navegador do celular, alguma função pode falhar.
+        </p>
+        <button type="button" @click="entendi">ENTENDI</button>
+      </div>
+    </div>
+
+    <div v-if="etapa === 'tour' && tour.ativo.value" class="tour">
       <div class="tour__faixa" :style="{ top: '0', left: '0', right: '0', height: `${rect?.top ?? 0}px` }" />
       <div
         class="tour__faixa"
@@ -160,7 +196,7 @@ onBeforeUnmount(() => {
       />
       <div
         v-if="!ultimo"
-        class="tour__faixa"
+        class="tour__trava"
         :style="{
           top: `${rect?.top ?? 0}px`,
           left: `${rect?.left ?? 0}px`,
@@ -206,15 +242,68 @@ onBeforeUnmount(() => {
 </template>
 
 <style lang="scss" scoped>
+.tour-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(6, 12, 22, 0.72);
+  font-family: 'Inter', sans-serif;
+
+  &__card {
+    width: min(520px, 100%);
+    padding: 28px 26px 22px;
+    border-radius: 18px;
+    background: #132438;
+    border: 1px solid rgba(217, 183, 126, 0.55);
+    color: #fffcff;
+    text-align: center;
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 26px;
+    }
+
+    p {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.55;
+      color: rgba(255, 252, 255, 0.9);
+    }
+
+    button {
+      display: block;
+      margin: 20px auto 0;
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 22px;
+      background: #b08d57;
+      color: #0b1b2b;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  }
+}
+
 .tour__faixa {
   position: fixed;
   z-index: 100;
   background: rgba(6, 12, 22, 0.72);
 }
 
-.tour__destaque {
+.tour__trava {
   position: fixed;
   z-index: 101;
+  background: transparent;
+  opacity: 1;
+}
+
+.tour__destaque {
+  position: fixed;
+  z-index: 102;
   border-radius: 14px;
   border: 2px solid #d9b77e;
   box-shadow: 0 0 0 4px rgba(217, 183, 126, 0.25);
@@ -223,7 +312,7 @@ onBeforeUnmount(() => {
 
 .tour__balao {
   position: fixed;
-  z-index: 102;
+  z-index: 103;
   width: 340px;
   max-width: calc(100vw - 32px);
   padding: 18px 18px 14px;

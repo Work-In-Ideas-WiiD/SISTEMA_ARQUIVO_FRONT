@@ -92,17 +92,27 @@ export const useAuthStore = defineStore('auth', () => {
       
       handleFetching(false)
       trackLogin('email')
+      if (loginData.precisa_confirmar_email) {
+        toast.info(loginData.message || 'Confirme seu e-mail antes de entrar.')
+        return 'confirmar' as const
+      }
       // Teste encerrado entra no sistema e o aviso trava o uso. Outros bloqueios vão para o pagamento.
       if (loginData.requires_payment && loginData.assinatura_status !== 'teste_encerrado') {
         router.push('/contratar')
       } else {
         router.push('/dashboard/arquivos')
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err)
       handleFetching(false)
+      if (err?.response?.data?.precisa_confirmar_email) {
+        toast.info(err.response.data.message || 'Confirme seu e-mail antes de entrar.')
+        return 'confirmar' as const
+      }
       toast.error('E-mail ou senha inválidos.')
+      return 'erro' as const
     }
+    return 'ok' as const
   }
 
   async function signInCustomer(email: string, password: string, companyId: string) {
@@ -145,6 +155,11 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       handleFetching(true)
       const { data } = await postRegistro(payload)
+      if (data.precisa_confirmar_email || !data.access_token) {
+        handleFetching(false)
+        trackSignUp('email')
+        return data
+      }
       setAuthToken(data.access_token)
       Cookies.set('ana_lucia.token', data.access_token, {
         expires: 1 / 24,

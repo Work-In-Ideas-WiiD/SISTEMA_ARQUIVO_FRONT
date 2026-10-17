@@ -56,6 +56,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/Cadastro/CadastroPage.vue')
   },
   {
+    path: '/confirmar-email',
+    name: 'confirmar-email',
+    component: () => import('@/pages/Cadastro/ConfirmarEmailPage.vue')
+  },
+  {
     path: '/contratar',
     name: 'contratar',
     component: () => import('@/pages/Contratar/ContratarPage.vue')
