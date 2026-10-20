@@ -15,6 +15,12 @@ import { isValidCnpj, isValidCpf, maskCnpj, maskCpf } from '@/utils/formatCpfCnp
 import { useAuthStore } from '@/stores/auth'
 import { getSelectedPlan, trackBeginCheckout, trackPurchase } from '@/utils/tracking'
 import { setPageSeo } from '@/utils/seo'
+import logoPagbank from '@/assets/imgs/pagamento/pagbank.png'
+import logoVisa from '@/assets/imgs/pagamento/visa.png'
+import logoMastercard from '@/assets/imgs/pagamento/mastercard.png'
+import logoElo from '@/assets/imgs/pagamento/elo.png'
+import logoAmex from '@/assets/imgs/pagamento/amex.png'
+import logoHipercard from '@/assets/imgs/pagamento/hipercard.png'
 
 const router = useRouter()
 const toast = useToast()
@@ -28,6 +34,11 @@ const processando = ref(false)
 
 const planoSelecionado = ref<IPlanoPublico | null>(null)
 const periodicidade = ref<TPeriodicidade>(getSelectedPlan()?.periodicidade === 'anual' ? 'anual' : 'mensal')
+
+/** Segundo plano da lista é o recomendado, como na página inicial. */
+function ehRecomendado(index: number) {
+  return planos.value.length > 1 && index === 1
+}
 
 function valorPorMes(plano: IPlanoPublico): number {
   return periodicidade.value === 'anual'
@@ -269,15 +280,17 @@ async function pagar() {
 
 <template>
   <main class="contratar_page">
-    <p class="contratar_page__watermark" aria-hidden="true">&lt;/DOC</p>
-
     <div v-if="sucesso" class="contratar_shell">
-      <img class="contratar_logo" :src="logoAkidocs" alt="Logotipo AkiDocs" />
-      <h1 class="contratar_title">Assinatura ativada</h1>
-      <p class="contratar_subtitle">Seu pagamento foi aprovado. Você já pode acessar o sistema.</p>
-      <button type="button" class="night_btn" @click="router.push('/')">
-        IR PARA O LOGIN
-      </button>
+      <div class="logo_chip">
+        <img class="contratar_logo" :src="logoAkidocs" alt="Logotipo AkiDocs" />
+      </div>
+      <div class="sucesso_card">
+        <h1 class="contratar_title">Assinatura ativada</h1>
+        <p class="contratar_subtitle">Seu pagamento foi aprovado. Você já pode acessar o sistema.</p>
+        <button type="button" class="night_btn" @click="router.push('/')">
+          IR PARA O LOGIN
+        </button>
+      </div>
     </div>
 
     <div v-else-if="planoSelecionado" class="contratar_shell contratar_shell--pay">
@@ -286,112 +299,175 @@ async function pagar() {
         <img class="back_btn__icon" :src="iconChevronLeft" alt="Ícone de seta para voltar" width="40" height="40" />
       </button>
 
-      <img class="contratar_logo" :src="logoAkidocs" alt="Logotipo AkiDocs" />
-      <h1 class="contratar_title">Pagamento</h1>
-      <p class="contratar_subtitle">
-        {{ planoSelecionado.nome }} —
-        <span v-if="periodicidade === 'anual'">{{ formatBRL(valorCobrado(planoSelecionado)) }}/ano</span>
-        <span v-else>{{ formatBRL(planoSelecionado.valor_mensal_centavos) }}/mês</span>
-        <template v-if="periodicidade === 'anual'">
-          <br />Cobrança única por ano, equivale a {{ formatBRL(valorPorMes(planoSelecionado)) }}/mês.
-        </template>
-      </p>
-
-      <form class="pay_form" @submit.prevent="pagar">
-        <template v-if="faltaDocumento">
-          <p class="pay_form__aviso">Informe o CPF ou o CNPJ para concluir a compra. Um dos dois basta.</p>
-          <label class="night_field">
-            <span class="night_field__label">CPF</span>
-            <input
-              :value="cpf"
-              type="text"
-              inputmode="numeric"
-              maxlength="14"
-              placeholder="000.000.000-00"
-              autocomplete="off"
-              @input="cpf = maskCpf(($event.target as HTMLInputElement).value)"
-            />
-          </label>
-          <label class="night_field">
-            <span class="night_field__label">CNPJ</span>
-            <input
-              :value="cnpj"
-              type="text"
-              inputmode="numeric"
-              maxlength="18"
-              placeholder="00.000.000/0000-00"
-              autocomplete="off"
-              @input="cnpj = maskCnpj(($event.target as HTMLInputElement).value)"
-            />
-          </label>
-        </template>
-        <label class="night_field">
-          <span class="night_field__label">Telefone</span>
-          <input
-            v-model="telefone"
-            type="tel"
-            inputmode="numeric"
-            maxlength="15"
-            placeholder="(11) 99999-8888"
-            autocomplete="tel"
-            @input="onTelefoneInput"
-          />
-        </label>
-        <label class="night_field">
-          <span class="night_field__label">Nome no cartão</span>
-          <input
-            v-model="card.holder"
-            type="text"
-            placeholder="Como está no cartão"
-            autocomplete="cc-name"
-          />
-        </label>
-        <label class="night_field">
-          <span class="night_field__label">Número do cartão</span>
-          <input
-            v-model="card.number"
-            type="text"
-            inputmode="numeric"
-            maxlength="19"
-            placeholder="0000 0000 0000 0000"
-            autocomplete="cc-number"
-            @input="onCardNumberInput"
-          />
-        </label>
-        <div class="pay_form__row">
-          <label class="night_field">
-            <span class="night_field__label">Mês</span>
-            <input v-model="card.expMonth" type="text" inputmode="numeric" maxlength="2" placeholder="MM" />
-          </label>
-          <label class="night_field">
-            <span class="night_field__label">Ano</span>
-            <input v-model="card.expYear" type="text" inputmode="numeric" maxlength="4" placeholder="AAAA" />
-          </label>
-          <label class="night_field">
-            <span class="night_field__label">CVV</span>
-            <input
-              v-model="card.cvv"
-              type="text"
-              inputmode="numeric"
-              maxlength="4"
-              placeholder="123"
-              autocomplete="cc-csc"
-            />
-          </label>
+      <header class="checkout_head">
+        <div class="logo_chip">
+          <img class="contratar_logo" :src="logoAkidocs" alt="Logotipo AkiDocs" />
         </div>
+        <h1 class="contratar_title">Finalize sua compra</h1>
+        <p class="contratar_subtitle">Confira os dados, pague e continue usando o AkiDocs sem interrupção.</p>
+      </header>
 
-        <button type="submit" class="night_btn" :disabled="processando">
-          <LoadingSpinner v-if="processando" />
-          <span v-else>PAGAR {{ formatBRL(valorCobrado(planoSelecionado)) }}</span>
-        </button>
+      <form class="checkout_grid" @submit.prevent="pagar">
+        <section class="checkout_card checkout_card--form" aria-label="Dados de pagamento">
+          <h2 class="checkout_card__title">Seus dados</h2>
+
+          <div class="pay_form">
+            <template v-if="faltaDocumento">
+              <p class="pay_form__aviso">Informe o CPF ou o CNPJ para concluir a compra. Um dos dois basta.</p>
+              <div class="pay_form__row">
+                <label class="night_field">
+                  <span class="night_field__label">CPF</span>
+                  <input
+                    :value="cpf"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="14"
+                    placeholder="000.000.000-00"
+                    autocomplete="off"
+                    @input="cpf = maskCpf(($event.target as HTMLInputElement).value)"
+                  />
+                </label>
+                <label class="night_field">
+                  <span class="night_field__label">CNPJ</span>
+                  <input
+                    :value="cnpj"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="18"
+                    placeholder="00.000.000/0000-00"
+                    autocomplete="off"
+                    @input="cnpj = maskCnpj(($event.target as HTMLInputElement).value)"
+                  />
+                </label>
+              </div>
+            </template>
+            <label class="night_field">
+              <span class="night_field__label">Telefone</span>
+              <input
+                v-model="telefone"
+                type="tel"
+                inputmode="numeric"
+                maxlength="15"
+                placeholder="(11) 99999-8888"
+                autocomplete="tel"
+                @input="onTelefoneInput"
+              />
+            </label>
+          </div>
+
+          <h2 class="checkout_card__title checkout_card__title--spaced">Pagamento com cartão</h2>
+
+          <div class="pay_form">
+            <label class="night_field">
+              <span class="night_field__label">Nome no cartão</span>
+              <input
+                v-model="card.holder"
+                type="text"
+                placeholder="Como está no cartão"
+                autocomplete="cc-name"
+              />
+            </label>
+            <label class="night_field">
+              <span class="night_field__label">Número do cartão</span>
+              <input
+                v-model="card.number"
+                type="text"
+                inputmode="numeric"
+                maxlength="19"
+                placeholder="0000 0000 0000 0000"
+                autocomplete="cc-number"
+                @input="onCardNumberInput"
+              />
+            </label>
+            <div class="pay_form__row">
+              <label class="night_field">
+                <span class="night_field__label">Mês</span>
+                <input v-model="card.expMonth" type="text" inputmode="numeric" maxlength="2" placeholder="MM" />
+              </label>
+              <label class="night_field">
+                <span class="night_field__label">Ano</span>
+                <input v-model="card.expYear" type="text" inputmode="numeric" maxlength="4" placeholder="AAAA" />
+              </label>
+              <label class="night_field">
+                <span class="night_field__label">CVV</span>
+                <input
+                  v-model="card.cvv"
+                  type="text"
+                  inputmode="numeric"
+                  maxlength="4"
+                  placeholder="123"
+                  autocomplete="cc-csc"
+                />
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <aside class="checkout_card checkout_summary" aria-label="Resumo da compra">
+          <h2 class="checkout_card__title">Resumo da compra</h2>
+
+          <div class="summary_plan">
+            <div>
+              <strong>{{ planoSelecionado.nome }}</strong>
+              <span>{{ periodicidade === 'anual' ? 'Assinatura anual' : 'Assinatura mensal' }}</span>
+            </div>
+            <span v-if="periodicidade === 'anual' && descontoAnual > 0" class="summary_badge">{{ descontoAnual }}% OFF</span>
+          </div>
+
+          <ul class="summary_features">
+            <li>Até {{ planoSelecionado.max_usuarios }} usuários</li>
+            <li>{{ formatGB(planoSelecionado.armazenamento_bytes) }} de armazenamento</li>
+          </ul>
+
+          <dl class="summary_lines">
+            <div>
+              <dt>Plano</dt>
+              <dd>{{ formatBRL(valorPorMes(planoSelecionado)) }}/mês</dd>
+            </div>
+            <div>
+              <dt>Cobrança</dt>
+              <dd>{{ periodicidade === 'anual' ? 'Uma vez por ano' : 'Todo mês' }}</dd>
+            </div>
+            <div v-if="periodicidade === 'anual'">
+              <dt>Equivale a</dt>
+              <dd>{{ formatBRL(valorPorMes(planoSelecionado)) }} por mês</dd>
+            </div>
+          </dl>
+
+          <div class="summary_total">
+            <span>Total hoje</span>
+            <strong>{{ formatBRL(valorCobrado(planoSelecionado)) }}</strong>
+          </div>
+
+          <button type="submit" class="night_btn night_btn--full" :disabled="processando">
+            <LoadingSpinner v-if="processando" />
+            <span v-else>PAGAR {{ formatBRL(valorCobrado(planoSelecionado)) }}</span>
+          </button>
+
+          <button type="button" class="summary_change" @click="voltarParaPlanos">Trocar de plano</button>
+
+          <div class="pagbank_banner">
+            <span class="pagbank_logo">
+              <img :src="logoPagbank" alt="PagBank" />
+            </span>
+            <div>
+              <strong>Pagamento protegido pelo PagBank</strong>
+              <span>Os dados do cartão são criptografados no seu navegador e não passam pelo nosso servidor.</span>
+            </div>
+          </div>
+
+          <div class="card_brands" aria-label="Bandeiras aceitas">
+            <span class="brand_box"><img :src="logoVisa" alt="Visa" /></span>
+            <span class="brand_box"><img :src="logoMastercard" alt="Mastercard" /></span>
+            <span class="brand_box brand_box--round"><img :src="logoElo" alt="Elo" /></span>
+            <span class="brand_box brand_box--round"><img :src="logoAmex" alt="American Express" /></span>
+            <span class="brand_box"><img :src="logoHipercard" alt="Hipercard" /></span>
+          </div>
+        </aside>
       </form>
-
-      <p class="secure_note">
-        Os dados do cartão são criptografados no seu navegador e não passam pelo nosso servidor.
-      </p>
     </div>
 
-    <div v-else class="contratar_shell">
+    <div v-else class="contratar_shell contratar_shell--planos">
       <button
         type="button"
         class="back_btn"
@@ -402,7 +478,9 @@ async function pagar() {
         <img class="back_btn__icon" :src="iconChevronLeft" alt="Ícone de seta para voltar" width="40" height="40" />
       </button>
 
-      <img class="contratar_logo" :src="logoAkidocs" alt="Logotipo AkiDocs" />
+      <div class="logo_chip">
+        <img class="contratar_logo" :src="logoAkidocs" alt="Logotipo AkiDocs" />
+      </div>
       <h1 class="contratar_title">Escolha seu plano</h1>
       <p v-if="authStore.me.teste_encerrado" class="contratar_subtitle contratar_subtitle--aviso">
         Seu teste grátis terminou. Escolha um plano para continuar usando o AkiDocs.
@@ -434,7 +512,13 @@ async function pagar() {
       <p v-else-if="planos.length === 0" class="contratar_loading">Nenhum plano disponível no momento.</p>
 
       <div v-else class="planos_grid">
-        <article v-for="plano in planos" :key="plano.id" class="plano_card">
+        <article
+          v-for="(plano, index) in planos"
+          :key="plano.id"
+          class="plano_card"
+          :class="{ 'plano_card--recomendado': ehRecomendado(index) }"
+        >
+          <span v-if="ehRecomendado(index)" class="plano_card__tag">Recomendado</span>
           <h2 class="plano_card__nome">{{ plano.nome }}</h2>
           <p class="plano_card__valor">
             {{ formatBRL(valorPorMes(plano)) }}<span>/mês</span>
@@ -448,10 +532,16 @@ async function pagar() {
           </p>
           <p v-if="plano.descricao" class="plano_card__desc">{{ plano.descricao }}</p>
           <ul class="plano_card__features">
-            <li>Até {{ plano.max_usuarios }} usuários</li>
-            <li>{{ formatGB(plano.armazenamento_bytes) }} de armazenamento</li>
+            <li>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              Até {{ plano.max_usuarios }} usuários
+            </li>
+            <li>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              {{ formatGB(plano.armazenamento_bytes) }} de armazenamento
+            </li>
           </ul>
-          <button type="button" class="night_btn" @click="selecionarPlano(plano)">
+          <button type="button" class="night_btn" :class="{ 'night_btn--ghost': !ehRecomendado(index) }" @click="selecionarPlano(plano)">
             CONTRATAR
           </button>
         </article>
@@ -464,288 +554,597 @@ async function pagar() {
 @import '@/styles/login-night-mobile.scss';
 
 .contratar_page {
-  --login-black: #0B1B2B;
-  --login-navy: #1F3A5F;
-  --login-gold: #B08D57;
-  --login-gray: #FFFCFF;
+  --cream: #f6f1e7;
+  --cream-dark: #efe6d4;
+  --paper: #fffdf8;
+  --ink: #12263a;
+  --muted: #5f7082;
+  --line: #e3d9c3;
+  --gold: #b08d57;
+  --gold-dark: #94744a;
+  --teal: #2f6f6d;
 
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  background: radial-gradient(circle at 85% 15%, rgba(176, 141, 87, 0.12) 0%, transparent 40%), linear-gradient(135deg, #0B1B2B 0%, #1F3A5F 100%);
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at 85% 8%, rgba(176, 141, 87, 0.16) 0%, transparent 34%),
+    linear-gradient(180deg, var(--cream) 0%, #fbf8f1 100%);
+  color: var(--ink);
   font-family: 'Inter', sans-serif;
-
-  @include login-mobile-gradient;
-  @include login-mobile-shell;
-
-  &__watermark {
-    position: absolute;
-    z-index: 0;
-    top: 80.28vh;
-    right: -1.82vw;
-    bottom: auto;
-    margin: 0;
-    font-size: clamp(90px, 24.07vh, 260px);
-    font-weight: 700;
-    line-height: 0.9;
-    color: rgba(255, 252, 255, 0.05);
-    pointer-events: none;
-    user-select: none;
-    white-space: nowrap;
-
-    @include login-mobile-watermark-hidden;
-  }
 }
 
 .contratar_shell {
   position: relative;
-  z-index: 2;
-  width: min(100%, 940px);
-  max-height: 100%;
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  padding: clamp(28px, 5vh, 56px) 20px 64px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: clamp(24px, 4vh, 48px) 18px;
-  box-sizing: border-box;
-  overflow-y: auto;
-  scrollbar-width: none;
 
   &--pay {
-    width: min(100%, 358px);
-    max-height: 100dvh;
-    padding-bottom: clamp(32px, 5vh, 48px);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    align-items: stretch;
   }
 }
 
+.logo_chip {
+  display: inline-flex;
+  padding: 12px 20px;
+  margin-bottom: 22px;
+  border-radius: 16px;
+  background: #0b1b2b;
+  box-shadow: 0 10px 24px rgba(11, 27, 43, 0.18);
+}
+
 .contratar_logo {
-  width: clamp(160px, 18vw, 200px);
+  width: 168px;
   height: auto;
-  margin-bottom: 24px;
+  display: block;
   object-fit: contain;
 }
 
 .contratar_title {
   margin: 0 0 8px;
-  font-family: 'Inter', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 1;
-  color: #f7f7f7;
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--ink);
   text-align: center;
 }
 
 .contratar_subtitle {
-  margin: 0 0 28px;
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  color: #f7f7f7;
+  margin: 0 0 26px;
+  max-width: 620px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--muted);
   text-align: center;
 
-  span {
-    font-weight: 700;
-    color: #f7f7f7;
-  }
-
   &--aviso {
-    max-width: 520px;
-    margin-bottom: 20px;
-    color: #d9b77e;
+    padding: 12px 18px;
+    border: 1px solid rgba(176, 141, 87, 0.45);
+    border-radius: 14px;
+    background: rgba(176, 141, 87, 0.12);
+    color: #7a5c2e;
+    font-weight: 600;
   }
 }
 
 .contratar_loading {
   margin: 24px 0 0;
-  font-family: 'Inter', sans-serif;
   font-size: 14px;
-  color: #f7f7f7;
-  opacity: 0.7;
+  color: var(--muted);
   text-align: center;
 }
+
+.sucesso_card,
+.checkout_card {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--paper);
+  box-shadow: 0 16px 36px rgba(74, 58, 32, 0.1);
+}
+
+.sucesso_card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 36px 32px;
+}
+
+/* ---------- Planos ---------- */
 
 .periodo_toggle {
   display: inline-flex;
   gap: 4px;
-  margin: 4px 0 20px;
+  margin: 2px 0 30px;
   padding: 4px;
+  border: 1px solid var(--line);
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--paper);
+  box-shadow: 0 8px 20px rgba(74, 58, 32, 0.08);
 
   button {
-    padding: 8px 18px;
+    padding: 9px 20px;
     border: 0;
     border-radius: 999px;
     background: transparent;
-    color: rgba(255, 252, 255, 0.75);
-    font-family: 'Inter', sans-serif;
+    color: var(--muted);
+    font: inherit;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
 
     small {
       margin-left: 6px;
-      padding: 2px 6px;
+      padding: 2px 7px;
       border-radius: 999px;
-      background: rgba(127, 200, 169, 0.2);
-      color: #7fc8a9;
+      background: rgba(47, 111, 109, 0.14);
+      color: var(--teal);
       font-size: 10px;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     &.is-ativo {
-      background: #fffcff;
-      color: #0b1b2b;
+      background: #0b1b2b;
+      color: #fffcff;
     }
   }
 }
 
 .planos_grid {
   width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 22px;
+  align-items: stretch;
 }
 
 .plano_card {
-  width: 270px;
-  max-width: 100%;
-  padding: 28px 24px;
-  border-radius: 24px;
-  background: var(--night-surface, #132438);
-  border: 1px solid var(--night-surface-border, rgba(176, 141, 87, 0.18));
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 32px 26px 28px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--paper);
+  box-shadow: 0 12px 28px rgba(74, 58, 32, 0.08);
   box-sizing: border-box;
+  text-align: center;
+
+  &--recomendado {
+    border: 2px solid var(--gold);
+    box-shadow: 0 20px 42px rgba(146, 116, 74, 0.22);
+    transform: translateY(-6px);
+  }
+
+  &__tag {
+    position: absolute;
+    top: -13px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 5px 16px;
+    border-radius: 999px;
+    background: var(--gold);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
 
   &__nome {
     margin: 0 0 10px;
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    color: #f7f7f7;
-    text-align: center;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: var(--ink);
     text-transform: uppercase;
   }
 
   &__valor {
-    margin: 0 0 16px;
-    font-family: 'Inter', sans-serif;
-    font-size: 28px;
-    font-weight: 700;
+    margin: 0 0 6px;
+    font-size: 30px;
+    font-weight: 800;
     line-height: 1;
-    color: #f7f7f7;
-    text-align: center;
+    color: var(--ink);
 
     span {
       margin-left: 4px;
       font-size: 14px;
-      font-weight: 400;
-      color: #f7f7f7;
-      opacity: 0.7;
+      font-weight: 500;
+      color: var(--muted);
     }
   }
 
   &__cobranca {
-    margin: -8px 0 14px;
-    font-family: 'Inter', sans-serif;
+    margin: 0 0 14px;
     font-size: 12px;
-    color: #7fc8a9;
-    text-align: center;
+    font-weight: 600;
+    color: var(--teal);
   }
 
   &__desc {
     margin: 0 0 16px;
-    font-family: 'Inter', sans-serif;
     font-size: 13px;
-    font-weight: 400;
-    color: rgba(255, 252, 255, 0.75);
-    text-align: center;
+    line-height: 1.5;
+    color: var(--muted);
   }
 
   &__features {
-    list-style: none;
     width: 100%;
+    flex: 1;
     margin: 0 0 24px;
     padding: 0;
-    flex: 1;
+    list-style: none;
 
     li {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       padding: 10px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      font-family: 'Inter', sans-serif;
+      border-bottom: 1px solid #f0e8d5;
       font-size: 14px;
-      font-weight: 400;
-      color: #FFFCFF;
-      text-align: center;
+      color: var(--ink);
+
+      svg {
+        flex-shrink: 0;
+        color: var(--gold);
+      }
     }
   }
 }
 
-.night_btn {
-  width: auto;
-  min-width: 168px;
-  max-width: 100%;
-  min-height: 49px;
-  padding: 0 24px;
-  border: none;
-  border-radius: 30px;
-  background: #B08D57;
-  color: #ffffff;
-  box-shadow: 0 4px 14px rgba(176, 141, 87, 0.3);
-  font-family: 'Inter', sans-serif;
-  font-size: 16px;
+/* ---------- Aquisição ---------- */
+
+.checkout_head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.checkout_grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr);
+  gap: 24px;
+  align-items: start;
+  width: 100%;
+}
+
+.checkout_card {
+  padding: 28px;
+
+  &__title {
+    margin: 0 0 18px;
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--ink);
+
+    &--spaced {
+      margin-top: 28px;
+    }
+  }
+}
+
+.checkout_summary {
+  position: sticky;
+  top: 24px;
+}
+
+.summary_plan {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+
+  strong {
+    display: block;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--ink);
+  }
+
+  span {
+    display: block;
+    margin-top: 3px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+}
+
+.summary_badge {
+  flex-shrink: 0;
+  margin-top: 0 !important;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(47, 111, 109, 0.14);
+  color: var(--teal) !important;
+  font-size: 11px !important;
+  font-weight: 800;
+}
+
+.summary_features {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 7px 0;
+    font-size: 14px;
+    color: var(--ink);
+  }
+}
+
+.summary_lines {
+  margin: 14px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 7px 0;
+    font-size: 14px;
+  }
+
+  dt {
+    color: var(--muted);
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 600;
+    color: var(--ink);
+    text-align: right;
+  }
+}
+
+.summary_total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 14px;
+  padding: 16px 0 20px;
+  border-top: 1px solid var(--line);
+
+  span {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  strong {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+}
+
+.summary_change {
+  display: block;
+  margin: 12px auto 0;
+  padding: 4px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--gold-dark);
+  font: inherit;
+  font-size: 13px;
   font-weight: 700;
-  line-height: 1;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.pagbank_banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 22px;
+  padding: 16px;
+  border-radius: 14px;
+  background: #0b1b2b;
+  color: #fffcff;
+
+  strong {
+    display: block;
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  div span {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: rgba(255, 252, 255, 0.78);
+  }
+}
+
+.pagbank_logo {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #fff;
+
+  img {
+    display: block;
+    width: 92px;
+    height: auto;
+  }
+}
+
+.card_brands {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.brand_box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fff;
+  box-sizing: border-box;
+
+  img {
+    display: block;
+    width: auto;
+    max-width: 76px;
+    height: 22px;
+    object-fit: contain;
+  }
+
+  &--round img {
+    height: 28px;
+  }
+}
+
+/* ---------- Formulário ---------- */
+
+.pay_form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  &__row {
+    display: flex;
+    gap: 12px;
+  }
+
+  &__aviso {
+    margin: 0;
+    padding: 12px 14px;
+    border: 1px solid rgba(176, 141, 87, 0.45);
+    border-radius: 12px;
+    background: rgba(176, 141, 87, 0.1);
+    color: #7a5c2e;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.45;
+  }
+}
+
+.night_field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  cursor: text;
+
+  &__label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  input {
+    width: 100%;
+    height: 48px;
+    padding: 0 16px;
+    border: 1px solid #d9cfb6;
+    border-radius: 12px;
+    background: #fff;
+    outline: none;
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(176, 141, 87, 0.22);
+    }
+
+    &::placeholder {
+      color: #9aa8b5;
+    }
+
+    @include login-input-autofill(#12263a);
+  }
+}
+
+.night_btn {
+  min-width: 190px;
+  min-height: 49px;
+  padding: 0 26px;
+  border: none;
+  border-radius: 999px;
+  background: var(--gold);
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(176, 141, 87, 0.35);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 800;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease, transform 0.2s ease;
 
   &:hover:not(:disabled) {
-    background: #C29F68;
+    background: var(--gold-dark);
     transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(176, 141, 87, 0.4);
   }
 
   &:disabled {
     opacity: 0.7;
     cursor: wait;
   }
+
+  &--ghost {
+    border: 1px solid #0b1b2b;
+    background: transparent;
+    color: #0b1b2b;
+    box-shadow: none;
+
+    &:hover:not(:disabled) {
+      background: #0b1b2b;
+      color: #fffcff;
+    }
+  }
+
+  &--full {
+    width: 100%;
+  }
 }
 
 .back_btn {
-  position: fixed;
+  position: absolute;
   z-index: 10;
-  top: clamp(24px, 3.5vh, 48px);
-  left: clamp(16px, 3vw, 48px);
-  width: 66px;
-  height: 66px;
+  top: 22px;
+  left: 20px;
+  width: 52px;
+  height: 52px;
   padding: 0;
   border: none;
-  background: transparent;
+  border-radius: 50%;
+  background: #0b1b2b;
+  box-shadow: 0 8px 20px rgba(11, 27, 43, 0.22);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: opacity 0.15s ease;
-
-  @include login-mobile-back-btn;
-
-  &:hover {
-    opacity: 0.85;
-  }
 
   &__circle {
     position: absolute;
@@ -757,114 +1156,38 @@ async function pagar() {
 
   &__icon {
     position: relative;
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     transform: rotate(90deg);
     object-fit: contain;
-
-    @include login-mobile-back-btn-icon;
   }
 }
 
-.pay_form {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-
-  &__row {
-    width: 100%;
-    display: flex;
-    gap: 10px;
+@media (max-width: 900px) {
+  .checkout_grid {
+    grid-template-columns: 1fr;
   }
 
-  &__aviso {
-    width: 100%;
-    margin: 0;
-    color: #d9b77e;
-    font-size: 14px;
-    line-height: 1.4;
-    text-align: left;
+  .checkout_summary {
+    position: static;
   }
-}
-
-.night_field {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 6px;
-  cursor: text;
-
-  &__label {
-    padding-left: 20px;
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    color: rgba(255, 252, 255, 0.85);
-    text-transform: uppercase;
-  }
-
-  input {
-    width: 100%;
-    height: 49px;
-    padding: 0 22px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 30px;
-    background: rgba(255, 255, 255, 0.08);
-    outline: none;
-    color: #fff;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    box-sizing: border-box;
-    transition: all 0.2s ease;
-
-    &:focus {
-      border-color: #B08D57;
-      box-shadow: 0 0 0 3px rgba(176, 141, 87, 0.25);
-    }
-
-    &::placeholder {
-      color: rgba(255, 255, 255, 0.65);
-    }
-
-    @include login-input-autofill(#fff);
-  }
-}
-
-.secure_note {
-  margin: 20px 0 0;
-  padding: 0 8px;
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.5;
-  color: rgba(255, 252, 255, 0.8);
-  text-align: center;
 }
 
 @media (max-width: 768px) {
   .contratar_shell {
-    width: 100%;
-    max-width: 358px;
-    min-height: 100dvh;
-    margin: 0 auto;
-    padding: 90px 18px 40px;
+    padding: 84px 16px 48px;
   }
 
-  .contratar_logo {
-    width: 168px;
-    margin-bottom: 32px;
-  }
-
-  .plano_card {
-    width: 100%;
+  .plano_card--recomendado {
+    transform: none;
   }
 
   .pay_form__row {
     flex-direction: column;
+  }
+
+  .checkout_card {
+    padding: 22px 18px;
   }
 }
 </style>
