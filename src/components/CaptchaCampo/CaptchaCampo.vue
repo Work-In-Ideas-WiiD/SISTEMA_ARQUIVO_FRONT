@@ -1,117 +1,110 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { api } from '@/services/http/api'
 
-const siteKey = (import.meta.env.VITE_TURNSTILE_SITE_KEY || '') as string
-const id = ref('')
-const resposta = ref('')
-const imagem = ref('')
+const siteKey = (import.meta.env.VITE_RECAPTCHA_SITE_KEY || '') as string
 const token = ref('')
+const aviso = ref('')
 const caixa = ref<HTMLElement | null>(null)
+let widget = -1
+
+type Recaptcha = {
+  render: (el: HTMLElement, opcoes: Record<string, unknown>) => number
+  reset: (id?: number) => void
+}
+
+function google(): Recaptcha | undefined {
+  return (window as unknown as { grecaptcha?: Recaptcha }).grecaptcha
+}
 
 function dados() {
-  if (siteKey) return { turnstile_token: token.value }
-  return { captcha_id: id.value, captcha_resposta: resposta.value }
+  return { recaptcha_token: token.value }
 }
 
-async function carregarImagem() {
-  const { data } = await api.get('/captcha')
-  id.value = data.id
-  imagem.value = data.imagem
-  resposta.value = ''
+function exigir() {
+  aviso.value = token.value ? '' : 'Confirme que você não é um robô.'
+  return token.value !== ''
 }
 
-function desenharTurnstile() {
-  const turnstile = (window as unknown as { turnstile?: { render: Function } }).turnstile
-  if (!turnstile || !caixa.value) return
-  caixa.value.innerHTML = ''
-  turnstile.render(caixa.value, {
+function desenhar() {
+  const recaptcha = google()
+  if (!recaptcha || !caixa.value || widget >= 0) return
+  widget = recaptcha.render(caixa.value, {
     sitekey: siteKey,
     theme: 'dark',
+    hl: 'pt-BR',
     callback: (valor: string) => {
       token.value = valor
+      aviso.value = ''
+    },
+    'expired-callback': () => {
+      token.value = ''
+    },
+    'error-callback': () => {
+      token.value = ''
     }
   })
 }
 
 function carregarScript(): Promise<void> {
-  return new Promise((resolve) => {
-    if ((window as unknown as { turnstile?: unknown }).turnstile) {
+  return new Promise((resolve, reject) => {
+    if (google()) {
       resolve()
       return
     }
-    const existente = document.querySelector('script[data-turnstile]')
+    const existente = document.querySelector('script[data-recaptcha]')
     if (existente) {
       existente.addEventListener('load', () => resolve())
+      existente.addEventListener('error', () => reject())
       return
     }
     const script = document.createElement('script')
-    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
+    script.src = 'https://www.google.com/recaptcha/api.js?hl=pt-BR&render=explicit'
     script.async = true
-    script.dataset.turnstile = '1'
+    script.dataset.recaptcha = '1'
     script.onload = () => resolve()
+    script.onerror = () => reject()
     document.head.appendChild(script)
   })
 }
 
 async function recarregar() {
   token.value = ''
-  if (siteKey) {
-    await carregarScript()
-    desenharTurnstile()
-    return
-  }
-  await carregarImagem()
+  if (widget >= 0) google()?.reset(widget)
 }
 
-onMounted(recarregar)
+onMounted(async () => {
+  if (!siteKey) return
+  try {
+    await carregarScript()
+    const pronto = google() as (Recaptcha & { ready?: (fn: () => void) => void }) | undefined
+    if (pronto?.ready) pronto.ready(desenhar)
+    else desenhar()
+  } catch {
+    aviso.value = 'Não foi possível carregar o captcha do Google.'
+  }
+})
 
-defineExpose({ dados, recarregar })
+defineExpose({ dados, recarregar, exigir })
 </script>
 
 <template>
   <div class="captcha">
-    <div v-if="siteKey" ref="caixa" />
-    <template v-else>
-      <img v-if="imagem" :src="imagem" alt="Código de verificação" width="180" height="56" />
-      <button type="button" @click="recarregar">Trocar código</button>
-      <input v-model="resposta" type="text" maxlength="5" autocomplete="off" placeholder="Digite o código" />
-    </template>
+    <p v-if="!siteKey" class="captcha__aviso">O captcha do Google ainda não foi configurado.</p>
+    <div ref="caixa" />
+    <small v-if="aviso">{{ aviso }}</small>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .captcha {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
   width: 100%;
 
-  img {
-    border-radius: 8px;
-    border: 1px solid rgba(176, 141, 87, 0.4);
-  }
-
-  button {
-    border: 0;
-    background: transparent;
-    color: #d9b77e;
-    font: inherit;
+  small,
+  &__aviso {
+    display: block;
+    margin-top: 6px;
+    color: #e07a7a;
     font-size: 12px;
-    cursor: pointer;
-    text-decoration: underline;
-  }
-
-  input {
-    flex: 1;
-    min-width: 120px;
-    border: 1px solid rgba(176, 141, 87, 0.35);
-    border-radius: 10px;
-    background: transparent;
-    color: #fffcff;
-    padding: 10px 12px;
-    font: inherit;
   }
 }
 </style>

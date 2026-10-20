@@ -10,9 +10,7 @@ export interface IRegistroModel {
   nome_empresa: string
   cpf?: string
   cnpj?: string
-  captcha_id?: string
-  captcha_resposta?: string
-  turnstile_token?: string
+  recaptcha_token?: string
   website?: string
 }
 

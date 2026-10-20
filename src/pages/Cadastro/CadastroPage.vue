@@ -84,7 +84,8 @@ function revalidar() {
 async function handleSubmit() {
   tentouEnviar.value = true
   erros.value = validar()
-  if (Object.keys(erros.value).length) {
+  const captchaOk = captcha.value?.exigir() ?? false
+  if (Object.keys(erros.value).length || !captchaOk) {
     toast.error('Confira os campos destacados.')
     return
   }

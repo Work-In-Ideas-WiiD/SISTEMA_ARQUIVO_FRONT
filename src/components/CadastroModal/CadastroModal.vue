@@ -78,6 +78,7 @@ function validar() {
 
 async function enviar() {
   erros.value = validar()
+  if (!captcha.value?.exigir()) return
   if (Object.keys(erros.value).length) return
   enviando.value = true
   try {
