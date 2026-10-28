@@ -85,6 +85,7 @@ export interface IGetAssinaturasSaasRes {
   per_page: number
   to: number
   total: number
+  cadastros?: number
 }
 
 export interface IAssinaturasSaasFilters {

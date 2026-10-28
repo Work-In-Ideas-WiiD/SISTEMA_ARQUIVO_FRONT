@@ -34,6 +34,7 @@ const criadoAte = ref('')
 const proximaDe = ref('')
 const proximaAte = ref('')
 const planos = ref<IPlano[]>([])
+const cadastros = ref<number | null>(null)
 
 const statusOpen = ref(false)
 const planoOpen = ref(false)
@@ -126,6 +127,7 @@ async function getData(pageParam: number) {
     pages.value = data.last_page
     itens.value = data.data
     noContent.value = data.data.length === 0
+    if (typeof data.cadastros === 'number') cadastros.value = data.cadastros
   } catch (error) {
     console.error(error)
     toast.error(getApiErrorMessage(error, 'Erro ao carregar assinaturas'))
@@ -223,7 +225,12 @@ function statusClass(s?: string) {
       >
         <img :src="iconChevronLeft" width="24" height="24" alt="" />
       </button>
-      <h2 class="saas-page__title dashboard_title">ASSINATURAS SAAS</h2>
+      <div>
+        <h2 class="saas-page__title dashboard_title">ASSINATURAS SAAS</h2>
+        <p v-if="cadastros !== null" class="saas-page__cadastros">
+          {{ cadastros }} cadastros na plataforma
+        </p>
+      </div>
     </div>
 
     <div class="saas-panel">
@@ -450,6 +457,12 @@ function statusClass(s?: string) {
 
   &__title {
     margin: 0;
+  }
+
+  &__cadastros {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: rgba(255, 252, 255, 0.72);
   }
 }
 

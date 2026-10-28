@@ -8,6 +8,7 @@ import type { IUserProps, TUserTypes } from '@/types/auth'
 import type { IPostContratoRes } from '@/types/contratos'
 import { postRegistro, type IRegistroModel } from '@/services/http/conta'
 import { trackSignUp, trackLogin } from '@/utils/tracking'
+import { dispositivoDesteNavegador } from '@/utils/acessoDireto'
 
 const defaultUser: IUserProps = {
   id: '',
@@ -73,6 +74,83 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  function gravarSessao(token: string) {
+    setAuthToken(token)
+    Cookies.set('ana_lucia.token', token, {
+      expires: 1 / 24,
+      path: '/',
+      sameSite: 'strict',
+      secure: window.location.protocol === 'https:'
+    })
+  }
+
+  function gravarAcesso(acesso: string) {
+    Cookies.set('ana_lucia.acesso', acesso, {
+      expires: 30,
+      path: '/',
+      sameSite: 'strict',
+      secure: window.location.protocol === 'https:'
+    })
+  }
+
+  function destinoDepoisDoLogin(loginData: { requires_payment?: boolean; assinatura_status?: string | null }) {
+    if (loginData.requires_payment && loginData.assinatura_status !== 'teste_encerrado') {
+      return '/contratar'
+    }
+    return '/dashboard/arquivos'
+  }
+
+  async function entrarPelaConfirmacao(loginData: {
+    access_token: string
+    acesso?: string
+    requires_payment?: boolean
+    assinatura_status?: string | null
+  }) {
+    gravarSessao(loginData.access_token)
+    if (loginData.acesso) gravarAcesso(loginData.acesso)
+    try {
+      const { data: user } = await api.post('/auth/me')
+      userRole.value = user.type
+      setUserData(user)
+    } catch (error) {
+      console.error(error)
+    }
+    trackLogin('email')
+    window.location.assign(destinoDepoisDoLogin(loginData))
+  }
+
+  let restaurando: Promise<string | null> | null = null
+
+  async function restaurarAcesso() {
+    if (restaurando) return restaurando
+    restaurando = restaurarAcessoAgora().finally(() => {
+      restaurando = null
+    })
+    return restaurando
+  }
+
+  async function restaurarAcessoAgora() {
+    const acesso = Cookies.get('ana_lucia.acesso')
+    const dispositivo = dispositivoDesteNavegador(false)
+    if (!acesso || !dispositivo) return null
+    try {
+      const { data } = await api.post('/auth/acesso', { acesso, dispositivo })
+      gravarSessao(data.access_token)
+      if (data.acesso) gravarAcesso(data.acesso)
+      try {
+        const { data: user } = await api.post('/auth/me')
+        userRole.value = user.type
+        setUserData(user)
+      } catch (error) {
+        console.error(error)
+      }
+      return destinoDepoisDoLogin(data)
+    } catch (error) {
+      Cookies.remove('ana_lucia.acesso')
+      return null
+    }
+  }
+
   async function signIn(email: string, password: string) {
     try {
       handleFetching(true)
@@ -97,11 +175,7 @@ export const useAuthStore = defineStore('auth', () => {
         return 'confirmar' as const
       }
       // Teste encerrado entra no sistema e o aviso trava o uso. Outros bloqueios vão para o pagamento.
-      if (loginData.requires_payment && loginData.assinatura_status !== 'teste_encerrado') {
-        router.push('/contratar')
-      } else {
-        router.push('/dashboard/arquivos')
-      }
+      router.push(destinoDepoisDoLogin(loginData))
     } catch (err: any) {
       console.error(err)
       handleFetching(false)
@@ -138,12 +212,7 @@ export const useAuthStore = defineStore('auth', () => {
       
       handleFetching(false)
       trackLogin('portal_cliente')
-      if (loginData.requires_payment && loginData.assinatura_status !== 'teste_encerrado') {
-        router.push('/contratar')
-      } else {
-        // Cliente: pastas ficam em Arquivos (visual do Figma)
-        router.push('/dashboard/arquivos')
-      }
+      router.push(destinoDepoisDoLogin(loginData))
     } catch (err) {
       console.error(err)
       handleFetching(false)
@@ -190,7 +259,12 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function signOut() {
+    const acesso = Cookies.get('ana_lucia.acesso')
+    if (acesso) {
+      api.post('/auth/acesso/encerrar', { acesso }).catch(() => undefined)
+    }
     Cookies.remove('ana_lucia.token')
+    Cookies.remove('ana_lucia.acesso')
     me.value = { ...defaultUser }
     userRole.value = ''
     setAuthToken('')
@@ -225,6 +299,8 @@ export const useAuthStore = defineStore('auth', () => {
     signInCustomer,
     signUp,
     signOut,
+    entrarPelaConfirmacao,
+    restaurarAcesso,
     refreshUserData,
     checkAuth,
     setNewContract,

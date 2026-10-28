@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
+import Cookies from 'js-cookie'
 import { trackPageView } from '@/utils/tracking'
+import { useAuthStore } from '@/stores/auth'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -461,18 +463,37 @@ const router = createRouter({
   }
 })
 
-// Navigation guard para autenticação
-router.beforeEach((to, _from, next) => {
-  const token = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('ana_lucia.token='))
-    ?.split('=')[1]
-
-  if (to.meta.requiresAuth && !token) {
-    next({ name: 'login' })
-  } else {
+// Sessão de 1 hora, ou o cookie de 30 dias da confirmação de e-mail.
+router.beforeEach(async (to, _from, next) => {
+  if (to.name === 'confirmar-email') {
     next()
+    return
   }
+
+  const entraSozinho = to.name === 'landing' || to.name === 'login' || Boolean(to.meta.requiresAuth)
+  if (!Cookies.get('ana_lucia.token') && Cookies.get('ana_lucia.acesso') && entraSozinho) {
+    const destino = await useAuthStore().restaurarAcesso()
+    if (destino) {
+      if (to.meta.requiresAuth) {
+        next()
+        return
+      }
+      next(destino)
+      return
+    }
+  }
+
+  if (to.meta.requiresAuth && !Cookies.get('ana_lucia.token')) {
+    next({ name: 'login' })
+    return
+  }
+
+  if ((to.name === 'landing' || to.name === 'login') && Cookies.get('ana_lucia.token')) {
+    next('/dashboard/arquivos')
+    return
+  }
+
+  next()
 })
 
 // Rastreamento de visualizações de página virtuais no GA4 em transições do SPA

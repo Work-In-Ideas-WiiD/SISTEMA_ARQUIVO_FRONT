@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { api } from '@/services/http/api'
 import { getApiErrorMessage } from '@/utils/apiError'
+import { useAuthStore } from '@/stores/auth'
+import { dispositivoDesteNavegador } from '@/utils/acessoDireto'
 import logoAkidocs from '@/assets/imgs/login/logo-akidocs-white.png'
 
 const route = useRoute()
+const auth = useAuthStore()
 const mensagem = ref('Confirmando seu e-mail…')
 const ok = ref(false)
 
@@ -15,10 +18,18 @@ onMounted(async () => {
     mensagem.value = 'Link incompleto. Peça um novo e-mail de confirmação.'
     return
   }
+  const dispositivo = dispositivoDesteNavegador()
+  if (!dispositivo) {
+    mensagem.value = 'Não foi possível abrir o acesso neste navegador. Tente de novo.'
+    return
+  }
   try {
-    const { data } = await api.post('/email/confirmar', { token })
+    const { data } = await api.post('/email/confirmar', { token, dispositivo })
     ok.value = true
-    mensagem.value = data.message || 'E-mail confirmado. Você já pode entrar.'
+    mensagem.value = 'E-mail confirmado. Abrindo a plataforma…'
+    if (data.access_token) {
+      await auth.entrarPelaConfirmacao(data)
+    }
   } catch (error) {
     mensagem.value = getApiErrorMessage(error, 'Este link não vale mais. Peça um novo e-mail de confirmação.')
   }
@@ -30,7 +41,6 @@ onMounted(async () => {
     <img :src="logoAkidocs" alt="AkiDocs" width="160" />
     <h1>{{ ok ? 'E-mail confirmado' : 'Confirmação' }}</h1>
     <p>{{ mensagem }}</p>
-    <RouterLink v-if="ok" to="/login">IR PARA O LOGIN</RouterLink>
   </main>
 </template>
 
@@ -57,16 +67,6 @@ onMounted(async () => {
     max-width: 420px;
     margin: 0;
     line-height: 1.5;
-  }
-
-  a {
-    margin-top: 8px;
-    background: #b08d57;
-    color: #0b1b2b;
-    text-decoration: none;
-    font-weight: 700;
-    border-radius: 999px;
-    padding: 12px 18px;
   }
 }
 </style>
