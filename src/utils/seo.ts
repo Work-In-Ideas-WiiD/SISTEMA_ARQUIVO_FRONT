@@ -9,7 +9,7 @@ export interface ISeoOptions {
 }
 
 const DEFAULT_ORIGIN = typeof window !== 'undefined' ? window.location.origin : 'https://akidocs.com.br'
-const DEFAULT_IMAGE = `${DEFAULT_ORIGIN}/logo-akidocs-white.png`
+const DEFAULT_IMAGE = `${DEFAULT_ORIGIN}/og-image.jpg`
 
 /**
  * Atualiza dinamicamente as meta tags da página para SEO, Open Graph, Twitter e Schema.org
